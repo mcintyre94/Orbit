@@ -1,9 +1,13 @@
 import { useState } from 'react'
 import reactLogo from '../assets/react.svg'
 import './App.css'
+import { getQueryParamsFromSearchParams } from './types/queryParams';
 
 function App() {
   const [count, setCount] = useState(0)
+
+  const query = new URLSearchParams(window.location.search);
+  const params = getQueryParamsFromSearchParams(query);
 
   return (
     <div className="App">
@@ -15,8 +19,11 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      <h1>Vite + React 2</h1>
+      <h1>Multiwallet</h1>
       <div className="card">
+        <p>View: {params.view}</p>
+        <p>Tab ID: {params.tabId}</p>
+        <p>Request ID: {params.requestId}</p>
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button>
