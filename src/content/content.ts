@@ -15,7 +15,8 @@ script.remove();
 
 /** Receive messages from the page */
 window.addEventListener("message", (event) => {
-  console.log({ event })
+  if(!event.isTrusted) return; 
+  console.log('received message in content', { event })
   chrome.runtime.sendMessage(event.data);
   console.log('sent');
 }, false);
