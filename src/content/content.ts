@@ -13,7 +13,7 @@ const element = document.head || document.documentElement;
 element.prepend(script);
 script.remove();
 
-/** Receive messages from the page */
+/** Receive messages from the page and forward to background unchanged */
 window.addEventListener("message", (event) => {
   if(!event.isTrusted) return; 
   console.log('received message in content', { event })

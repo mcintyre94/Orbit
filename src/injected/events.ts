@@ -1,9 +1,9 @@
-type InjectedEvent = {
+type InjectedEventBase = {
     origin: 'injected',
     requestId: number,
 }
 
-export type RequestConnectionEvent = InjectedEvent & {
+type RequestConnectionEvent = InjectedEventBase & {
     type: 'requestConnection',
 }
 
@@ -14,3 +14,5 @@ export function makeRequestConnectionEvent(requestId: number): RequestConnection
         type: 'requestConnection',
     }
 }
+
+export type InjectedEvent = RequestConnectionEvent
