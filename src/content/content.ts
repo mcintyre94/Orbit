@@ -1,5 +1,7 @@
 'use strict';
 
+import { BackgroundEvent } from '../background/events';
+import type { InjectedEvent } from '../injected/events';
 // @ts-ignore
 import injected from '../injected/injected?script&module';
 
@@ -14,24 +16,36 @@ element.prepend(script);
 script.remove();
 
 /** Receive messages from the page and forward to background unchanged */
-window.addEventListener("message", (event) => {
-  if(!event.isTrusted) return; 
-  console.log('received message in content', { event })
+window.addEventListener("message", (event: MessageEvent<InjectedEvent>) => {
+  if (!event.isTrusted) {
+    console.log('dropping untrusted event', event);
+    return;
+  }
+
+  // drop messages not from injected
+  if (event.data.origin !== 'injected') {
+    console.log('dropping event from origin', event.data.origin, event);
+    return;
+  }
+
+  console.log('forwarding event data from injected to background unchanged', event.data)
   chrome.runtime.sendMessage(event.data);
-  console.log('sent');
 }, false);
 
 /** Receive messages from the background */
 chrome.runtime.onMessage.addListener(
   function (request, sender, sendResponse) {
-    console.dir({ request, sender }, { depth: null });
-    sendResponse({ "success": true });
+    // TODO: do I need this/when?
+    // sendResponse({ "success": true });
 
-    if (request.origin === 'background') {
-      window.postMessage({
-        ...request,
-        origin: 'content',
-      })
+    const event = request as BackgroundEvent;
+
+    if (event.origin !== 'background') {
+      console.log('dropping event from origin', event.origin, event);
+      return;
     }
+
+    console.log('forwarding event data from background to injected unchanged', event)
+    window.postMessage(event);
   }
 );

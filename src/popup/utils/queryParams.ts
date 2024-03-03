@@ -1,4 +1,4 @@
-type QueryParams = {
+export type QueryParams = {
     view: 'home'
 } | {
     view: 'connect',
@@ -32,7 +32,7 @@ function getRequestId(requestId: string | null): number {
     return getNumberFromQuery(requestId, 'requestId');
 }
 
-export function getQueryParamsFromSearchParams(searchParams: URLSearchParams) {
+export function getQueryParamsFromSearchParams(searchParams: URLSearchParams): QueryParams {
     const viewString = searchParams.get('view');
     const view = getView(searchParams.get('view'));
     if(view === 'home') {

@@ -3,7 +3,8 @@ import { SOLANA_DEVNET_CHAIN, SOLANA_LOCALNET_CHAIN, SOLANA_MAINNET_CHAIN, SOLAN
 import { SolanaSignTransaction, SolanaSignTransactionFeature } from '@solana/wallet-standard-features';
 import { StandardConnect, StandardConnectFeature, StandardConnectMethod, StandardDisconnect, StandardDisconnectFeature, StandardDisconnectMethod, StandardEvents, StandardEventsFeature, StandardEventsListeners, StandardEventsNames, StandardEventsOnMethod, Wallet, WalletAccount, registerWallet } from '@wallet-standard/core';
 import { getBase58Encoder } from '@solana/codecs-strings';
-import { RequestConnectionEvent, makeRequestConnectionEvent } from './events';
+import { makeRequestConnectionEvent } from './events';
+import type { BackgroundEvent, ConnectionSubmitForwardedEvent } from '../background/events';
 
 class RequestManager {
     constructor() {
@@ -23,7 +24,7 @@ class RequestManager {
             reject = _reject;
         });
         this.#resolvers[requestId] = [resolve, reject];
-        return {requestId, promise};
+        return { requestId, promise };
     }
 
     // TODO: type this properly
@@ -51,7 +52,7 @@ class MultiWallet implements Wallet {
     readonly #base58Encoder = getBase58Encoder();
 
     readonly #requestManager = new RequestManager();
-    
+
     #accounts: WalletAccount[] = [];
 
     readonly #listeners: { [E in StandardEventsNames]?: StandardEventsListeners[E][] } = {};
@@ -95,6 +96,7 @@ class MultiWallet implements Wallet {
                 version: '1.0.0',
                 on: this.#on,
             },
+            // TODO: remove this (and SolanaSignTransactionFeature), but wallet-adapter example can't see us then
             [SolanaSignTransaction]: {
                 version: '1.0.0',
                 signTransaction: () => Promise.resolve([{ signedTransaction: new Uint8Array() }]),
@@ -112,16 +114,17 @@ class MultiWallet implements Wallet {
         // TODO: get them 
 
         // TODO: add a type here when I create the response type
-        const { requestId, promise } = this.#requestManager.addResolver();
+        const { requestId, promise } = this.#requestManager.addResolver<ConnectionSubmitForwardedEvent>();
         const requestConnectionEvent = makeRequestConnectionEvent(requestId);
         window.postMessage(requestConnectionEvent);
 
         console.log(`waiting on request ID ${requestId}`);
 
-        // TODO proper types for events
-        const { selectedAddresses } = await promise;
+        // const { selectedAddresses } = await promise;
+        const { address } = await promise;
 
-        const accounts: WalletAccount[] = this.makeAccounts(selectedAddresses);
+        // const accounts: WalletAccount[] = this.makeAccounts(selectedAddresses);
+        const accounts: WalletAccount[] = this.makeAccounts([address]);
 
         if (accounts === null) {
             throw new Error('The user rejected the request.');
@@ -166,12 +169,19 @@ class MultiWallet implements Wallet {
     registerWallet(wallet);
     console.log('registered!');
 
-    window.addEventListener("message", (event) => {
-        console.log("received in injected", { event })
-        if (event.data.event?.origin === "extension_popup") {
-            console.log(`resolving request ID ${event.data.event.requestId}`);
-            requestManager.resolve(event.data.event);
+    window.addEventListener("message", (event: MessageEvent<BackgroundEvent>) => {
+        if (!event.isTrusted) {
+            console.log('dropping untrusted event', event);
+            return;
         }
+
+        if (event.data.origin !== 'background') {
+            console.log('dropping event from origin', event.data.origin, event);
+            return;
+        }
+
+        console.log('resolving request', event.data);
+        requestManager.resolve(event.data);
     }, false);
 })();
 
