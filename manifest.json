@@ -3,7 +3,7 @@
     "name": "Multiwallet2",
     "version": "1.0.0",
     "action": {
-        "default_popup": "index.html"
+        "default_title": "Click to open"
     },
     "background": {
         "service_worker": "src/background/background.ts",
@@ -18,5 +18,11 @@
                 "*://*/*"
             ]
         }
+    ],
+    "side_panel": {
+        "default_path": "index.html"
+    },
+    "permissions": [
+        "sidePanel"
     ]
 }

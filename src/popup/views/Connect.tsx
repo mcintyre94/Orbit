@@ -22,6 +22,14 @@ export default function Connect({ tabId, requestId }: Props) {
         const address = event.currentTarget.elements.address1.value as Address
         console.log({ address });
         await chrome.runtime.sendMessage(makeConnectionSubmitEvent(tabId, requestId, address))
+
+        // if in panel, this will make sure if user opens it from action button
+        // then it'll open the expected home page
+        // TODO: doesn't seem to be working, idk why yet
+        await chrome.sidePanel.setOptions({ path: 'index.html' });
+
+        // close popup window, or hide sidebar panel
+        window.close();
     }, [tabId, requestId]);
 
     return (
