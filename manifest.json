@@ -23,6 +23,7 @@
         "default_path": "index.html"
     },
     "permissions": [
-        "sidePanel"
+        "sidePanel",
+        "storage"
     ]
 }

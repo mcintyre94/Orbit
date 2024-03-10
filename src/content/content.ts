@@ -1,9 +1,14 @@
 "use strict";
 
-import { BackgroundEvent } from "../background/events";
+import {
+  BackgroundEvent,
+  ConnectionSubmitForwardedEvent,
+  makeConnectionSubmitForwardedEvent,
+} from "../background/events";
 import type { InjectedEvent } from "../injected/events";
 // @ts-ignore
 import injected from "../injected/injected?script&module";
+import { getSavedConnection, saveConnection } from "../connections/storage";
 
 /** Inject the wallet into the page */
 const script = document.createElement("script");
@@ -18,7 +23,7 @@ script.remove();
 /** Receive messages from the page and forward to background unchanged */
 window.addEventListener(
   "message",
-  (event: MessageEvent<InjectedEvent>) => {
+  async (event: MessageEvent<InjectedEvent>) => {
     if (!event.isTrusted) {
       console.log("dropping untrusted event", event);
       return;
@@ -30,6 +35,31 @@ window.addEventListener(
       return;
     }
 
+    // if the message is connection request, check if we already have a connection
+    // if we do return that instead of passing through
+    if (event.data.type === "requestConnection") {
+      const origin = event.origin;
+      const existingAddresses = await getSavedConnection(origin);
+      if (existingAddresses && existingAddresses.length > 0) {
+        console.log("Found existing addresses for origin", {
+          origin,
+          existingAddresses,
+        });
+        // create a connection submit event with these addresses + send back to page
+        const newEvent: ConnectionSubmitForwardedEvent =
+          makeConnectionSubmitForwardedEvent({
+            requestId: event.data.requestId,
+            forOrigin: origin,
+            addresses: existingAddresses,
+          });
+
+        window.postMessage(newEvent);
+        return;
+      }
+    }
+
+    // for anything we can't handle directly, pass to background script
+
     console.log(
       "forwarding event data from injected to background unchanged",
       event.data
@@ -40,7 +70,11 @@ window.addEventListener(
 );
 
 /** Receive messages from the background */
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(async function (
+  request,
+  sender,
+  sendResponse
+) {
   // TODO: do I need this/when?
   // sendResponse({ "success": true });
 
@@ -51,12 +85,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     return;
   }
 
-  // TODO: store addresses for connect
   if (event.type === "connectionSubmitForwarded") {
     console.log("store addresses for origin", {
       forOrigin: event.forOrigin,
       addresses: event.addresses,
     });
+    await saveConnection(event.forOrigin, event.addresses);
   }
 
   console.log(

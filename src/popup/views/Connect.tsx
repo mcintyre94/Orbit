@@ -23,7 +23,6 @@ export default function Connect({ tabId, requestId, forOrigin }: Props) {
         event.preventDefault();
         // this is just temporary, no validation here
         const address = event.currentTarget.elements.address1.value as Address
-        console.log({ address });
         await chrome.runtime.sendMessage(makeConnectionSubmitEvent({
             tabId,
             requestId,
