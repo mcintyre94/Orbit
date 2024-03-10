@@ -1,11 +1,11 @@
 import './App.css'
 import { type QueryParams, getQueryParamsFromSearchParams } from './utils/queryParams';
+import Connect from './views/Connect';
 import Home from './views/Home';
-import Connect from './views/connect';
 
 function Inner({ params }: { params: QueryParams }) {
   if (params.view === 'connect') {
-    return <Connect tabId={params.tabId} requestId={params.requestId} />
+    return <Connect tabId={params.tabId} requestId={params.requestId} forOrigin={params.forOrigin} />
   } else {
     return <Home />
   }

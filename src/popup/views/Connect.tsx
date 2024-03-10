@@ -1,10 +1,11 @@
 import type { Address } from "@solana/web3.js";
-import { useCallback } from "react"
+import { useCallback, useMemo } from "react"
 import { makeConnectionSubmitEvent } from "../events";
 
 type Props = {
     tabId: number,
     requestId: number,
+    forOrigin: string,
 }
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -15,13 +16,20 @@ interface AddressFormElement extends HTMLFormElement {
     readonly elements: FormElements
 }
 
-export default function Connect({ tabId, requestId }: Props) {
+export default function Connect({ tabId, requestId, forOrigin }: Props) {
+    const decodedForOrigin = useMemo(() => decodeURIComponent(forOrigin), [forOrigin]);
+
     const onSubmit = useCallback(async (event: React.FormEvent<AddressFormElement>) => {
         event.preventDefault();
         // this is just temporary, no validation here
         const address = event.currentTarget.elements.address1.value as Address
         console.log({ address });
-        await chrome.runtime.sendMessage(makeConnectionSubmitEvent(tabId, requestId, address))
+        await chrome.runtime.sendMessage(makeConnectionSubmitEvent({
+            tabId,
+            requestId,
+            forOrigin,
+            addresses: [address]
+        }))
 
         // if in panel, this will make sure if user opens it from action button
         // then it'll open the expected home page
@@ -34,6 +42,8 @@ export default function Connect({ tabId, requestId }: Props) {
 
     return (
         <div>
+            <h3>Connect to {decodedForOrigin}</h3>
+
             <form onSubmit={onSubmit}>
                 <input type="text" name="address1" />
                 <button type="submit">

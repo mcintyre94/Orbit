@@ -1,18 +1,24 @@
 type InjectedEventBase = {
-    origin: 'injected',
-    requestId: number,
-}
+  origin: "injected";
+  requestId: number;
+};
 
 type RequestConnectionEvent = InjectedEventBase & {
-    type: 'requestConnection',
+  type: "requestConnection";
+};
+
+type RequestConnectionEventInput = {
+  requestId: number;
+};
+
+export function makeRequestConnectionEvent({
+  requestId,
+}: RequestConnectionEventInput): RequestConnectionEvent {
+  return {
+    origin: "injected",
+    requestId,
+    type: "requestConnection",
+  };
 }
 
-export function makeRequestConnectionEvent(requestId: number): RequestConnectionEvent {
-    return {
-        origin: 'injected',
-        requestId,
-        type: 'requestConnection',
-    }
-}
-
-export type InjectedEvent = RequestConnectionEvent
+export type InjectedEvent = RequestConnectionEvent;
