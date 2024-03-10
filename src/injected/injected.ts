@@ -26,11 +26,12 @@ import {
   registerWallet,
 } from "@wallet-standard/core";
 import { getBase58Encoder } from "@solana/codecs-strings";
-import { makeRequestConnectionEvent } from "./events";
+import { makeDisconnectEvent, makeRequestConnectionEvent } from "./events";
 import type {
   BackgroundEvent,
   ConnectionSubmitForwardedEvent,
 } from "../background/events";
+import { ContentEvent } from "../content/event";
 
 class RequestManager {
   constructor() {
@@ -148,21 +149,13 @@ class MultiWallet implements Wallet {
   }
 
   #connect: StandardConnectMethod = async ({ silent } = {}) => {
-    console.log("hello from connect");
-    // TODO: get them
-
-    // TODO: add a type here when I create the response type
     const { requestId, promise } =
       this.#requestManager.addResolver<ConnectionSubmitForwardedEvent>();
-    const requestConnectionEvent = makeRequestConnectionEvent({ requestId });
+    // TODO: support silent (return from storage or nothing)
+    const requestConnectionEvent = makeRequestConnectionEvent(requestId);
     window.postMessage(requestConnectionEvent);
 
-    console.log(`waiting on request ID ${requestId}`);
-
-    // const { selectedAddresses } = await promise;
     const { addresses } = await promise;
-
-    // const accounts: WalletAccount[] = this.makeAccounts(selectedAddresses);
     const accounts: WalletAccount[] = this.makeAccounts(addresses);
 
     if (accounts === null) {
@@ -181,7 +174,11 @@ class MultiWallet implements Wallet {
   #disconnect: StandardDisconnectMethod = () => {
     this.#accounts = [];
     this.#emit("change", { accounts: this.accounts });
-    return Promise.resolve();
+
+    const { requestId, promise } = this.#requestManager.addResolver<void>();
+    const disconnectEvent = makeDisconnectEvent(requestId);
+    window.postMessage(disconnectEvent);
+    return promise;
   };
 
   #on: StandardEventsOnMethod = (event, listener) => {
@@ -219,13 +216,13 @@ class MultiWallet implements Wallet {
 
   window.addEventListener(
     "message",
-    (event: MessageEvent<BackgroundEvent>) => {
+    (event: MessageEvent<ContentEvent>) => {
       if (!event.isTrusted) {
         console.log("dropping untrusted event", event);
         return;
       }
 
-      if (event.data.origin !== "background") {
+      if (event.data.origin !== "content") {
         console.log("dropping event from origin", event.data.origin, event);
         return;
       }

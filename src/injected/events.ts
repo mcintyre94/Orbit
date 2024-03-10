@@ -7,13 +7,13 @@ type RequestConnectionEvent = InjectedEventBase & {
   type: "requestConnection";
 };
 
-type RequestConnectionEventInput = {
-  requestId: number;
+type DisconnectEvent = InjectedEventBase & {
+  type: "disconnect";
 };
 
-export function makeRequestConnectionEvent({
-  requestId,
-}: RequestConnectionEventInput): RequestConnectionEvent {
+export function makeRequestConnectionEvent(
+  requestId: number
+): RequestConnectionEvent {
   return {
     origin: "injected",
     requestId,
@@ -21,4 +21,12 @@ export function makeRequestConnectionEvent({
   };
 }
 
-export type InjectedEvent = RequestConnectionEvent;
+export function makeDisconnectEvent(requestId: number): DisconnectEvent {
+  return {
+    origin: "injected",
+    requestId,
+    type: "disconnect",
+  };
+}
+
+export type InjectedEvent = RequestConnectionEvent | DisconnectEvent;

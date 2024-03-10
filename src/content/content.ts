@@ -8,7 +8,17 @@ import {
 import type { InjectedEvent } from "../injected/events";
 // @ts-ignore
 import injected from "../injected/injected?script&module";
-import { getSavedConnection, saveConnection } from "../connections/storage";
+import {
+  getSavedConnection,
+  removeConnection,
+  saveConnection,
+} from "../connections/storage";
+import {
+  ConnectAccountsEvent,
+  DisconnectCompleteEvent,
+  makeConnectAccountsEvent,
+  makeDisconnectCompleteEvent,
+} from "./event";
 
 /** Inject the wallet into the page */
 const script = document.createElement("script");
@@ -45,17 +55,25 @@ window.addEventListener(
           origin,
           existingAddresses,
         });
-        // create a connection submit event with these addresses + send back to page
-        const newEvent: ConnectionSubmitForwardedEvent =
-          makeConnectionSubmitForwardedEvent({
-            requestId: event.data.requestId,
-            forOrigin: origin,
-            addresses: existingAddresses,
-          });
-
-        window.postMessage(newEvent);
+        // create a connect accounts event with these addresses + send back to page
+        const connectAccountsEvent = makeConnectAccountsEvent(
+          event.data.requestId,
+          existingAddresses
+        );
+        window.postMessage(connectAccountsEvent);
         return;
       }
+    }
+
+    // if the message is disconnect, remove from storage
+    if (event.data.type === "disconnect") {
+      const origin = event.origin;
+      await removeConnection(origin);
+      const disconnectCompleteEvent = makeDisconnectCompleteEvent(
+        event.data.requestId
+      );
+      window.postMessage(disconnectCompleteEvent);
+      return;
     }
 
     // for anything we can't handle directly, pass to background script
@@ -86,16 +104,11 @@ chrome.runtime.onMessage.addListener(async function (
   }
 
   if (event.type === "connectionSubmitForwarded") {
-    console.log("store addresses for origin", {
-      forOrigin: event.forOrigin,
-      addresses: event.addresses,
-    });
     await saveConnection(event.forOrigin, event.addresses);
+    const connectAccountsEvent = makeConnectAccountsEvent(
+      event.requestId,
+      event.addresses
+    );
+    window.postMessage(connectAccountsEvent);
   }
-
-  console.log(
-    "forwarding event data from background to injected unchanged",
-    event
-  );
-  window.postMessage(event);
 });
