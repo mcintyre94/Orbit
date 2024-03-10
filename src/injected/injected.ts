@@ -54,8 +54,7 @@ class RequestManager {
     return { requestId, promise };
   }
 
-  // TODO: type this properly
-  resolve(event: any) {
+  resolve(event: ContentEvent) {
     const requestId = event.requestId;
     const [resolve, reject] = this.#resolvers[requestId];
     // TODO: add error handling, we should be able to reject too - on some basis
@@ -134,12 +133,15 @@ class MultiWallet implements Wallet {
         version: "1.0.0",
         on: this.#on,
       },
-      // TODO: remove this (and SolanaSignTransactionFeature), but wallet-adapter example can't see us then
+      // Note: wallet-adapter (and most apps) filter out wallet-standard wallets that don't have
+      // this feature. For now add this so we show up in apps
       [SolanaSignTransaction]: {
         version: "1.0.0",
         signTransaction: () =>
-          Promise.resolve([{ signedTransaction: new Uint8Array() }]),
-        supportedTransactionVersions: ["legacy", 0],
+          Promise.reject(
+            new Error("Wallet does not support signing transactions")
+          ),
+        supportedTransactionVersions: [0],
       },
     };
   }
