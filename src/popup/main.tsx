@@ -1,12 +1,26 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
-import './index.css'
+import { ChakraProvider, ColorModeScript, DarkMode, ThemeConfig, extendTheme } from '@chakra-ui/react'
+
+// import './index.css'
+
+const config: ThemeConfig = {
+  initialColorMode: 'dark',
+  useSystemColorMode: false
+}
+
+const theme = extendTheme({ config })
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <div id='testcm2'>
+    <ChakraProvider colorModeManager={{
+      type: "cookie",
+      set: () => { },
+      get: () => "dark",
+      ssr: true,
+    }}>
       <App />
-    </div>
+    </ChakraProvider>
   </React.StrictMode>
 )
