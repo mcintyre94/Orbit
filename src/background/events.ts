@@ -31,4 +31,10 @@ export function makeConnectionSubmitForwardedEvent({
   };
 }
 
+export type SilentConnectionSubmitForwardedEvent = BackgroundEventBase & {
+  type: "silentConnectionSubmitForwarded";
+  forOrigin: string;
+  addresses: Address[];
+};
+
 export type BackgroundEvent = ConnectionSubmitForwardedEvent;

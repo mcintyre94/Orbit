@@ -89,8 +89,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         addresses: event.addresses,
       })
     );
-  } else {
-    console.log("dropping event from unexpected origin", event);
   }
 });
 

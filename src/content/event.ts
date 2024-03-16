@@ -5,7 +5,7 @@ type ContentEventBase = {
   requestId: number;
 };
 
-type ConnectAccountsEvent = ContentEventBase & {
+export type ConnectAccountsEvent = ContentEventBase & {
   type: "connectAccounts";
   addresses: Address[];
 };

@@ -26,12 +26,12 @@ import {
   registerWallet,
 } from "@wallet-standard/core";
 import { getBase58Encoder } from "@solana/codecs-strings";
-import { makeDisconnectEvent, makeRequestConnectionEvent } from "./events";
-import type {
-  BackgroundEvent,
-  ConnectionSubmitForwardedEvent,
-} from "../background/events";
-import { ContentEvent } from "../content/event";
+import {
+  makeDisconnectEvent,
+  makeRequestConnectionEvent,
+  makeSilentConnectionEvent,
+} from "./events";
+import { ContentEvent, ConnectAccountsEvent } from "../content/event";
 
 class RequestManager {
   constructor() {
@@ -152,21 +152,27 @@ class MultiWallet implements Wallet {
 
   #connect: StandardConnectMethod = async ({ silent } = {}) => {
     const { requestId, promise } =
-      this.#requestManager.addResolver<ConnectionSubmitForwardedEvent>();
-    // TODO: support silent (return from storage or nothing)
-    const requestConnectionEvent = makeRequestConnectionEvent(requestId);
+      this.#requestManager.addResolver<ConnectAccountsEvent>();
+
+    const requestConnectionEvent = silent
+      ? makeSilentConnectionEvent(requestId)
+      : makeRequestConnectionEvent(requestId);
+    console.log({ silent, requestConnectionEvent });
     window.postMessage(requestConnectionEvent);
 
     const { addresses } = await promise;
     const accounts: WalletAccount[] = this.makeAccounts(addresses);
 
-    if (accounts === null) {
+    if (accounts === null && !silent) {
       throw new Error("The user rejected the request.");
     }
 
+    const changed = this.#accounts !== accounts;
     this.#accounts = accounts;
 
-    this.#emit("change", { accounts: this.accounts });
+    if (changed) {
+      this.#emit("change", { accounts: this.accounts });
+    }
 
     return {
       accounts: this.accounts,
@@ -212,7 +218,8 @@ class MultiWallet implements Wallet {
 
   const requestManager = new RequestManager();
   const wallet = new MultiWallet(requestManager);
-  console.dir({ requestManager, wallet }, { depth: null });
+  // this will expose accounts if there are any previously connected
+  wallet["features"]["standard:connect"].connect({ silent: true });
   registerWallet(wallet);
   console.log("registered!");
 
@@ -225,7 +232,6 @@ class MultiWallet implements Wallet {
       }
 
       if (event.data.origin !== "content") {
-        console.log("dropping event from origin", event.data.origin, event);
         return;
       }
 

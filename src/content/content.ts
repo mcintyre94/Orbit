@@ -41,7 +41,6 @@ window.addEventListener(
 
     // drop messages not from injected
     if (event.data.origin !== "injected") {
-      console.log("dropping event from origin", event.data.origin, event);
       return;
     }
 
@@ -63,6 +62,20 @@ window.addEventListener(
         window.postMessage(connectAccountsEvent);
         return;
       }
+    }
+
+    // if the message is silent connection request, check if we already have a connection
+    // if we do return it, else return empty accounts
+    // never pass to background to prompt user
+    if (event.data.type === "silentConnection") {
+      const origin = event.origin;
+      const existingAddresses = (await getSavedConnection(origin)) ?? [];
+      const connectAccountsEvent = makeConnectAccountsEvent(
+        event.data.requestId,
+        existingAddresses
+      );
+      window.postMessage(connectAccountsEvent);
+      return;
     }
 
     // if the message is disconnect, remove from storage
@@ -99,7 +112,6 @@ chrome.runtime.onMessage.addListener(async function (
   const event = request as BackgroundEvent;
 
   if (event.origin !== "background") {
-    console.log("dropping event from origin", event.origin, event);
     return;
   }
 
