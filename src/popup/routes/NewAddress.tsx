@@ -1,5 +1,5 @@
 import { AddIcon, CloseIcon } from '@chakra-ui/icons';
-import { Box, Button, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, Input, Spacer, Stack, Textarea, VStack, useColorMode, useToast } from '@chakra-ui/react'
+import { Box, Button, ButtonGroup, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, Input, Spacer, Stack, Textarea, VStack, useColorMode, useToast } from '@chakra-ui/react'
 import { AutoComplete, AutoCompleteInput, AutoCompleteTag, AutoCompleteList, AutoCompleteItem, AutoCompleteCreatable } from '@choc-ui/chakra-autocomplete';
 import { isAddress } from '@solana/web3.js';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -150,14 +150,14 @@ export default function NewAddress() {
 
                         <Spacer marginBottom={12} />
 
-                        <Stack direction='row' spacing={4}>
+                        <ButtonGroup spacing={4}>
                             <Button type='submit' leftIcon={<AddIcon />} colorScheme='blue' variant='solid' isDisabled={addressError}>
                                 Save Address
                             </Button>
-                            <Button type='reset' leftIcon={<CloseIcon />} colorScheme='red' variant='outline'>
+                            <Button type='reset' colorScheme='red' variant='outline'>
                                 Cancel
                             </Button>
-                        </Stack>
+                        </ButtonGroup>
                     </VStack>
                 </Form>
             </VStack>

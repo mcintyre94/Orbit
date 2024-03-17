@@ -1,5 +1,5 @@
-import { Box, Heading, Text, VStack } from "@chakra-ui/react";
-import { useRouteError } from "react-router-dom";
+import { Box, Button, Heading, Text, VStack } from "@chakra-ui/react";
+import { Link, useRouteError } from "react-router-dom";
 
 type ReactRouterError = {
     statusText?: string,
@@ -19,6 +19,9 @@ export default function ErrorPage() {
                 <Text fontSize='md'>
                     <i>{error.statusText || error.message}</i>
                 </Text>
+                <Link to="/index.html">
+                    <Button>Home</Button>
+                </Link>
             </VStack>
         </Box>
     );

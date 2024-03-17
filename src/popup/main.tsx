@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { ChakraProvider, ThemeConfig, extendTheme } from '@chakra-ui/react'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import ErrorPage from './error-page'
-import Home from './routes/Home'
+import Home, { loader as homeLoader } from './routes/Home'
 import NewAddress, { action as newAddressAction, loader as newAddressLoader } from './routes/NewAddress'
 import Layout from './layout'
 import Connect from './routes/Connect'
@@ -22,6 +22,7 @@ const router = createBrowserRouter([
       {
         // chrome extension default path
         path: "/index.html",
+        loader: homeLoader,
         element: <Home />
       },
       {
