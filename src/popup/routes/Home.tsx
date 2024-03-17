@@ -1,5 +1,5 @@
 import { PropsWithChildren } from "react";
-import { getSavedAddresses } from '../../addresses/storage';
+import { getSavedAccounts } from '../../accounts/storage';
 import { shortAddress } from '../utils';
 import { Form, Link, LoaderFunctionArgs, useLoaderData, useSubmit } from "react-router-dom";
 import { Box, Button, CheckboxGroup, Flex, HStack, Tag, Text, UseCheckboxProps, VStack, Wrap, WrapItem, chakra, useCheckbox } from "@chakra-ui/react";
@@ -9,7 +9,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const previousTagCount = url.searchParams.get('previousTagCount') ?? 0
     let tagsInSearch = new Set(url.searchParams.getAll("tag"))
 
-    const addresses = await getSavedAddresses();
+    const addresses = await getSavedAccounts();
     const tagNamesSet = new Set(addresses.flatMap(a => a.tags))
     const tagNames = [...tagNamesSet].sort();
 
@@ -83,8 +83,8 @@ export default function Home() {
                 </Form>
             </Box>
 
-            <Link to='/address'>
-                <Button colorScheme='blue'>New Address</Button>
+            <Link to='/account/new'>
+                <Button colorScheme='blue'>Add Account</Button>
             </Link>
 
             <Flex direction='column' alignItems='flex-start' width='100%'>

@@ -1,10 +1,10 @@
-import { AddIcon, CloseIcon } from '@chakra-ui/icons';
+import { AddIcon } from '@chakra-ui/icons';
 import { Box, Button, ButtonGroup, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, Input, Spacer, Stack, Textarea, VStack, useColorMode, useToast } from '@chakra-ui/react'
 import { AutoComplete, AutoCompleteInput, AutoCompleteTag, AutoCompleteList, AutoCompleteItem, AutoCompleteCreatable } from '@choc-ui/chakra-autocomplete';
 import { isAddress } from '@solana/web3.js';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { getTags, saveNewAddress } from '../../addresses/storage';
-import { SavedAddress } from '../../addresses/savedAddress';
+import { getTags, saveNewAccount } from '../../accounts/storage';
+import { SavedAccount } from '../../accounts/savedAccount';
 import { ActionFunctionArgs, Form, redirect, useActionData, useLoaderData, useNavigate } from 'react-router-dom';
 
 type jsonString = string;
@@ -33,7 +33,7 @@ export async function action({ request }: ActionFunctionArgs) {
         return { error: 'Invalid address' }
     }
 
-    const newAddress: SavedAddress = {
+    const newAccount: SavedAccount = {
         address: updates.addressInput,
         label: updates.labelInput,
         notes: updates.notesInput,
@@ -41,20 +41,20 @@ export async function action({ request }: ActionFunctionArgs) {
     }
 
     try {
-        await saveNewAddress(newAddress)
+        await saveNewAccount(newAccount)
     } catch (e) {
-        console.error('error saving address', e);
+        console.error('error saving account', e);
         if (e instanceof Error) {
-            return { error: `Error saving address: ${e.message}` }
+            return { error: `Error saving account: ${e.message}` }
         } else {
-            return { error: `Error saving address: ${e}` }
+            return { error: `Error saving account: ${e}` }
         }
     }
 
     return redirect('/index.html');
 }
 
-export default function NewAddress() {
+export default function CreateAccount() {
     const [addressError, setAddressError] = useState(false);
     const actionData = useActionData() as ActionData | undefined;
     const { tags } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
@@ -85,7 +85,7 @@ export default function NewAddress() {
     return (
         <Box marginTop={4}>
             <VStack spacing={8}>
-                <Heading as='h1' size='xl' noOfLines={1}>Add Address</Heading>
+                <Heading as='h1' size='xl' noOfLines={1}>Add New Account</Heading>
 
                 <Form method='post' onReset={cancel}>
                     <VStack spacing={4}>
@@ -152,7 +152,7 @@ export default function NewAddress() {
 
                         <ButtonGroup spacing={4}>
                             <Button type='submit' leftIcon={<AddIcon />} colorScheme='blue' variant='solid' isDisabled={addressError}>
-                                Save Address
+                                Save Account
                             </Button>
                             <Button type='reset' colorScheme='red' variant='outline'>
                                 Cancel

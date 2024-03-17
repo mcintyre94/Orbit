@@ -1,6 +1,6 @@
 import { Address } from "@solana/web3.js";
 
-export type SavedAddress = {
+export type SavedAccount = {
   address: Address;
   label: string;
   notes: string;

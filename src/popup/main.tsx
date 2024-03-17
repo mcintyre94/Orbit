@@ -4,7 +4,7 @@ import { ChakraProvider, ThemeConfig, extendTheme } from '@chakra-ui/react'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import ErrorPage from './error-page'
 import Home, { loader as homeLoader } from './routes/Home'
-import NewAddress, { action as newAddressAction, loader as newAddressLoader } from './routes/NewAddress'
+import CreateAccount, { action as createAccountAction, loader as createAccountLoader } from './routes/CreateAccount'
 import Layout from './layout'
 import Connect from './routes/Connect'
 
@@ -26,10 +26,10 @@ const router = createBrowserRouter([
         element: <Home />
       },
       {
-        path: "/address",
-        action: newAddressAction,
-        loader: newAddressLoader,
-        element: <NewAddress />,
+        path: "/account/new",
+        action: createAccountAction,
+        loader: createAccountLoader,
+        element: <CreateAccount />,
       },
       {
         path: "/connect",
