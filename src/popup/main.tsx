@@ -4,7 +4,7 @@ import { ChakraProvider, ThemeConfig, extendTheme } from '@chakra-ui/react'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import ErrorPage from './error-page'
 import Home from './routes/Home'
-import NewAddress from './routes/NewAddress'
+import NewAddress, { action as newAddressAction, loader as newAddressLoader } from './routes/NewAddress'
 import Layout from './layout'
 import Connect from './routes/Connect'
 
@@ -26,7 +26,9 @@ const router = createBrowserRouter([
       },
       {
         path: "/address",
-        element: <NewAddress tags={[]} />,
+        action: newAddressAction,
+        loader: newAddressLoader,
+        element: <NewAddress />,
       },
       {
         path: "/connect",

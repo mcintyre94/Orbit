@@ -1,58 +1,77 @@
 import { AddIcon, CloseIcon } from '@chakra-ui/icons';
-import { Box, Button, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, Input, Stack, Textarea, VStack, useColorMode, useToast } from '@chakra-ui/react'
+import { Box, Button, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, Input, Spacer, Stack, Textarea, VStack, useColorMode, useToast } from '@chakra-ui/react'
 import { AutoComplete, AutoCompleteInput, AutoCompleteTag, AutoCompleteList, AutoCompleteItem, AutoCompleteCreatable } from '@choc-ui/chakra-autocomplete';
 import { isAddress } from '@solana/web3.js';
-import { useCallback, useState } from 'react';
-import { saveNewAddress } from '../../addresses/storage';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { getTags, saveNewAddress } from '../../addresses/storage';
 import { SavedAddress } from '../../addresses/savedAddress';
+import { ActionFunctionArgs, Form, redirect, useActionData, useLoaderData, useNavigate } from 'react-router-dom';
 
-type Props = {
-    tags: string[]
-};
+type jsonString = string;
 
-interface FormElements extends HTMLFormControlsCollection {
-    addressInput: HTMLInputElement
-    labelInput: HTMLInputElement
-    notesInput: HTMLInputElement
-}
-interface AddressFormElement extends HTMLFormElement {
-    readonly elements: FormElements
+export async function loader() {
+    const tags = await getTags();
+    return { tags };
 }
 
-// TODO: refactor to fetch tags, instead of passing them like this
-export default function NewAddress({ tags }: Props) {
-    const [addressError, setAddressError] = useState(false);
-    const [selectedTags, setSelectedTags] = useState<string[]>([]);
+interface FormDataUpdates {
+    addressInput: string;
+    labelInput: string;
+    notesInput: string;
+    tagsInput: jsonString;
+}
 
-    const saveAddress = useCallback(async (event: React.FormEvent<AddressFormElement>) => {
-        event.preventDefault();
+interface ActionData {
+    error: string
+}
 
-        const { elements } = event.currentTarget;
+export async function action({ request }: ActionFunctionArgs) {
+    const formData = await request.formData();
+    const updates = Object.fromEntries(formData) as unknown as FormDataUpdates;
 
-        const address = elements.addressInput.value;
-        if (!isAddress(address)) return; // UI already shows an error here
+    if (!isAddress(updates.addressInput)) {
+        return { error: 'Invalid address' }
+    }
 
-        const label = elements.labelInput.value;
-        const notes = elements.notesInput.value;
+    const newAddress: SavedAddress = {
+        address: updates.addressInput,
+        label: updates.labelInput,
+        notes: updates.notesInput,
+        tags: JSON.parse(updates.tagsInput),
+    }
 
-        console.log(selectedTags);
-
-        const newAddress: SavedAddress = {
-            address,
-            label,
-            notes,
-            tags: selectedTags
-        };
-
-        try {
-            await saveNewAddress(newAddress)
-            window.location.replace('index.html');
-        } catch (e) {
-            // TODO: use toast
-            console.error(e)
-            alert(e)
+    try {
+        await saveNewAddress(newAddress)
+    } catch (e) {
+        console.error('error saving address', e);
+        if (e instanceof Error) {
+            return { error: `Error saving address: ${e.message}` }
+        } else {
+            return { error: `Error saving address: ${e}` }
         }
-    }, [])
+    }
+
+    return redirect('/index.html');
+}
+
+export default function NewAddress() {
+    const [addressError, setAddressError] = useState(false);
+    const actionData = useActionData() as ActionData | undefined;
+    const { tags } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+    const tagsInputRef = useRef<HTMLInputElement | null>(null);
+    const toast = useToast();
+    const navigate = useNavigate();
+
+    // Display error as toast if there is one
+    useEffect(() => {
+        if (actionData) {
+            toast({
+                title: actionData.error,
+                status: 'error',
+                isClosable: true,
+            })
+        }
+    }, [actionData])
 
     const validateAddress = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const isValid = isAddress(e.currentTarget.value);
@@ -60,7 +79,7 @@ export default function NewAddress({ tags }: Props) {
     }, [])
 
     const cancel = useCallback(() => {
-        window.location.replace('index.html');
+        navigate(-1);
     }, [])
 
     return (
@@ -68,7 +87,7 @@ export default function NewAddress({ tags }: Props) {
             <VStack spacing={8}>
                 <Heading as='h1' size='xl' noOfLines={1}>Add Address</Heading>
 
-                <form onSubmit={saveAddress} onReset={cancel}>
+                <Form method='post' onReset={cancel}>
                     <VStack spacing={4}>
                         <FormControl isRequired isInvalid={addressError} id='addressInput'>
                             <FormLabel>Address</FormLabel>
@@ -86,10 +105,20 @@ export default function NewAddress({ tags }: Props) {
                             <Textarea name='notesInput' />
                         </FormControl>
 
+                        {/* this is the input that actually gets passed to our action as tags values */}
+                        <FormControl hidden={true} aria-hidden={true}>
+                            <Input type='hidden' name='tagsInput' ref={tagsInputRef} />
+                        </FormControl>
+
                         <FormControl id='tagsInput'>
                             <FormLabel optionalIndicator>Tags</FormLabel>
-                            <AutoComplete openOnFocus multiple creatable onChange={(vals: string[]) => setSelectedTags(vals)}>
-                                <AutoCompleteInput variant="filled" name='tagsInput'>
+                            <AutoComplete openOnFocus multiple creatable onChange={(vals: string[]) => {
+                                // sync to the hidden input
+                                if (tagsInputRef.current) {
+                                    tagsInputRef.current.value = JSON.stringify(vals);
+                                }
+                            }}>
+                                <AutoCompleteInput variant="filled" name='tagsInputUI'>
                                     {({ tags }) =>
                                         tags.map((tag, tid) => (
                                             <AutoCompleteTag
@@ -119,6 +148,8 @@ export default function NewAddress({ tags }: Props) {
                             </AutoComplete>
                         </FormControl>
 
+                        <Spacer marginBottom={12} />
+
                         <Stack direction='row' spacing={4}>
                             <Button type='submit' leftIcon={<AddIcon />} colorScheme='blue' variant='solid' isDisabled={addressError}>
                                 Save Address
@@ -128,7 +159,7 @@ export default function NewAddress({ tags }: Props) {
                             </Button>
                         </Stack>
                     </VStack>
-                </form>
+                </Form>
             </VStack>
         </Box>
     )
