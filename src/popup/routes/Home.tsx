@@ -3,7 +3,8 @@ import reactLogo from '../../assets/react.svg'
 import { getSavedAddresses } from '../../addresses/storage';
 import { SavedAddress } from "../../addresses/savedAddress";
 
-const baseNewAddressUrl = 'index.html?view=newAddress';
+// const baseNewAddressUrl = 'index.html?view=newAddress';
+const baseNewAddressUrl = '/address?a=1';
 
 export default function Home() {
     const [count, setCount] = useState(0);

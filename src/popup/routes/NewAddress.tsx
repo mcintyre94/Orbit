@@ -64,9 +64,9 @@ export default function NewAddress({ tags }: Props) {
     }, [])
 
     return (
-        <Box>
+        <Box marginTop={4}>
             <VStack spacing={8}>
-                <Heading as='h1' size='xl' noOfLines={1}>New Address</Heading>
+                <Heading as='h1' size='xl' noOfLines={1}>Add Address</Heading>
 
                 <form onSubmit={saveAddress} onReset={cancel}>
                     <VStack spacing={4}>
