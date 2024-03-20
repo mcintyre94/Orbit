@@ -1,4 +1,4 @@
-import { FormControl, FormLabel, Input } from "@chakra-ui/react";
+import { FormControl, FormLabel, Input, RequiredIndicator } from "@chakra-ui/react";
 import { AutoComplete, AutoCompleteCreatable, AutoCompleteInput, AutoCompleteItem, AutoCompleteList, AutoCompleteTag } from "@choc-ui/chakra-autocomplete";
 
 interface TagsInputProps {
@@ -16,7 +16,7 @@ export default function TagsInput({ allKnownTags, initialTags, tagsInputRef }: T
             </FormControl>
 
             <FormControl id='tagsInput'>
-                <FormLabel optionalIndicator>Tags</FormLabel>
+                <FormLabel>Tags</FormLabel>
                 <AutoComplete openOnFocus multiple creatable defaultValues={initialTags} onChange={(vals: string[]) => {
                     // sync to the hidden input
                     if (tagsInputRef.current) {

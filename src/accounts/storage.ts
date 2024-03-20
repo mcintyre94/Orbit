@@ -1,4 +1,4 @@
-import { Address } from "@solana/web3.js";
+import { Address, isAddress } from "@solana/web3.js";
 import { SavedAccount } from "./savedAccount";
 
 const SAVED_ACCOUNTS_KEY = "accounts";
@@ -16,7 +16,18 @@ async function saveAccounts(savedAccounts: SavedAccount[]): Promise<void> {
   });
 }
 
+function validateAccount(savedAccount: SavedAccount) {
+  if (!isAddress(savedAccount.address)) {
+    throw new Error("Invalid address");
+  }
+
+  if (savedAccount.label.length === 0) {
+    throw new Error("Label can't be empty");
+  }
+}
+
 export async function saveNewAccount(newAccount: SavedAccount): Promise<void> {
+  validateAccount(newAccount);
   const accounts = await getSavedAccounts();
 
   for (const account of accounts) {
@@ -24,7 +35,11 @@ export async function saveNewAccount(newAccount: SavedAccount): Promise<void> {
       throw new Error("Address already exists");
     }
 
-    if (account.label === newAccount.label) {
+    if (
+      account.label.localeCompare(newAccount.label, "en", {
+        sensitivity: "accent",
+      }) === 0
+    ) {
       throw new Error("Label already exists");
     }
   }
@@ -44,24 +59,30 @@ export async function getAccount(address: Address) {
   return account;
 }
 
-export async function updateAccount(account: SavedAccount): Promise<void> {
+export async function updateAccount(
+  updatedAccount: SavedAccount
+): Promise<void> {
+  validateAccount(updatedAccount);
   const accounts = await getSavedAccounts();
 
-  if (
-    accounts.some(
-      (a) => a.label === account.label && a.address !== account.address
-    )
-  ) {
-    throw new Error("Label already exists");
+  for (const account of accounts) {
+    if (
+      account.address !== updatedAccount.address &&
+      account.label.localeCompare(updatedAccount.label, "en", {
+        sensitivity: "accent",
+      }) === 0
+    ) {
+      throw new Error("Label already exists");
+    }
   }
 
-  const updated = accounts.map((a) => {
-    if (a.address === account.address) {
+  const updated = accounts.map((account) => {
+    if (account.address === updatedAccount.address) {
       // replace the account with this address with the updated one
-      return account;
+      return updatedAccount;
     } else {
       // keep accounts with any other address unedited
-      return a;
+      return account;
     }
   });
 
