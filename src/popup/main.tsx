@@ -5,6 +5,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import ErrorPage from './error-page'
 import Home, { loader as homeLoader } from './routes/Home'
 import CreateAccount, { action as createAccountAction, loader as createAccountLoader } from './routes/CreateAccount'
+import { action as deleteAccountAction } from './routes/DeleteAccount'
 import EditAccount, { action as editAccountAction, loader as editAccountLoader } from './routes/EditAccount'
 import Layout from './layout'
 import Connect from './routes/Connect'
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
         action: editAccountAction,
         loader: editAccountLoader,
         element: <EditAccount />
+      },
+      {
+        path: "/account/:address/delete",
+        action: deleteAccountAction
       },
       {
         path: "/connect",

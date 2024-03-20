@@ -1,11 +1,12 @@
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
-import { Box, Button, ButtonGroup, FormControl, FormLabel, Heading, IconButton, Input, Spacer, Textarea, VStack, useToast } from '@chakra-ui/react'
+import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Box, Button, ButtonGroup, FormControl, FormLabel, HStack, Heading, IconButton, Input, Spacer, Textarea, VStack, useDisclosure, useToast } from '@chakra-ui/react'
 import { type Address } from '@solana/web3.js';
-import { useCallback, useEffect, useRef } from 'react';
+import { RefObject, useCallback, useEffect, useRef } from 'react';
 import { getAccount, getTags, updateAccount } from '../../accounts/storage';
 import { SavedAccount } from '../../accounts/savedAccount';
-import { ActionFunctionArgs, Form, LoaderFunctionArgs, redirect, useActionData, useLoaderData, useNavigate } from 'react-router-dom';
+import { ActionFunctionArgs, Form, LoaderFunctionArgs, redirect, useActionData, useFetcher, useLoaderData, useNavigate } from 'react-router-dom';
 import TagsInput from '../components/TagsInput';
+import { shortAddress } from '../utils';
 
 type jsonString = string;
 
@@ -79,45 +80,87 @@ export default function EditAccount() {
         navigate(-1);
     }, [])
 
+    const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure()
+    const cancelDeleteRef: RefObject<HTMLButtonElement> = useRef() as RefObject<HTMLButtonElement>;
+
     return (
-        <Box marginTop={4}>
-            <VStack spacing={8}>
-                <Heading as='h1' size='xl' noOfLines={1}>Edit Account</Heading>
+        <>
+            <Box marginTop={4}>
+                <VStack spacing={8}>
+                    <Heading as='h1' size='xl' noOfLines={1}>Edit Account</Heading>
 
-                <Form method='post' onReset={cancel}>
-                    <VStack spacing={4}>
-                        <FormControl isReadOnly isDisabled>
-                            <FormLabel>Address</FormLabel>
-                            <Input type='text' name='addressInput' value={account.address} />
-                        </FormControl>
+                    <Form
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            alert('gm');
+                        }}
+                        id='delete-confirm-form'
+                    />
 
-                        <FormControl isRequired id='labelInput'>
-                            <FormLabel>Label</FormLabel>
-                            <Input type='text' name='labelInput' defaultValue={account.label} />
-                        </FormControl>
+                    <Form method='post' onReset={cancel}>
+                        <VStack spacing={4}>
+                            <FormControl isReadOnly isDisabled>
+                                <FormLabel>Address</FormLabel>
+                                <Input type='text' name='addressInput' value={account.address} />
+                            </FormControl>
 
-                        <FormControl id='notesInput'>
-                            <FormLabel optionalIndicator>Notes</FormLabel>
-                            <Textarea name='notesInput' defaultValue={account.notes} />
-                        </FormControl>
+                            <FormControl isRequired id='labelInput'>
+                                <FormLabel>Label</FormLabel>
+                                <Input type='text' name='labelInput' defaultValue={account.label} />
+                            </FormControl>
 
-                        <TagsInput allKnownTags={tags} initialTags={account.tags} tagsInputRef={tagsInputRef} />
+                            <FormControl id='notesInput'>
+                                <FormLabel optionalIndicator>Notes</FormLabel>
+                                <Textarea name='notesInput' defaultValue={account.notes} />
+                            </FormControl>
 
-                        <Spacer marginBottom={12} />
+                            <TagsInput allKnownTags={tags} initialTags={account.tags} tagsInputRef={tagsInputRef} />
 
-                        <ButtonGroup spacing={4}>
-                            <Button type='submit' leftIcon={<AddIcon />} colorScheme='blue' variant='solid'>
-                                Update Account
-                            </Button>
-                            <Button type='reset' colorScheme='red' variant='outline'>
-                                Cancel
-                            </Button>
-                            {/* TODO: delete confirm + delete route */}
-                            <IconButton aria-label='Delete account' colorScheme='red' variant='outline' icon={<DeleteIcon />}></IconButton>
-                        </ButtonGroup>
-                    </VStack>
-                </Form>
-            </VStack>
-        </Box>
+                            <Spacer marginBottom={12} />
+
+                            <ButtonGroup spacing={4}>
+                                <Button type='submit' leftIcon={<AddIcon />} colorScheme='blue' variant='solid'>
+                                    Update Account
+                                </Button>
+                                <Button type='reset' colorScheme='red' variant='outline'>
+                                    Cancel
+                                </Button>
+                                {/* delete button opens the delete confirm */}
+                                <IconButton onClick={onDeleteOpen} aria-label='Delete account' colorScheme='red' variant='outline' icon={<DeleteIcon />}></IconButton>
+                            </ButtonGroup>
+                        </VStack>
+                    </Form>
+                </VStack>
+            </Box>
+
+            <AlertDialog
+                isOpen={isDeleteOpen}
+                leastDestructiveRef={cancelDeleteRef}
+                onClose={onDeleteClose}
+            >
+                <AlertDialogOverlay>
+                    <AlertDialogContent>
+                        <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                            Delete Account?
+                        </AlertDialogHeader>
+
+                        <AlertDialogBody>Are you sure you want to delete <b>{account.label}</b> ({shortAddress(account.address)})?</AlertDialogBody>
+
+                        <AlertDialogFooter>
+                            <Form
+                                method='post'
+                                action={`/account/${account.address}/delete`}
+                                onReset={onDeleteClose}
+                            >
+                                <ButtonGroup spacing={4}>
+                                    <Button ref={cancelDeleteRef} type='reset'>Cancel</Button>
+                                    <Button colorScheme='red' type='submit'>Delete</Button>
+                                </ButtonGroup>
+                            </Form>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
+        </>
     )
 }

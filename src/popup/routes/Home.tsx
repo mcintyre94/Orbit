@@ -13,6 +13,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const tagNamesSet = new Set(addresses.flatMap(a => a.tags))
     const tagNames = [...tagNamesSet].sort();
 
+    // TODO update this
+    // - preselect only one tag (I think)
+    // - select all accounts with *any* selected tag
+
     // default to all checked, unless the user has unselected them all
     if (tagsInSearch.size === 0 && previousTagCount === 0) {
         tagsInSearch = new Set(tagNames);

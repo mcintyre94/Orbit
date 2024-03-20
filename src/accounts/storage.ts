@@ -67,3 +67,9 @@ export async function updateAccount(account: SavedAccount): Promise<void> {
 
   await saveAccounts(updated);
 }
+
+export async function deleteAccount(address: Address): Promise<void> {
+  const accounts = await getSavedAccounts();
+  const updated = accounts.filter((a) => a.address !== address);
+  await saveAccounts(updated);
+}
