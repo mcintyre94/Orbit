@@ -32,6 +32,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
 
     // filter out any address with a deselected tag
+    // TODO: if there's exactly one tag, show all addresses with that tag
     const filteredAddresses = addresses.filter(a => !a.tags.some(t => deselectedTags.has(t)));
 
     return { filteredAddresses, tags };
@@ -89,17 +90,21 @@ export default function Home() {
 
             <Flex direction='column' alignItems='flex-start' width='100%'>
                 {filteredAddresses.map(address => (
-                    <VStack padding={4} key={address.address} spacing={1} width='100%' alignItems='flex-start' _hover={{ backgroundColor: 'gray.700' }}>
-                        <Text fontSize='md'>{address.label} <Text as='span' color='gray.400'>({shortAddress(address.address)})</Text></Text>
-                        <Text fontSize='sm'>{address.notes.split('\n').join(', ')}</Text>
-                        <Wrap>
-                            {address.tags.map(tag =>
-                                <WrapItem key={tag}>
-                                    <Tag variant='outline' size='sm' key={tag}>{tag}</Tag>
-                                </WrapItem>
-                            )}
-                        </Wrap>
-                    </VStack>
+                    <Box width='100%'>
+                        <Link to={`/account/${address.address}/edit`}>
+                            <VStack padding={4} key={address.address} spacing={1} alignItems='flex-start' _hover={{ backgroundColor: 'gray.700' }}>
+                                <Text fontSize='md'>{address.label} <Text as='span' color='gray.400'>({shortAddress(address.address)})</Text></Text>
+                                <Text fontSize='sm'>{address.notes.split('\n').join(', ')}</Text>
+                                <Wrap>
+                                    {address.tags.map(tag =>
+                                        <WrapItem key={tag}>
+                                            <Tag variant='outline' size='sm' key={tag}>{tag}</Tag>
+                                        </WrapItem>
+                                    )}
+                                </Wrap>
+                            </VStack>
+                        </Link>
+                    </Box>
                 ))}
             </Flex>
 

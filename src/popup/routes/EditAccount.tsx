@@ -1,17 +1,23 @@
-import { AddIcon } from '@chakra-ui/icons';
-import { Box, Button, ButtonGroup, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, Input, Spacer, Stack, Textarea, VStack, useColorMode, useToast } from '@chakra-ui/react'
-import { isAddress } from '@solana/web3.js';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { getTags, saveNewAccount } from '../../accounts/storage';
+import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
+import { Box, Button, ButtonGroup, FormControl, FormLabel, Heading, IconButton, Input, Spacer, Textarea, VStack, useToast } from '@chakra-ui/react'
+import { type Address } from '@solana/web3.js';
+import { useCallback, useEffect, useRef } from 'react';
+import { getAccount, getTags, updateAccount } from '../../accounts/storage';
 import { SavedAccount } from '../../accounts/savedAccount';
-import { ActionFunctionArgs, Form, redirect, useActionData, useLoaderData, useNavigate } from 'react-router-dom';
+import { ActionFunctionArgs, Form, LoaderFunctionArgs, redirect, useActionData, useLoaderData, useNavigate } from 'react-router-dom';
 import TagsInput from '../components/TagsInput';
 
 type jsonString = string;
 
-export async function loader() {
+interface Params {
+    address: Address
+}
+
+export async function loader({ params }: LoaderFunctionArgs) {
+    const { address } = params as unknown as Params
+    const account = await getAccount(address);
     const tags = await getTags();
-    return { tags };
+    return { account, tags };
 }
 
 interface FormDataUpdates {
@@ -25,23 +31,20 @@ interface ActionData {
     error: string
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ params, request }: ActionFunctionArgs) {
     const formData = await request.formData();
     const updates = Object.fromEntries(formData) as unknown as FormDataUpdates;
+    const { address } = params as unknown as Params;
 
-    if (!isAddress(updates.addressInput)) {
-        return { error: 'Invalid address' }
-    }
-
-    const newAccount: SavedAccount = {
-        address: updates.addressInput,
+    const updatedAccount: SavedAccount = {
+        address,
         label: updates.labelInput,
         notes: updates.notesInput,
         tags: JSON.parse(updates.tagsInput),
     }
 
     try {
-        await saveNewAccount(newAccount)
+        await updateAccount(updatedAccount);
     } catch (e) {
         console.error('error saving account', e);
         if (e instanceof Error) {
@@ -54,10 +57,9 @@ export async function action({ request }: ActionFunctionArgs) {
     return redirect('/index.html');
 }
 
-export default function CreateAccount() {
-    const [addressError, setAddressError] = useState(false);
+export default function EditAccount() {
     const actionData = useActionData() as ActionData | undefined;
-    const { tags } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+    const { account, tags } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
     const tagsInputRef = useRef<HTMLInputElement | null>(null);
     const toast = useToast();
     const navigate = useNavigate();
@@ -73,11 +75,6 @@ export default function CreateAccount() {
         }
     }, [actionData])
 
-    const validateAddress = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        const isValid = isAddress(e.currentTarget.value);
-        setAddressError(!isValid);
-    }, [])
-
     const cancel = useCallback(() => {
         navigate(-1);
     }, [])
@@ -85,37 +82,38 @@ export default function CreateAccount() {
     return (
         <Box marginTop={4}>
             <VStack spacing={8}>
-                <Heading as='h1' size='xl' noOfLines={1}>Add New Account</Heading>
+                <Heading as='h1' size='xl' noOfLines={1}>Edit Account</Heading>
 
                 <Form method='post' onReset={cancel}>
                     <VStack spacing={4}>
-                        <FormControl isRequired isInvalid={addressError} id='addressInput'>
+                        <FormControl isReadOnly isDisabled>
                             <FormLabel>Address</FormLabel>
-                            <Input type='text' name='addressInput' onChange={validateAddress} />
-                            <FormErrorMessage>Invalid address</FormErrorMessage>
+                            <Input type='text' name='addressInput' value={account.address} />
                         </FormControl>
 
                         <FormControl isRequired id='labelInput'>
                             <FormLabel>Label</FormLabel>
-                            <Input type='text' name='labelInput' />
+                            <Input type='text' name='labelInput' defaultValue={account.label} />
                         </FormControl>
 
                         <FormControl id='notesInput'>
                             <FormLabel optionalIndicator>Notes</FormLabel>
-                            <Textarea name='notesInput' />
+                            <Textarea name='notesInput' defaultValue={account.notes} />
                         </FormControl>
 
-                        <TagsInput allKnownTags={tags} initialTags={[]} tagsInputRef={tagsInputRef} />
+                        <TagsInput allKnownTags={tags} initialTags={account.tags} tagsInputRef={tagsInputRef} />
 
                         <Spacer marginBottom={12} />
 
                         <ButtonGroup spacing={4}>
-                            <Button type='submit' leftIcon={<AddIcon />} colorScheme='blue' variant='solid' isDisabled={addressError}>
-                                Save Account
+                            <Button type='submit' leftIcon={<AddIcon />} colorScheme='blue' variant='solid'>
+                                Update Account
                             </Button>
                             <Button type='reset' colorScheme='red' variant='outline'>
                                 Cancel
                             </Button>
+                            {/* TODO: delete confirm + delete route */}
+                            <IconButton aria-label='Delete account' colorScheme='red' variant='outline' icon={<DeleteIcon />}></IconButton>
                         </ButtonGroup>
                     </VStack>
                 </Form>
