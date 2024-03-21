@@ -2,7 +2,9 @@ import { PropsWithChildren } from "react";
 import { getSavedAccounts } from '../../accounts/storage';
 import { shortAddress } from '../utils';
 import { Form, Link, LoaderFunctionArgs, useLoaderData, useSubmit } from "react-router-dom";
-import { Box, Button, CheckboxGroup, Flex, FormControl, FormLabel, HStack, Switch, Tag, Text, UseCheckboxProps, VStack, Wrap, WrapItem, chakra, useCheckbox } from "@chakra-ui/react";
+import { Box, Button, CheckboxGroup, Flex, FormControl, FormLabel, HStack, Switch, Tag, Text, Tooltip, UseCheckboxProps, VStack, Wrap, WrapItem, chakra, useCheckbox, useClipboard } from "@chakra-ui/react";
+import { CopyIcon } from "@chakra-ui/icons";
+import { Address } from "@solana/web3.js";
 
 export async function loader({ request }: LoaderFunctionArgs) {
     const url = new URL(request.url);
@@ -46,6 +48,20 @@ function TagCheckbox(props: PropsWithChildren<UseCheckboxProps>) {
     )
 }
 
+function CopyButton({ address }: { address: Address }) {
+    const { onCopy, hasCopied } = useClipboard(address);
+
+    if (hasCopied) {
+        return <Text fontSize='sm'>Copied</Text>
+    } else {
+        return <CopyIcon cursor='pointer' boxSize={4} onClick={(event) => {
+            // prevent following the link it's nested in
+            event.preventDefault();
+            onCopy();
+        }} />
+    }
+}
+
 export default function Home() {
     const { accounts, filtersEnabled, tags } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
     const submit = useSubmit();
@@ -55,10 +71,10 @@ export default function Home() {
             {tags.length > 0 ?
                 <Box>
                     <Form>
-                        <VStack spacing={1}>
+                        <VStack spacing={2}>
                             <FormControl display='flex' alignItems='center'>
                                 <FormLabel htmlFor='enableFilters' mb='0'>
-                                    Enable filters
+                                    Enable filtering
                                 </FormLabel>
                                 <Switch
                                     name='enableFilters'
@@ -102,7 +118,13 @@ export default function Home() {
                     <Box width='100%' key={account.address}>
                         <Link to={`/account/${account.address}/edit`}>
                             <VStack padding={4} key={account.address} spacing={1} alignItems='flex-start' _hover={{ backgroundColor: 'gray.700' }}>
-                                <Text fontSize='md'>{account.label} <Text as='span' color='gray.400'>({shortAddress(account.address)})</Text></Text>
+                                <HStack>
+                                    <Text as='span' fontSize='lg'>{account.label}</Text>
+                                    <Tooltip label={account.address}>
+                                        <Text as='span' fontSize='md' color='gray.400'>({shortAddress(account.address)})</Text>
+                                    </Tooltip>
+                                    <CopyButton address={account.address} />
+                                </HStack>
                                 <Text fontSize='sm'>{account.notes.split('\n').join(', ')}</Text>
                                 <Wrap>
                                     {account.tags.map(tag =>
