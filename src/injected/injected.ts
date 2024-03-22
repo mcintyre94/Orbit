@@ -163,7 +163,7 @@ class MultiWallet implements Wallet {
     const { addresses } = await promise;
     const accounts: WalletAccount[] = this.makeAccounts(addresses);
 
-    if (accounts === null && !silent) {
+    if (accounts.length === 0 && !silent) {
       throw new Error("The user rejected the request.");
     }
 
