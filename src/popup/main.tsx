@@ -8,7 +8,7 @@ import CreateAccount, { action as createAccountAction, loader as createAccountLo
 import { action as deleteAccountAction } from './routes/DeleteAccount'
 import EditAccount, { action as editAccountAction, loader as editAccountLoader } from './routes/EditAccount'
 import Layout from './layout'
-import Connect from './routes/Connect'
+import Connect, { loader as connectLoader } from './routes/Connect'
 
 const config: ThemeConfig = {
   initialColorMode: 'dark',
@@ -44,8 +44,9 @@ const router = createBrowserRouter([
         action: deleteAccountAction
       },
       {
-        path: "/connect",
-        element: <Connect tabId={0} requestId={0} forOrigin={''} />
+        path: "/connect/:tabId/:requestId",
+        loader: connectLoader,
+        element: <Connect />
       }
     ]
   }

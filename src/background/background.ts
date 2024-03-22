@@ -20,8 +20,7 @@ function openPopup({
   if (event.type === "requestConnection") {
     const encodedForOrigin = encodeURIComponent(forOrigin);
 
-    // const url = `index.html?view=connect&tabId=${tabId}&requestId=${event.requestId}&forOrigin=${encodedForOrigin}`;
-    const url = `/connect`;
+    const url = `/connect/${tabId}/${event.requestId}?forOrigin=${encodedForOrigin}`;
 
     chrome.sidePanel.setOptions({
       path: url,
