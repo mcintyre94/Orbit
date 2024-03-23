@@ -1,7 +1,7 @@
 import type { Address } from "@solana/web3.js";
 import { makeConnectionSubmitEvent } from "../events";
-import { LoaderFunctionArgs, useLoaderData, useSubmit } from "react-router-dom";
-import { Box, Button, Flex, Heading, VStack } from "@chakra-ui/react";
+import { Link, LoaderFunctionArgs, useLoaderData, useSubmit } from "react-router-dom";
+import { Box, Button, Flex, Heading, Spacer, Tab, TabList, TabPanel, TabPanels, Tabs, VStack } from "@chakra-ui/react";
 import AccountDisplay from "../components/AccountDisplay";
 import TagFilters from "../components/TagFilters";
 import { getAccountsAndTags } from "../utils";
@@ -54,20 +54,25 @@ export default function Connect() {
     const submit = useSubmit();
 
     return (
-        <VStack spacing={8} alignItems='flex-start' maxHeight={4}>
-            <Heading as='h3' size='lg'>Connect to {forOrigin}</Heading>
+        <Flex direction='column' minHeight='100vh'>
+            <VStack spacing={8} alignItems='flex-start'>
+                <Heading as='h3' size='lg'>Connect to {forOrigin}</Heading>
 
-            <TagFilters tags={tags} filtersEnabled={filtersEnabled} submit={submit} additionalSearchParams={{ forOrigin }} />
+                <TagFilters tags={tags} filtersEnabled={filtersEnabled} submit={submit} additionalSearchParams={{ forOrigin }} />
 
-            <Flex direction='column' alignItems='flex-start' width='100%'>
-                {accounts.map(account => (
-                    <Box width='100%' key={account.address} onClick={() => sendAndClose(tabId, requestId, forOrigin, account.address)} cursor='pointer'>
-                        <AccountDisplay account={account} />
-                    </Box>
-                ))}
-            </Flex>
+                <Flex direction='column' alignItems='flex-start' width='100%'>
+                    {accounts.map(account => (
+                        <Box width='100%' key={account.address} onClick={() => sendAndClose(tabId, requestId, forOrigin, account.address)} cursor='pointer'>
+                            <AccountDisplay account={account} />
+                        </Box>
+                    ))}
+                </Flex>
 
-            <Button colorScheme='blue' size='md' paddingY={4} onClick={() => sendAndClose(tabId, requestId, forOrigin, null)}>Cancel</Button>
-        </VStack>
+            </VStack>
+            <Spacer />
+            <Box marginBottom={8}>
+                <Button colorScheme='blue' size='md' paddingY={4} onClick={() => sendAndClose(tabId, requestId, forOrigin, null)}>Cancel</Button>
+            </Box>
+        </Flex>
     )
 }

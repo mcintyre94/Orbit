@@ -1,5 +1,5 @@
 import { Link, LoaderFunctionArgs, useLoaderData, useNavigate, useSubmit } from "react-router-dom";
-import { Box, Button, ButtonGroup, Code, Flex, IconButton, Menu, MenuButton, MenuItem, MenuList, Tab, TabList, TabPanel, TabPanels, Tabs, VStack, Text, useClipboard, Heading } from "@chakra-ui/react";
+import { Box, Button, ButtonGroup, Code, Flex, IconButton, Menu, MenuButton, MenuItem, MenuList, Tab, TabList, TabPanel, TabPanels, Tabs, VStack, Text, useClipboard, Heading, Spacer } from "@chakra-ui/react";
 import TagFilters from "../components/TagFilters";
 import AccountDisplay from "../components/AccountDisplay";
 import { getAccountsAndTags } from "../utils";
@@ -59,34 +59,38 @@ export default function ExportAccounts() {
     const submit = useSubmit();
 
     return (
-        <VStack spacing={8} alignItems='flex-start'>
-            <Heading alignSelf='center' as='h1' size='xl' noOfLines={1}>Export Accounts</Heading>
+        <Flex direction='column' minHeight='100vh'>
+            <VStack spacing={8} alignItems='flex-start'>
+                <Heading alignSelf='center' as='h1' size='xl' noOfLines={1}>Export Accounts</Heading>
 
-            <TagFilters tags={tags} filtersEnabled={filtersEnabled} submit={submit} />
+                <TagFilters tags={tags} filtersEnabled={filtersEnabled} submit={submit} />
 
-            <Box>
-                <Tabs minWidth='100%'>
-                    <TabList>
-                        <Tab>Addresses</Tab>
-                        <Tab>Code</Tab>
-                    </TabList>
+                <Box>
+                    <Tabs minWidth='100%'>
+                        <TabList>
+                            <Tab>Addresses</Tab>
+                            <Tab>Code</Tab>
+                        </TabList>
 
-                    <TabPanels>
-                        <TabPanel>
-                            <ExportableText text={accounts.map(a => a.address).join('\n')} contentType='text/plain' />
-                        </TabPanel>
-                        <TabPanel>
-                            <ExportableText text={JSON.stringify(accounts, null, 2)} contentType='application/json' />
-                        </TabPanel>
-                    </TabPanels>
-                </Tabs>
+                        <TabPanels>
+                            <TabPanel>
+                                <ExportableText text={accounts.map(a => a.address).join('\n')} contentType='text/plain' />
+                            </TabPanel>
+                            <TabPanel>
+                                <ExportableText text={JSON.stringify(accounts, null, 2)} contentType='application/json' />
+                            </TabPanel>
+                        </TabPanels>
+                    </Tabs>
+                </Box>
+            </VStack>
+            <Spacer />
+            <Box marginBottom={8}>
+                <Link to='/index.html'>
+                    <Button colorScheme='white' variant='outline'>
+                        Back
+                    </Button>
+                </Link>
             </Box>
-
-            <Link to='/index.html'>
-                <Button colorScheme='white' variant='outline'>
-                    Back
-                </Button>
-            </Link>
-        </VStack>
+        </Flex>
     )
 }
