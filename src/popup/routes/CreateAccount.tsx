@@ -83,43 +83,41 @@ export default function CreateAccount() {
     }, [])
 
     return (
-        <Box marginTop={4}>
-            <VStack spacing={8}>
-                <Heading as='h1' size='xl' noOfLines={1}>Add New Account</Heading>
+        <VStack spacing={8}>
+            <Heading as='h1' size='xl' noOfLines={1}>Add New Account</Heading>
 
-                <Form method='post' onReset={cancel}>
-                    <VStack spacing={4}>
-                        <FormControl isRequired isInvalid={addressError} id='addressInput'>
-                            <FormLabel>Address</FormLabel>
-                            <Input type='text' name='addressInput' onChange={validateAddress} />
-                            <FormErrorMessage>Invalid address</FormErrorMessage>
-                        </FormControl>
+            <Form method='post' onReset={cancel}>
+                <VStack spacing={4}>
+                    <FormControl isRequired isInvalid={addressError} id='addressInput'>
+                        <FormLabel>Address</FormLabel>
+                        <Input type='text' name='addressInput' onChange={validateAddress} />
+                        <FormErrorMessage>Invalid address</FormErrorMessage>
+                    </FormControl>
 
-                        <FormControl isRequired id='labelInput'>
-                            <FormLabel>Label</FormLabel>
-                            <Input type='text' name='labelInput' />
-                        </FormControl>
+                    <FormControl isRequired id='labelInput'>
+                        <FormLabel>Label</FormLabel>
+                        <Input type='text' name='labelInput' />
+                    </FormControl>
 
-                        <FormControl id='notesInput'>
-                            <FormLabel optionalIndicator>Notes</FormLabel>
-                            <Textarea name='notesInput' />
-                        </FormControl>
+                    <FormControl id='notesInput'>
+                        <FormLabel optionalIndicator>Notes</FormLabel>
+                        <Textarea name='notesInput' />
+                    </FormControl>
 
-                        <TagsInput allKnownTags={tags} initialTags={[]} tagsInputRef={tagsInputRef} />
+                    <TagsInput allKnownTags={tags} initialTags={[]} tagsInputRef={tagsInputRef} />
 
-                        <Spacer marginBottom={12} />
+                    <Spacer marginBottom={12} />
 
-                        <ButtonGroup spacing={4}>
-                            <Button type='submit' leftIcon={<AddIcon />} colorScheme='blue' variant='solid' isDisabled={addressError}>
-                                Save Account
-                            </Button>
-                            <Button type='reset' colorScheme='red' variant='outline'>
-                                Cancel
-                            </Button>
-                        </ButtonGroup>
-                    </VStack>
-                </Form>
-            </VStack>
-        </Box>
+                    <ButtonGroup spacing={4}>
+                        <Button type='submit' leftIcon={<AddIcon />} colorScheme='blue' variant='solid' isDisabled={addressError}>
+                            Save Account
+                        </Button>
+                        <Button type='reset' colorScheme='red' variant='outline'>
+                            Cancel
+                        </Button>
+                    </ButtonGroup>
+                </VStack>
+            </Form>
+        </VStack>
     )
 }

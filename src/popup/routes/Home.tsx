@@ -1,8 +1,9 @@
 import { Link, LoaderFunctionArgs, useLoaderData, useSubmit } from "react-router-dom";
-import { Box, Button, Flex, VStack } from "@chakra-ui/react";
+import { Box, Button, ButtonGroup, Flex, IconButton, Menu, MenuButton, MenuItem, MenuList, VStack } from "@chakra-ui/react";
 import TagFilters from "../components/TagFilters";
 import AccountDisplay from "../components/AccountDisplay";
 import { getAccountsAndTags } from "../utils";
+import { AddIcon, SettingsIcon } from "@chakra-ui/icons";
 
 export async function loader({ request }: LoaderFunctionArgs) {
     const { searchParams } = new URL(request.url);
@@ -20,12 +21,22 @@ export default function Home() {
     const submit = useSubmit();
 
     return (
-        <VStack spacing={8} alignItems='flex-start' maxHeight={4}>
-            <TagFilters tags={tags} filtersEnabled={filtersEnabled} submit={submit} />
+        <VStack spacing={8} alignItems='flex-start'>
+            <ButtonGroup>
+                <Link to='/account/new'>
+                    <Button colorScheme='blue' leftIcon={<AddIcon />}>Add Account</Button>
+                </Link>
 
-            <Link to='/account/new'>
-                <Button colorScheme='blue'>Add Account</Button>
-            </Link>
+                <Menu>
+                    <MenuButton colorScheme='blue' variant='outline' as={IconButton} icon={<SettingsIcon />} aria-label="settings" />
+                    <MenuList>
+                        <Link to='/account/export'><MenuItem isDisabled={accounts.length === 0}>Export</MenuItem></Link>
+                        <Link to='/account/import'><MenuItem>Import</MenuItem></Link>
+                    </MenuList>
+                </Menu>
+            </ButtonGroup>
+
+            <TagFilters tags={tags} filtersEnabled={filtersEnabled} submit={submit} />
 
             <Flex direction='column' alignItems='flex-start' width='100%'>
                 {accounts.map(account => (

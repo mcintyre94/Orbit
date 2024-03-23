@@ -54,22 +54,20 @@ export default function Connect() {
     const submit = useSubmit();
 
     return (
-        <Box>
-            <VStack spacing={8} alignItems='flex-start' maxHeight={4}>
-                <Heading as='h3' size='lg'>Connect to {forOrigin}</Heading>
+        <VStack spacing={8} alignItems='flex-start' maxHeight={4}>
+            <Heading as='h3' size='lg'>Connect to {forOrigin}</Heading>
 
-                <TagFilters tags={tags} filtersEnabled={filtersEnabled} submit={submit} additionalSearchParams={{ forOrigin }} />
+            <TagFilters tags={tags} filtersEnabled={filtersEnabled} submit={submit} additionalSearchParams={{ forOrigin }} />
 
-                <Flex direction='column' alignItems='flex-start' width='100%'>
-                    {accounts.map(account => (
-                        <Box width='100%' key={account.address} onClick={() => sendAndClose(tabId, requestId, forOrigin, account.address)} cursor='pointer'>
-                            <AccountDisplay account={account} />
-                        </Box>
-                    ))}
-                </Flex>
+            <Flex direction='column' alignItems='flex-start' width='100%'>
+                {accounts.map(account => (
+                    <Box width='100%' key={account.address} onClick={() => sendAndClose(tabId, requestId, forOrigin, account.address)} cursor='pointer'>
+                        <AccountDisplay account={account} />
+                    </Box>
+                ))}
+            </Flex>
 
-                <Button colorScheme='blue' size='md' paddingY={4} onClick={() => sendAndClose(tabId, requestId, forOrigin, null)}>Cancel</Button>
-            </VStack>
-        </Box>
+            <Button colorScheme='blue' size='md' paddingY={4} onClick={() => sendAndClose(tabId, requestId, forOrigin, null)}>Cancel</Button>
+        </VStack>
     )
 }

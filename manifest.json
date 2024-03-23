@@ -24,6 +24,7 @@
     },
     "permissions": [
         "sidePanel",
-        "storage"
+        "storage",
+        "downloads"
     ]
 }

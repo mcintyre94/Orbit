@@ -85,53 +85,43 @@ export default function EditAccount() {
 
     return (
         <>
-            <Box marginTop={4}>
-                <VStack spacing={8}>
-                    <Heading as='h1' size='xl' noOfLines={1}>Edit Account</Heading>
+            <VStack spacing={8}>
+                <Heading as='h1' size='xl' noOfLines={1}>Edit Account</Heading>
 
-                    <Form
-                        onSubmit={(event) => {
-                            event.preventDefault();
-                            alert('gm');
-                        }}
-                        id='delete-confirm-form'
-                    />
+                <Form method='post' onReset={cancel}>
+                    <VStack spacing={4}>
+                        <FormControl isReadOnly isDisabled>
+                            <FormLabel>Address</FormLabel>
+                            <Input type='text' name='addressInput' value={account.address} />
+                        </FormControl>
 
-                    <Form method='post' onReset={cancel}>
-                        <VStack spacing={4}>
-                            <FormControl isReadOnly isDisabled>
-                                <FormLabel>Address</FormLabel>
-                                <Input type='text' name='addressInput' value={account.address} />
-                            </FormControl>
+                        <FormControl isRequired id='labelInput'>
+                            <FormLabel>Label</FormLabel>
+                            <Input type='text' name='labelInput' defaultValue={account.label} />
+                        </FormControl>
 
-                            <FormControl isRequired id='labelInput'>
-                                <FormLabel>Label</FormLabel>
-                                <Input type='text' name='labelInput' defaultValue={account.label} />
-                            </FormControl>
+                        <FormControl id='notesInput'>
+                            <FormLabel optionalIndicator>Notes</FormLabel>
+                            <Textarea name='notesInput' defaultValue={account.notes} />
+                        </FormControl>
 
-                            <FormControl id='notesInput'>
-                                <FormLabel optionalIndicator>Notes</FormLabel>
-                                <Textarea name='notesInput' defaultValue={account.notes} />
-                            </FormControl>
+                        <TagsInput allKnownTags={tags} initialTags={account.tags} tagsInputRef={tagsInputRef} />
 
-                            <TagsInput allKnownTags={tags} initialTags={account.tags} tagsInputRef={tagsInputRef} />
+                        <Spacer marginBottom={12} />
 
-                            <Spacer marginBottom={12} />
-
-                            <ButtonGroup spacing={4}>
-                                <Button type='submit' leftIcon={<AddIcon />} colorScheme='blue' variant='solid'>
-                                    Update Account
-                                </Button>
-                                <Button type='reset' colorScheme='red' variant='outline'>
-                                    Cancel
-                                </Button>
-                                {/* delete button opens the delete confirm */}
-                                <IconButton onClick={onDeleteOpen} aria-label='Delete account' colorScheme='red' variant='outline' icon={<DeleteIcon />}></IconButton>
-                            </ButtonGroup>
-                        </VStack>
-                    </Form>
-                </VStack>
-            </Box>
+                        <ButtonGroup spacing={4}>
+                            <Button type='submit' leftIcon={<AddIcon />} colorScheme='blue' variant='solid'>
+                                Update Account
+                            </Button>
+                            <Button type='reset' colorScheme='red' variant='outline'>
+                                Cancel
+                            </Button>
+                            {/* delete button opens the delete confirm */}
+                            <IconButton onClick={onDeleteOpen} aria-label='Delete account' colorScheme='red' variant='outline' icon={<DeleteIcon />}></IconButton>
+                        </ButtonGroup>
+                    </VStack>
+                </Form>
+            </VStack>
 
             <AlertDialog
                 isOpen={isDeleteOpen}
