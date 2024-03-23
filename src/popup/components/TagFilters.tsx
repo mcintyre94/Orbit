@@ -1,6 +1,6 @@
 import { UseCheckboxProps, useCheckbox, chakra, Tag, Box, CheckboxGroup, FormControl, FormLabel, Switch, VStack, Wrap, WrapItem, Input } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
-import { filteredAccountsLoader } from "../loaders/filteredAccountsLoader";
+import { loader } from "../routes/Home";
 import { Form, SubmitFunction } from "react-router-dom";
 
 function TagCheckbox(props: PropsWithChildren<UseCheckboxProps>) {
@@ -21,7 +21,7 @@ function TagCheckbox(props: PropsWithChildren<UseCheckboxProps>) {
 }
 
 interface Props {
-    tags: Awaited<ReturnType<typeof filteredAccountsLoader>>['tags'];
+    tags: Awaited<ReturnType<typeof loader>>['tags'];
     filtersEnabled: boolean;
     submit: SubmitFunction;
     additionalSearchParams?: Record<string, string>
@@ -53,23 +53,26 @@ export default function TagFilters({ tags, filtersEnabled, submit, additionalSea
                             }}
                         />
                     </FormControl>
-                    <Wrap alignSelf='center'>
-                        <CheckboxGroup colorScheme='blue'>
-                            {tags.map(tag =>
-                                <WrapItem key={tag.tagName}>
-                                    <TagCheckbox
-                                        name='tag'
-                                        value={tag.tagName}
-                                        onChange={(event) => {
-                                            submit(event.currentTarget.form);
-                                        }}
-                                        isChecked={tag.selected}
-                                        isDisabled={!filtersEnabled}
-                                    >{tag.tagName}</TagCheckbox>
-                                </WrapItem>
-                            )}
-                        </CheckboxGroup>
-                    </Wrap>
+                    {filtersEnabled ?
+                        <Wrap alignSelf='center'>
+                            <CheckboxGroup colorScheme='blue'>
+                                {tags.map(tag =>
+                                    <WrapItem key={tag.tagName}>
+                                        <TagCheckbox
+                                            name='tag'
+                                            value={tag.tagName}
+                                            onChange={(event) => {
+                                                submit(event.currentTarget.form);
+                                            }}
+                                            isChecked={tag.selected}
+                                            isDisabled={!filtersEnabled}
+                                        >{tag.tagName}</TagCheckbox>
+                                    </WrapItem>
+                                )}
+                            </CheckboxGroup>
+                        </Wrap>
+                        : null
+                    }
                 </VStack>
             </Form>
         </Box>
