@@ -8,6 +8,7 @@ import CreateAccount, { action as createAccountAction, loader as createAccountLo
 import { action as deleteAccountAction } from './routes/DeleteAccount'
 import EditAccount, { action as editAccountAction, loader as editAccountLoader } from './routes/EditAccount'
 import ExportAccounts, { loader as exportAccountsLoader } from './routes/ExportAccounts'
+import ImportAccounts, { action as importAccountsAction } from './routes/ImportAccounts'
 import Layout from './layout'
 import Connect, { loader as connectLoader } from './routes/Connect'
 
@@ -38,6 +39,11 @@ const router = createBrowserRouter([
         path: "/account/export",
         loader: exportAccountsLoader,
         element: <ExportAccounts />,
+      },
+      {
+        path: "/account/import",
+        action: importAccountsAction,
+        element: <ImportAccounts />,
       },
       {
         path: "/account/:address/edit",

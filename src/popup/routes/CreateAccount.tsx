@@ -66,8 +66,10 @@ export default function CreateAccount() {
     useEffect(() => {
         if (actionData) {
             toast({
-                title: actionData.error,
+                title: 'Error creating account',
+                description: actionData.error,
                 status: 'error',
+                duration: 10_000,
                 isClosable: true,
             })
         }

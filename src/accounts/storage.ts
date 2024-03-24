@@ -47,6 +47,60 @@ export async function saveNewAccount(newAccount: SavedAccount): Promise<void> {
   await saveAccounts([...accounts, newAccount]);
 }
 
+export async function importAddresses(addresses: string[]): Promise<{
+  importedCount: number;
+  skipped: Address[];
+  invalid: string[];
+}> {
+  const accounts = await getSavedAccounts();
+
+  const existingAddresses = new Set(accounts.map((a) => a.address));
+  const existingLabels = new Set(accounts.map((a) => a.label));
+
+  let importedCount = 0;
+  let skipped: Address[] = [];
+  let invalid: string[] = [];
+
+  let labelNumber = accounts.length + 1;
+  for (const address of addresses) {
+    // filter out invalid addresses
+    if (!isAddress(address)) {
+      invalid.push(address);
+      continue;
+    }
+
+    // filter out existing addresses(incl duplicates within the addresses input)
+    if (existingAddresses.has(address)) {
+      skipped.push(address);
+      continue;
+    }
+
+    // find a unique label to use
+    let nextLabel = `account ${labelNumber}`;
+    while (existingLabels.has(nextLabel)) {
+      nextLabel = `account ${labelNumber++}`;
+    }
+
+    accounts.push({
+      address,
+      label: nextLabel,
+      notes: "",
+      tags: [],
+    });
+
+    importedCount++;
+    existingAddresses.add(address);
+    existingLabels.add(nextLabel);
+  }
+
+  await saveAccounts(accounts);
+  return {
+    importedCount,
+    skipped,
+    invalid,
+  };
+}
+
 export async function getTags(): Promise<string[]> {
   const accounts = await getSavedAccounts();
   return [...new Set(accounts.flatMap((a) => a.tags))];

@@ -68,7 +68,7 @@ export default function ExportAccounts() {
                     <Tabs minWidth='100%'>
                         <TabList>
                             <Tab>Addresses</Tab>
-                            <Tab>Code</Tab>
+                            <Tab>Accounts</Tab>
                         </TabList>
 
                         <TabPanels>
