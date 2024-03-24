@@ -101,14 +101,7 @@ window.addEventListener(
 );
 
 /** Receive messages from the background */
-chrome.runtime.onMessage.addListener(async function (
-  request,
-  sender,
-  sendResponse
-) {
-  // TODO: do I need this/when?
-  // sendResponse({ "success": true });
-
+chrome.runtime.onMessage.addListener(async function (request) {
   const event = request as BackgroundEvent;
 
   if (event.origin !== "background") {

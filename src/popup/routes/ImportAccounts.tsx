@@ -59,7 +59,7 @@ async function importAccountsAction(accounts: SavedAccount[]): Promise<ActionDat
     }
 }
 
-// TODO: too much here, refactor to a nested route
+// TODO: too much here, can we refactor to a nested route?
 export async function action({ request }: ActionFunctionArgs): Promise<ActionData | null> {
     const formData = await request.formData();
     const updates = Object.fromEntries(formData) as unknown as FormDataUpdates;

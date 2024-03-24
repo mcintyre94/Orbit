@@ -36,7 +36,6 @@ export default function Home() {
                 </Menu>
             </ButtonGroup>
 
-            {/* TODO: use url replace to stop navigation getting messed up (we have swipe back/forward, should have clean history) */}
             <TagFilters tags={tags} filtersEnabled={filtersEnabled} submit={submit} />
 
             <Flex direction='column' alignItems='flex-start' width='100%'>

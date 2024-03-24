@@ -50,9 +50,6 @@ function openPopup({
 }
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  // TODO: do I need this/when?
-  //   sendResponse({ success: true });
-
   if (sender.origin === undefined) {
     console.log("dropping event with unknown origin", request, sender);
     return;
