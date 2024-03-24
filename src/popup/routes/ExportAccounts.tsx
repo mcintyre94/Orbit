@@ -1,9 +1,8 @@
-import { Link, LoaderFunctionArgs, useLoaderData, useNavigate, useSubmit } from "react-router-dom";
-import { Box, Button, ButtonGroup, Code, Flex, IconButton, Menu, MenuButton, MenuItem, MenuList, Tab, TabList, TabPanel, TabPanels, Tabs, VStack, Text, useClipboard, Heading, Spacer } from "@chakra-ui/react";
+import { Link, LoaderFunctionArgs, useLoaderData, useSubmit } from "react-router-dom";
+import { Box, Button, ButtonGroup, Flex, Tab, TabList, TabPanel, TabPanels, Tabs, VStack, Text, useClipboard, Heading, Spacer } from "@chakra-ui/react";
 import TagFilters from "../components/TagFilters";
-import AccountDisplay from "../components/AccountDisplay";
 import { getAccountsAndTags } from "../utils";
-import { AddIcon, CopyIcon, DownloadIcon, SettingsIcon } from "@chakra-ui/icons";
+import { CopyIcon, DownloadIcon } from "@chakra-ui/icons";
 import { useMemo } from "react";
 
 export async function loader({ request }: LoaderFunctionArgs) {

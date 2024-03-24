@@ -1,7 +1,7 @@
 import type { Address } from "@solana/web3.js";
 import { makeConnectionSubmitEvent } from "../events";
-import { Link, LoaderFunctionArgs, useLoaderData, useSubmit } from "react-router-dom";
-import { Box, Button, Flex, Heading, Spacer, Tab, TabList, TabPanel, TabPanels, Tabs, VStack } from "@chakra-ui/react";
+import { LoaderFunctionArgs, useLoaderData, useSubmit } from "react-router-dom";
+import { Box, Button, Flex, Heading, Spacer, VStack } from "@chakra-ui/react";
 import AccountDisplay from "../components/AccountDisplay";
 import TagFilters from "../components/TagFilters";
 import { getAccountsAndTags } from "../utils";
