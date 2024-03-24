@@ -4,14 +4,17 @@ import TagFilters from "../components/TagFilters";
 import { getAccountsAndTags } from "../utils";
 import { CopyIcon, DownloadIcon } from "@chakra-ui/icons";
 import { useEffect, useMemo } from "react";
-import { importAddresses } from "../../accounts/storage";
+import { importAccounts, importAddresses } from "../../accounts/storage";
 import { Address } from "@solana/web3.js";
+import { SavedAccount, savedAccountSchema } from "../../accounts/savedAccount";
+import { z } from 'zod';
 
 type FormDataUpdates = {
     importType: 'addresses';
     addresses: string;
 } | {
     importType: 'accounts';
+    accountsFile: File;
 }
 
 type ActionData = {
@@ -35,14 +38,28 @@ async function importAddressesAction(addresses: string[]): Promise<ActionData> {
         } as ActionData;
     } catch (e) {
         console.error('error importing addresses', e);
-        if (e instanceof Error) {
-            return { responseType: 'error', error: `Error saving account: ${e.message}` }
-        } else {
-            return { responseType: 'error', error: `Error saving account: ${e}` }
-        }
+        const message = e instanceof Error ? e.message : e;
+        return { responseType: 'error', error: `Error importing addresses: ${message}` }
     }
 }
 
+async function importAccountsAction(accounts: SavedAccount[]): Promise<ActionData> {
+    try {
+        const { importedCount, skipped } = await importAccounts(accounts);
+        return {
+            responseType: 'imported successfully',
+            importedCount,
+            skipped,
+            invalid: [],
+        } as ActionData;
+    } catch (e) {
+        console.error('error importing accounts', e);
+        const message = e instanceof Error ? e.message : e;
+        return { responseType: 'error', error: `Error importing accounts: ${message}` }
+    }
+}
+
+// TODO: too much here, refactor to a nested route
 export async function action({ request }: ActionFunctionArgs): Promise<ActionData | null> {
     const formData = await request.formData();
     const updates = Object.fromEntries(formData) as unknown as FormDataUpdates;
@@ -50,6 +67,25 @@ export async function action({ request }: ActionFunctionArgs): Promise<ActionDat
     if (updates.importType === 'addresses') {
         const addresses = updates.addresses.split('\n').map(a => a.trim());
         return await importAddressesAction(addresses);
+    } else {
+        // validate the file as a list of accounts
+        // if any issues (including invalid addresses), just error, user probably chose the wrong file
+        const accountsSchema = z.array(savedAccountSchema);
+        let accountsContent: SavedAccount[] = [];
+        try {
+            accountsContent = accountsSchema.parse(JSON.parse(await updates.accountsFile.text())) as SavedAccount[];
+        } catch {
+            // parse error
+            return { responseType: 'error', error: 'Invalid file, does not contain accounts' }
+        }
+
+        try {
+            return await importAccountsAction(accountsContent)
+        } catch (e) {
+            console.error('invalid imported accounts', e);
+            const message = e instanceof Error ? e.message : e;
+            return { responseType: 'error', error: `Invalid accounts file: ${message}` }
+        }
     }
     return null;
 }
@@ -124,12 +160,12 @@ export default function ImportAccounts() {
                         <TabPanels>
                             <TabPanel>
                                 <VStack spacing={4} alignItems='flex-start'>
-                                    <Text fontSize='md'>Enter one address per line to bulk import. Any account already imported will be skipped.</Text>
+                                    <Text fontSize='md'>Enter one address per line to bulk import. Any address already added will be skipped.</Text>
                                     <Box width='100%'>
                                         <Form method='post'>
                                             <VStack spacing={4} alignItems='flex-start'>
                                                 <Input type='hidden' aria-hidden='true' name='importType' value='addresses' />
-                                                <Textarea name='addresses' fontSize='sm' whiteSpace='pre' overflowWrap='normal' borderColor='white' borderWidth={1} rows={10} width='100%' resize='vertical' colorScheme='blue' size='lg' />
+                                                <Textarea isRequired={true} aria-required='true' name='addresses' fontSize='sm' whiteSpace='pre' overflowWrap='normal' borderColor='white' borderWidth={1} rows={10} width='100%' resize='vertical' colorScheme='blue' size='lg' />
                                                 <Button type='submit'>Import</Button>
                                             </VStack>
                                         </Form>
@@ -137,7 +173,16 @@ export default function ImportAccounts() {
                                 </VStack>
                             </TabPanel>
                             <TabPanel>
-                                <Text fontSize='md'>Accounts!</Text>
+                                <VStack spacing={4} alignItems='flex-start'>
+                                    <Text fontSize='md'>Select a file with exported accounts to import them. Any account already added will be skipped.</Text>
+                                    <Form method='post' encType='multipart/form-data'>
+                                        <VStack spacing={4} alignItems='flex-start'>
+                                            <Input type='hidden' aria-hidden='true' name='importType' value='accounts' />
+                                            <Input type='file' isRequired={true} aria-required='true' name='accountsFile' accept=".json" />
+                                            <Button type='submit'>Import</Button>
+                                        </VStack>
+                                    </Form>
+                                </VStack>
                             </TabPanel>
                         </TabPanels>
                     </Tabs>

@@ -101,6 +101,48 @@ export async function importAddresses(addresses: string[]): Promise<{
   };
 }
 
+export async function importAccounts(importAccounts: SavedAccount[]): Promise<{
+  importedCount: number;
+  skipped: Address[];
+}> {
+  const accounts = await getSavedAccounts();
+
+  const existingAddresses = new Set(accounts.map((a) => a.address));
+  const existingLabels = new Set(accounts.map((a) => a.label));
+
+  let importedCount = 0;
+  let skipped: Address[] = [];
+
+  for (const account of importAccounts) {
+    // filter out existing addresses(incl duplicates within the addresses input)
+    if (existingAddresses.has(account.address)) {
+      skipped.push(account.address);
+      continue;
+    }
+
+    if (existingLabels.has(account.label)) {
+      // if the label is a dupe, rename it
+      let labelNumber = accounts.length + importedCount + 1;
+      let nextLabel = `account ${labelNumber}`;
+      while (existingLabels.has(nextLabel)) {
+        nextLabel = `account ${labelNumber++}`;
+      }
+      account.label = nextLabel;
+    }
+
+    accounts.push(account);
+    importedCount++;
+    existingAddresses.add(account.address);
+    existingLabels.add(account.label);
+  }
+
+  await saveAccounts(accounts);
+  return {
+    importedCount,
+    skipped,
+  };
+}
+
 export async function getTags(): Promise<string[]> {
   const accounts = await getSavedAccounts();
   return [...new Set(accounts.flatMap((a) => a.tags))];
