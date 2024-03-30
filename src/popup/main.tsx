@@ -1,14 +1,16 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { ChakraProvider, ThemeConfig, extendTheme } from '@chakra-ui/react'
-import { RouterProvider, createBrowserRouter } from 'react-router-dom'
+import { Navigate, RouterProvider, createBrowserRouter } from 'react-router-dom'
 import ErrorPage from './error-page'
 import Home, { loader as homeLoader } from './routes/Home'
 import CreateAccount, { action as createAccountAction, loader as createAccountLoader } from './routes/CreateAccount'
 import { action as deleteAccountAction } from './routes/DeleteAccount'
 import EditAccount, { action as editAccountAction, loader as editAccountLoader } from './routes/EditAccount'
 import ExportAccounts, { loader as exportAccountsLoader } from './routes/ExportAccounts'
-import ImportAccounts, { action as importAccountsAction } from './routes/ImportAccounts'
+import ImportAccounts from './routes/ImportAccounts'
+import ImportAccountsAccounts, { action as importAccountsAccountsAction } from './routes/ImportAccountsAccounts'
+import ImportAccountsAddresses, { action as importAccountsAddressesAction } from './routes/ImportAccountsAddresses'
 import Layout from './layout'
 import Connect, { loader as connectLoader } from './routes/Connect'
 
@@ -42,8 +44,23 @@ const router = createBrowserRouter([
       },
       {
         path: "/account/import",
-        action: importAccountsAction,
         element: <ImportAccounts />,
+        children: [
+          {
+            index: true,
+            element: <Navigate to='addresses' replace />
+          },
+          {
+            path: "/account/import/addresses",
+            action: importAccountsAddressesAction,
+            element: <ImportAccountsAddresses />
+          },
+          {
+            action: importAccountsAccountsAction,
+            path: "/account/import/accounts",
+            element: <ImportAccountsAccounts />
+          }
+        ]
       },
       {
         path: "/account/:address/edit",
