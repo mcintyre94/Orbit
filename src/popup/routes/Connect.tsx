@@ -1,10 +1,11 @@
 import type { Address } from "@solana/web3.js";
 import { makeConnectionSubmitEvent } from "../events";
-import { LoaderFunctionArgs, useLoaderData, useSubmit } from "react-router-dom";
+import { FetcherWithComponents, LoaderFunctionArgs, useFetcher, useLoaderData } from "react-router-dom";
 import { Box, Button, Flex, Heading, Spacer, VStack } from "@chakra-ui/react";
 import AccountDisplay from "../components/AccountDisplay";
 import TagFilters from "../components/TagFilters";
-import { getAccountsAndTags } from "../utils";
+import { getAccountsAndTags, getFilteredAccountsData } from "../utils/filterAccounts";
+import { FilteredAccountsLoaderData } from "./FilteredAccounts";
 
 interface Params {
     tabId: string;
@@ -25,12 +26,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     if (!encodedForOrigin) throw new Error('forOrigin is required for connect')
     const forOrigin = decodeURIComponent(encodedForOrigin);
 
-    const enableFilters = searchParams.get("enableFilters");
-    const filtersEnabled = enableFilters === "enabled";
-    let tagsInSearch = new Set(searchParams.getAll("tag"));
-
-    const { accounts, tags } = await getAccountsAndTags(filtersEnabled, tagsInSearch)
-    return { tabId, requestId, forOrigin, accounts, tags, filtersEnabled };
+    const filtersEnabled = false;
+    const { accounts, tags } = await getAccountsAndTags(filtersEnabled, new Set())
+    return { tabId, requestId, forOrigin, accounts, filtersEnabled, tags };
 }
 
 async function sendAndClose(tabId: number, requestId: number, forOrigin: string, address: Address | null) {
@@ -50,15 +48,18 @@ async function sendAndClose(tabId: number, requestId: number, forOrigin: string,
 }
 
 export default function Connect() {
-    const { tabId, requestId, forOrigin, accounts, tags, filtersEnabled } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
-    const submit = useSubmit();
+    const loaderData = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+    const { tabId, requestId, forOrigin } = loaderData;
+    const fetcher = useFetcher() as FetcherWithComponents<FilteredAccountsLoaderData>;
+    const { accounts, filtersEnabled, tags } = getFilteredAccountsData(loaderData, fetcher.data)
 
     return (
         <Flex direction='column' minHeight='100vh'>
             <VStack spacing={8} alignItems='flex-start'>
                 <Heading as='h3' size='lg'>Connect to {forOrigin}</Heading>
 
-                <TagFilters tags={tags} filtersEnabled={filtersEnabled} submit={submit} additionalSearchParams={{ forOrigin }} />
+                {/* TODO: can we remove this additional params? */}
+                <TagFilters tags={tags} filtersEnabled={filtersEnabled} fetcher={fetcher} additionalSearchParams={{ forOrigin }} />
 
                 <Flex direction='column' alignItems='flex-start' width='100%'>
                     {accounts.map(account => (

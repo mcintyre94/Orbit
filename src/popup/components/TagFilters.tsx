@@ -1,7 +1,8 @@
 import { UseCheckboxProps, useCheckbox, chakra, Tag, Box, CheckboxGroup, FormControl, FormLabel, Switch, VStack, Wrap, WrapItem, Input } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
 import { loader } from "../routes/Home";
-import { Form, SubmitFunction } from "react-router-dom";
+import { Fetcher, FetcherWithComponents, Form, SubmitFunction, useFetcher } from "react-router-dom";
+import { FilteredAccountsLoaderData } from "../routes/FilteredAccounts";
 
 function TagCheckbox(props: PropsWithChildren<UseCheckboxProps>) {
     const { children } = props;
@@ -23,16 +24,16 @@ function TagCheckbox(props: PropsWithChildren<UseCheckboxProps>) {
 interface Props {
     tags: Awaited<ReturnType<typeof loader>>['tags'];
     filtersEnabled: boolean;
-    submit: SubmitFunction;
+    fetcher: FetcherWithComponents<unknown>;
     additionalSearchParams?: Record<string, string>
 }
 
-export default function TagFilters({ tags, filtersEnabled, submit, additionalSearchParams }: Props) {
+export default function TagFilters({ tags, filtersEnabled, fetcher, additionalSearchParams }: Props) {
     if (tags.length === 0) return null;
 
     return (
         <Box>
-            <Form>
+            <fetcher.Form action="/filtered-accounts">
                 <VStack spacing={2}>
                     {Object.entries(additionalSearchParams ?? {}).map(([name, value]) => (
                         <FormControl hidden={true} aria-hidden={true}>
@@ -49,7 +50,7 @@ export default function TagFilters({ tags, filtersEnabled, submit, additionalSea
                             value='enabled'
                             defaultChecked={filtersEnabled}
                             onChange={(event) => {
-                                submit(event.currentTarget.form);
+                                fetcher.submit(event.currentTarget.form);
                             }}
                         />
                     </FormControl>
@@ -62,7 +63,7 @@ export default function TagFilters({ tags, filtersEnabled, submit, additionalSea
                                             name='tag'
                                             value={tag.tagName}
                                             onChange={(event) => {
-                                                submit(event.currentTarget.form);
+                                                fetcher.submit(event.currentTarget.form);
                                             }}
                                             isChecked={tag.selected}
                                             isDisabled={!filtersEnabled}
@@ -74,7 +75,7 @@ export default function TagFilters({ tags, filtersEnabled, submit, additionalSea
                         : null
                     }
                 </VStack>
-            </Form>
+            </fetcher.Form>
         </Box>
     )
 }

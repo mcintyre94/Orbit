@@ -1,19 +1,13 @@
-import { Link, LoaderFunctionArgs, useLoaderData, useSubmit } from "react-router-dom";
+import { FetcherWithComponents, Link, useFetcher, useLoaderData } from "react-router-dom";
 import { Box, Button, ButtonGroup, Flex, Tab, TabList, TabPanel, TabPanels, Tabs, VStack, Text, useClipboard, Heading, Spacer } from "@chakra-ui/react";
 import TagFilters from "../components/TagFilters";
-import { getAccountsAndTags } from "../utils";
+import { getFilteredAccountsData, getUnfilteredAccountsData } from "../utils/filterAccounts";
 import { CopyIcon, DownloadIcon } from "@chakra-ui/icons";
 import { useMemo } from "react";
+import { FilteredAccountsLoaderData } from "./FilteredAccounts";
 
-export async function loader({ request }: LoaderFunctionArgs) {
-    const { searchParams } = new URL(request.url);
-
-    const enableFilters = searchParams.get("enableFilters");
-    const filtersEnabled = enableFilters === "enabled";
-    let tagsInSearch = new Set(searchParams.getAll("tag"));
-
-    const { accounts, tags } = await getAccountsAndTags(filtersEnabled, tagsInSearch);
-    return { accounts, filtersEnabled, tags };
+export async function loader(): Promise<FilteredAccountsLoaderData> {
+    return getUnfilteredAccountsData();
 }
 
 function ExportableText({ text, contentType }: { text: string, contentType: 'text/plain' | 'application/json' }) {
@@ -54,15 +48,16 @@ function ExportableText({ text, contentType }: { text: string, contentType: 'tex
 }
 
 export default function ExportAccounts() {
-    const { accounts, filtersEnabled, tags } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
-    const submit = useSubmit();
+    const loaderData = useLoaderData() as FilteredAccountsLoaderData;
+    const fetcher = useFetcher() as FetcherWithComponents<FilteredAccountsLoaderData>;
+    const { accounts, filtersEnabled, tags } = getFilteredAccountsData(loaderData, fetcher.data)
 
     return (
         <Flex direction='column' minHeight='100vh'>
             <VStack spacing={8} alignItems='flex-start'>
                 <Heading alignSelf='center' as='h1' size='xl' noOfLines={1}>Export Accounts</Heading>
 
-                <TagFilters tags={tags} filtersEnabled={filtersEnabled} submit={submit} />
+                <TagFilters tags={tags} filtersEnabled={filtersEnabled} fetcher={fetcher} />
 
                 <Box>
                     <Tabs minWidth='100%'>

@@ -11,6 +11,7 @@ import ExportAccounts, { loader as exportAccountsLoader } from './routes/ExportA
 import ImportAccounts from './routes/ImportAccounts'
 import ImportAccountsAccounts, { action as importAccountsAccountsAction } from './routes/ImportAccountsAccounts'
 import ImportAccountsAddresses, { action as importAccountsAddressesAction } from './routes/ImportAccountsAddresses'
+import { loader as filteredAccountsLoader } from './routes/FilteredAccounts'
 import Layout from './layout'
 import Connect, { loader as connectLoader } from './routes/Connect'
 
@@ -76,6 +77,10 @@ const router = createBrowserRouter([
         path: "/connect/:tabId/:requestId",
         loader: connectLoader,
         element: <Connect />
+      },
+      {
+        path: "/filtered-accounts",
+        loader: filteredAccountsLoader,
       }
     ]
   }
