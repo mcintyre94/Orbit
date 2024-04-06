@@ -4,9 +4,10 @@ import { type Address } from '@solana/web3.js';
 import { RefObject, useCallback, useEffect, useRef } from 'react';
 import { getAccount, getTags, updateAccount } from '../../accounts/storage';
 import { SavedAccount } from '../../accounts/savedAccount';
-import { ActionFunctionArgs, Form, LoaderFunctionArgs, redirect, useActionData, useLoaderData, useNavigate } from 'react-router-dom';
+import { ActionFunctionArgs, Form, LoaderFunctionArgs, redirect, useActionData, useLoaderData, useNavigate, useRouteLoaderData } from 'react-router-dom';
 import TagsInput from '../components/TagsInput';
 import { shortAddress } from '../utils';
+import { FilteredAccountsLoaderData } from './FilteredAccounts';
 
 type jsonString = string;
 
@@ -17,8 +18,7 @@ interface Params {
 export async function loader({ params }: LoaderFunctionArgs) {
     const { address } = params as unknown as Params
     const account = await getAccount(address);
-    const tags = await getTags();
-    return { account, tags };
+    return { account };
 }
 
 interface FormDataUpdates {
@@ -60,7 +60,9 @@ export async function action({ params, request }: ActionFunctionArgs) {
 
 export default function EditAccount() {
     const actionData = useActionData() as ActionData | undefined;
-    const { account, tags } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+    const { account } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+    const { tags } = useRouteLoaderData('accounts-route') as FilteredAccountsLoaderData;
+    const tagNames = tags.map(t => t.tagName);
     const tagsInputRef = useRef<HTMLInputElement | null>(null);
     const toast = useToast();
     const navigate = useNavigate();
@@ -106,7 +108,7 @@ export default function EditAccount() {
                                 <Textarea name='notesInput' defaultValue={account.notes} />
                             </FormControl>
 
-                            <TagsInput allKnownTags={tags} initialTags={account.tags} tagsInputRef={tagsInputRef} />
+                            <TagsInput allKnownTags={tagNames} initialTags={account.tags} tagsInputRef={tagsInputRef} />
                         </VStack>
                     </Form>
                 </VStack>

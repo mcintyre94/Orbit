@@ -1,17 +1,11 @@
-import { FetcherWithComponents, Link as ReactRouterLink, NavLink, Outlet, useFetcher, useLoaderData } from "react-router-dom";
-import { Box, Button, ButtonGroup, Flex, Link, Tab, TabList, TabPanel, TabPanels, Tabs, VStack, Text, useClipboard, Heading, Spacer, HStack } from "@chakra-ui/react";
+import { FetcherWithComponents, Link as ReactRouterLink, NavLink, Outlet, useFetcher, useLoaderData, useRouteLoaderData } from "react-router-dom";
+import { Box, Button, Flex, Link, VStack, Heading, Spacer, HStack } from "@chakra-ui/react";
 import TagFilters from "../components/TagFilters";
-import { getFilteredAccountsData, getUnfilteredAccountsData } from "../utils/filterAccounts";
-import { CopyIcon, DownloadIcon } from "@chakra-ui/icons";
-import { useMemo } from "react";
+import { getFilteredAccountsData } from "../utils/filterAccounts";
 import { FilteredAccountsLoaderData } from "./FilteredAccounts";
 
-export async function loader(): Promise<FilteredAccountsLoaderData> {
-    return getUnfilteredAccountsData();
-}
-
 export default function ExportAccounts() {
-    const loaderData = useLoaderData() as FilteredAccountsLoaderData;
+    const loaderData = useRouteLoaderData('accounts-route') as FilteredAccountsLoaderData;
     const fetcher = useFetcher({ key: 'export-accounts-fetcher' }) as FetcherWithComponents<FilteredAccountsLoaderData>;
     const { filtersEnabled, tags } = getFilteredAccountsData(loaderData, fetcher.data)
 

@@ -1,6 +1,6 @@
 import type { Address } from "@solana/web3.js";
 import { makeConnectionSubmitEvent } from "../events";
-import { FetcherWithComponents, LoaderFunctionArgs, useFetcher, useLoaderData } from "react-router-dom";
+import { FetcherWithComponents, LoaderFunctionArgs, useFetcher, useLoaderData, useRouteLoaderData } from "react-router-dom";
 import { Box, Button, Flex, Heading, Spacer, VStack } from "@chakra-ui/react";
 import AccountDisplay from "../components/AccountDisplay";
 import TagFilters from "../components/TagFilters";
@@ -26,11 +26,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     if (!encodedForOrigin) throw new Error('forOrigin is required for connect')
     const forOrigin = decodeURIComponent(encodedForOrigin);
 
-    const filtersEnabled = false;
-    const { accounts, tags } = await getAccountsAndTags(filtersEnabled, new Set())
-    return { tabId, requestId, forOrigin, accounts, filtersEnabled, tags };
+    return { tabId, requestId, forOrigin };
 }
 
+// TODO: should probably be an action
 async function sendAndClose(tabId: number, requestId: number, forOrigin: string, address: Address | null) {
     await chrome.runtime.sendMessage(makeConnectionSubmitEvent({
         tabId,
@@ -51,7 +50,8 @@ export default function Connect() {
     const loaderData = useLoaderData() as Awaited<ReturnType<typeof loader>>;
     const { tabId, requestId, forOrigin } = loaderData;
     const fetcher = useFetcher() as FetcherWithComponents<FilteredAccountsLoaderData>;
-    const { accounts, filtersEnabled, tags } = getFilteredAccountsData(loaderData, fetcher.data)
+    const routeLoaderData = useRouteLoaderData('accounts-route') as FilteredAccountsLoaderData;
+    const { accounts, tags, filtersEnabled } = getFilteredAccountsData(routeLoaderData, fetcher.data);
 
     return (
         <Flex direction='column' minHeight='100vh'>

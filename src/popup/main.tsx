@@ -1,13 +1,14 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { ChakraProvider, ThemeConfig, extendTheme } from '@chakra-ui/react'
-import { Navigate, RouterProvider, createBrowserRouter } from 'react-router-dom'
+import { Navigate, Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom'
 import ErrorPage from './error-page'
-import Home, { loader as homeLoader } from './routes/Home'
-import CreateAccount, { action as createAccountAction, loader as createAccountLoader } from './routes/CreateAccount'
+import { loader as accountsLoader } from './routes/Accounts'
+import Home from './routes/Home'
+import CreateAccount, { action as createAccountAction } from './routes/CreateAccount'
 import { action as deleteAccountAction } from './routes/DeleteAccount'
 import EditAccount, { action as editAccountAction, loader as editAccountLoader } from './routes/EditAccount'
-import ExportAccounts, { loader as exportAccountsLoader } from './routes/ExportAccounts'
+import ExportAccounts from './routes/ExportAccounts'
 import ExportAccountsAccounts from './routes/ExportAccountsAccounts';
 import ExportAccountsAddresses from './routes/ExportAccountsAddresses';
 import ImportAccounts from './routes/ImportAccounts'
@@ -27,76 +28,82 @@ const router = createBrowserRouter([
   {
     element: <Layout />,
     errorElement: <ErrorPage />,
+    path: "/",
     children: [
       {
-        // TODO: rethink routes. Can we put the accounts/tags/filtersEnabled on a base route, eg /accounts?
-        // then leaves just have their own required minimal loader?
-        // would redirect index.html to eg /accounts/home
         // chrome extension default path
-        path: "/index.html",
-        loader: homeLoader,
-        element: <Home />
+        path: "index.html",
+        element: <Navigate to='/accounts/home' replace />
       },
       {
-        path: "/account/new",
-        action: createAccountAction,
-        loader: createAccountLoader,
-        element: <CreateAccount />,
-      },
-      {
-        path: "/account/export",
-        loader: exportAccountsLoader,
-        element: <ExportAccounts />,
-        id: "export-accounts-route",
+        path: "accounts",
+        loader: accountsLoader,
+        id: "accounts-route",
+        element: <Outlet />,
         children: [
           {
-            index: true,
-            element: <Navigate to='addresses' replace />
+            path: "home",
+            element: <Home />,
           },
           {
-            path: "/account/export/addresses",
-            element: <ExportAccountsAddresses />
+            path: "new",
+            action: createAccountAction,
+            element: <CreateAccount />,
           },
           {
-            path: "/account/export/accounts",
-            element: <ExportAccountsAccounts />
-          }
+            path: "export",
+            element: <ExportAccounts />,
+            children: [
+              {
+                index: true,
+                element: <Navigate to='addresses' replace />
+              },
+              {
+                path: "addresses",
+                element: <ExportAccountsAddresses />
+              },
+              {
+                path: "accounts",
+                element: <ExportAccountsAccounts />
+              }
+            ]
+          },
+          {
+            path: "import",
+            element: <ImportAccounts />,
+            children: [
+              {
+                index: true,
+                element: <Navigate to='addresses' replace />
+              },
+              {
+                path: "addresses",
+                action: importAccountsAddressesAction,
+                element: <ImportAccountsAddresses />
+              },
+              {
+                path: "accounts",
+                action: importAccountsAccountsAction,
+                element: <ImportAccountsAccounts />
+              }
+            ]
+          },
+          {
+            path: "/accounts/:address/edit",
+            action: editAccountAction,
+            loader: editAccountLoader,
+            element: <EditAccount />
+          },
+          {
+            path: "/accounts/:address/delete",
+            action: deleteAccountAction
+          },
+          {
+            path: "connect/:tabId/:requestId",
+            loader: connectLoader,
+            element: <Connect />
+          },
         ]
-      },
-      {
-        path: "/account/import",
-        element: <ImportAccounts />,
-        children: [
-          {
-            index: true,
-            element: <Navigate to='addresses' replace />
-          },
-          {
-            path: "/account/import/addresses",
-            action: importAccountsAddressesAction,
-            element: <ImportAccountsAddresses />
-          },
-          {
-            action: importAccountsAccountsAction,
-            path: "/account/import/accounts",
-            element: <ImportAccountsAccounts />
-          }
-        ]
-      },
-      {
-        path: "/account/:address/edit",
-        action: editAccountAction,
-        loader: editAccountLoader,
-        element: <EditAccount />
-      },
-      {
-        path: "/account/:address/delete",
-        action: deleteAccountAction
-      },
-      {
-        path: "/connect/:tabId/:requestId",
-        loader: connectLoader,
-        element: <Connect />
       },
       {
         path: "/filtered-accounts",

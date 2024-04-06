@@ -2,17 +2,13 @@ import { AddIcon } from '@chakra-ui/icons';
 import { Button, ButtonGroup, FormControl, FormErrorMessage, FormLabel, Heading, Input, Spacer, Textarea, VStack, useToast } from '@chakra-ui/react'
 import { isAddress } from '@solana/web3.js';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { getTags, saveNewAccount } from '../../accounts/storage';
+import { saveNewAccount } from '../../accounts/storage';
 import { SavedAccount } from '../../accounts/savedAccount';
-import { ActionFunctionArgs, Form, redirect, useActionData, useLoaderData, useNavigate } from 'react-router-dom';
+import { ActionFunctionArgs, Form, redirect, useActionData, useNavigate, useRouteLoaderData } from 'react-router-dom';
 import TagsInput from '../components/TagsInput';
+import { FilteredAccountsLoaderData } from './FilteredAccounts';
 
 type jsonString = string;
-
-export async function loader() {
-    const tags = await getTags();
-    return { tags };
-}
 
 interface FormDataUpdates {
     addressInput: string;
@@ -57,7 +53,8 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function CreateAccount() {
     const [addressError, setAddressError] = useState(false);
     const actionData = useActionData() as ActionData | undefined;
-    const { tags } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
+    const { tags } = useRouteLoaderData('accounts-route') as FilteredAccountsLoaderData;
+    const tagNames = tags.map(t => t.tagName);
     const tagsInputRef = useRef<HTMLInputElement | null>(null);
     const toast = useToast();
     const navigate = useNavigate();
@@ -106,7 +103,8 @@ export default function CreateAccount() {
                         <Textarea name='notesInput' />
                     </FormControl>
 
-                    <TagsInput allKnownTags={tags} initialTags={[]} tagsInputRef={tagsInputRef} />
+                    {/* TODO: figure out how to disable browser autocomplete */}
+                    <TagsInput allKnownTags={tagNames} initialTags={[]} tagsInputRef={tagsInputRef} />
 
                     <Spacer marginBottom={12} />
 
