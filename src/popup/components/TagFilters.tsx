@@ -1,6 +1,6 @@
 import { UseCheckboxProps, useCheckbox, chakra, Tag, Box, CheckboxGroup, FormControl, FormLabel, Switch, VStack, Wrap, WrapItem, Input } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
-import { loader } from "../routes/Home";
+import { loader } from "../routes/Accounts";
 import { FetcherWithComponents } from "react-router-dom";
 
 function TagCheckbox(props: PropsWithChildren<UseCheckboxProps>) {

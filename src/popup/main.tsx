@@ -16,7 +16,7 @@ import ImportAccountsAccounts, { action as importAccountsAccountsAction } from '
 import ImportAccountsAddresses, { action as importAccountsAddressesAction } from './routes/ImportAccountsAddresses'
 import { loader as filteredAccountsLoader } from './routes/FilteredAccounts'
 import Layout from './layout'
-import Connect, { loader as connectLoader } from './routes/Connect'
+import Connect, { action as connectAction, loader as connectLoader } from './routes/Connect'
 
 const config: ThemeConfig = {
   initialColorMode: 'dark',
@@ -101,6 +101,7 @@ const router = createBrowserRouter([
           {
             path: "connect/:tabId/:requestId",
             loader: connectLoader,
+            action: connectAction,
             element: <Connect />
           },
         ]
