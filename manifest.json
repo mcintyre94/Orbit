@@ -1,9 +1,9 @@
 {
     "manifest_version": 3,
-    "name": "Multiwallet2",
+    "name": "Orbit",
     "version": "1.0.0",
     "action": {
-        "default_title": "Click to open"
+        "default_title": "Organise your Solana wallets"
     },
     "background": {
         "service_worker": "src/background/background.ts",
