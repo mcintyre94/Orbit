@@ -62,16 +62,16 @@ class RequestManager {
   }
 }
 
-class MultiWallet implements Wallet {
+class OrbitWallet implements Wallet {
   constructor(requestManager: RequestManager) {
-    if (new.target === MultiWallet) {
+    if (new.target === OrbitWallet) {
       Object.freeze(this);
     }
 
     this.#requestManager = requestManager;
   }
 
-  #name = "Multiwallet";
+  #name = "Orbit";
   // TODO: Add image.
   #icon =
     "data:image/svg+xml;base64,Cjxzdmcgd2lkdGg9IjEwMjQiIGhlaWdodD0iMTAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ3aGl0ZSIvPgogIDx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJibGFjayIgZm9udC1zaXplPSIyNCI+CiAgICBXYWxsZXQgSWNvbiBQbGFjZWhvbGRlcgogIDwvdGV4dD4KPC9zdmc+Cg==" as const;
@@ -217,7 +217,7 @@ class MultiWallet implements Wallet {
   console.log("injected");
 
   const requestManager = new RequestManager();
-  const wallet = new MultiWallet(requestManager);
+  const wallet = new OrbitWallet(requestManager);
   // this will expose accounts if there are any previously connected
   wallet["features"]["standard:connect"].connect({ silent: true });
   registerWallet(wallet);
