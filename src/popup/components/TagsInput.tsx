@@ -1,4 +1,4 @@
-import { FormControl, FormLabel, Input, RequiredIndicator } from "@chakra-ui/react";
+import { FormControl, FormLabel, Input } from "@chakra-ui/react";
 import { AutoComplete, AutoCompleteCreatable, AutoCompleteInput, AutoCompleteItem, AutoCompleteList, AutoCompleteTag } from "@choc-ui/chakra-autocomplete";
 
 interface TagsInputProps {
@@ -23,7 +23,7 @@ export default function TagsInput({ allKnownTags, initialTags, tagsInputRef }: T
                         tagsInputRef.current.value = JSON.stringify(vals);
                     }
                 }}>
-                    <AutoCompleteInput variant="filled" name='tagsInputUI'>
+                    <AutoCompleteInput variant="filled" name='tagsInputUI' autoComplete="off" type="search">
                         {({ tags }) =>
                             tags.map((tag, tid) => (
                                 <AutoCompleteTag

@@ -103,7 +103,6 @@ export default function CreateAccount() {
                         <Textarea name='notesInput' />
                     </FormControl>
 
-                    {/* TODO: figure out how to disable browser autocomplete */}
                     <TagsInput allKnownTags={tagNames} initialTags={[]} tagsInputRef={tagsInputRef} />
 
                     <Spacer marginBottom={12} />
