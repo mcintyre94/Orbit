@@ -1,5 +1,5 @@
-import { FetcherWithComponents, Link, useFetcher, useLoaderData } from "react-router-dom";
-import { Box, Button, ButtonGroup, Flex, Tab, TabList, TabPanel, TabPanels, Tabs, VStack, Text, useClipboard, Heading, Spacer } from "@chakra-ui/react";
+import { FetcherWithComponents, Link as ReactRouterLink, NavLink, Outlet, useFetcher, useLoaderData } from "react-router-dom";
+import { Box, Button, ButtonGroup, Flex, Link, Tab, TabList, TabPanel, TabPanels, Tabs, VStack, Text, useClipboard, Heading, Spacer, HStack } from "@chakra-ui/react";
 import TagFilters from "../components/TagFilters";
 import { getFilteredAccountsData, getUnfilteredAccountsData } from "../utils/filterAccounts";
 import { CopyIcon, DownloadIcon } from "@chakra-ui/icons";
@@ -10,47 +10,10 @@ export async function loader(): Promise<FilteredAccountsLoaderData> {
     return getUnfilteredAccountsData();
 }
 
-function ExportableText({ text, contentType }: { text: string, contentType: 'text/plain' | 'application/json' }) {
-    const clipboard = useClipboard(text);
-
-    const downloadUrl = useMemo(() => {
-        const blob = new Blob([text], { type: contentType });
-        return URL.createObjectURL(blob);
-    }, [text, contentType]);
-
-    const downloadFilename = useMemo(() => {
-        if (contentType === 'application/json') {
-            return 'accounts.json'
-        } else {
-            return 'addresses.txt'
-        }
-    }, [contentType]);
-
-    return (
-        <VStack spacing={4} alignItems='flex-start'>
-            <ButtonGroup size='xs'>
-                <Button leftIcon={<CopyIcon />} onClick={() => clipboard.onCopy()}>{clipboard.hasCopied ? 'Copied' : 'Copy'}</Button>
-                <Button leftIcon={<DownloadIcon />} onClick={async () => {
-                    await chrome.downloads.download({
-                        url: downloadUrl,
-                        filename: downloadFilename,
-                        saveAs: true,
-                    })
-                }}>Download</Button>
-            </ButtonGroup>
-
-            <Text fontSize='md' whiteSpace='pre-wrap' borderWidth='1px' borderRadius='md' padding={2}>{text}</Text>
-
-
-
-        </VStack >
-    )
-}
-
 export default function ExportAccounts() {
     const loaderData = useLoaderData() as FilteredAccountsLoaderData;
-    const fetcher = useFetcher() as FetcherWithComponents<FilteredAccountsLoaderData>;
-    const { accounts, filtersEnabled, tags } = getFilteredAccountsData(loaderData, fetcher.data)
+    const fetcher = useFetcher({ key: 'export-accounts-fetcher' }) as FetcherWithComponents<FilteredAccountsLoaderData>;
+    const { filtersEnabled, tags } = getFilteredAccountsData(loaderData, fetcher.data)
 
     return (
         <Flex direction='column' minHeight='100vh'>
@@ -59,27 +22,16 @@ export default function ExportAccounts() {
 
                 <TagFilters tags={tags} filtersEnabled={filtersEnabled} fetcher={fetcher} />
 
-                <Box>
-                    <Tabs minWidth='100%'>
-                        <TabList>
-                            <Tab>Addresses</Tab>
-                            <Tab>Accounts</Tab>
-                        </TabList>
+                <HStack gap='8'>
+                    <Link to='addresses' as={NavLink} fontSize='large' _activeLink={{ color: 'lightblue', fontWeight: 'bold', textDecoration: 'underline' }}>Addresses</Link>
+                    <Link to='accounts' as={NavLink} fontSize='large' _activeLink={{ color: 'lightblue', fontWeight: 'bold', textDecoration: 'underline' }}>Accounts</Link>
+                </HStack>
 
-                        <TabPanels>
-                            <TabPanel>
-                                <ExportableText text={accounts.map(a => a.address).join('\n')} contentType='text/plain' />
-                            </TabPanel>
-                            <TabPanel>
-                                <ExportableText text={JSON.stringify(accounts, null, 2)} contentType='application/json' />
-                            </TabPanel>
-                        </TabPanels>
-                    </Tabs>
-                </Box>
+                <Outlet />
             </VStack>
             <Spacer />
-            <Box marginBottom={8}>
-                <Link to='/index.html'>
+            <Box marginBottom={8} marginTop={8}>
+                <Link to='/index.html' as={ReactRouterLink}>
                     <Button colorScheme='white' variant='outline'>
                         Back
                     </Button>

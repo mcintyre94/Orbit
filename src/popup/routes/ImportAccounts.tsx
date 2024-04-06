@@ -15,7 +15,7 @@ export default function ImportAccounts() {
                 <Outlet />
             </VStack>
             <Spacer />
-            <Box marginBottom={8}>
+            <Box marginBottom={8} marginTop={8}>
                 <Link to='/index.html' as={ReactRouterLink}>
                     <Button colorScheme='white' variant='outline'>
                         Back
