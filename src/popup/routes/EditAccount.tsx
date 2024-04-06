@@ -6,7 +6,7 @@ import { getAccount, getTags, updateAccount } from '../../accounts/storage';
 import { SavedAccount } from '../../accounts/savedAccount';
 import { ActionFunctionArgs, Form, LoaderFunctionArgs, redirect, useActionData, useLoaderData, useNavigate, useRouteLoaderData } from 'react-router-dom';
 import TagsInput from '../components/TagsInput';
-import { shortAddress } from '../utils';
+import { shortAddress } from '../utils/address';
 import { FilteredAccountsLoaderData } from './FilteredAccounts';
 
 type jsonString = string;
