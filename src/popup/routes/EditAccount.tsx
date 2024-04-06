@@ -91,26 +91,28 @@ export default function EditAccount() {
                 <VStack spacing={8}>
                     <Heading as='h1' size='xl' noOfLines={1}>Edit Account</Heading>
 
-                    <Form method='post' onReset={cancel} id='editForm'>
-                        <VStack spacing={4}>
-                            <FormControl isReadOnly isDisabled>
-                                <FormLabel>Address</FormLabel>
-                                <Input type='text' name='addressInput' value={account.address} />
-                            </FormControl>
+                    <Box width='100%' maxWidth={400}>
+                        <Form method='post' onReset={cancel} id='editForm'>
+                            <VStack spacing={4}>
+                                <FormControl isReadOnly isDisabled>
+                                    <FormLabel>Address</FormLabel>
+                                    <Input type='text' name='addressInput' value={account.address} />
+                                </FormControl>
 
-                            <FormControl isRequired id='labelInput'>
-                                <FormLabel>Label</FormLabel>
-                                <Input type='text' name='labelInput' defaultValue={account.label} />
-                            </FormControl>
+                                <FormControl isRequired id='labelInput'>
+                                    <FormLabel>Label</FormLabel>
+                                    <Input type='text' name='labelInput' defaultValue={account.label} />
+                                </FormControl>
 
-                            <FormControl id='notesInput'>
-                                <FormLabel optionalIndicator>Notes</FormLabel>
-                                <Textarea name='notesInput' defaultValue={account.notes} />
-                            </FormControl>
+                                <FormControl id='notesInput'>
+                                    <FormLabel optionalIndicator>Notes</FormLabel>
+                                    <Textarea name='notesInput' defaultValue={account.notes} />
+                                </FormControl>
 
-                            <TagsInput allKnownTags={tagNames} initialTags={account.tags} tagsInputRef={tagsInputRef} />
-                        </VStack>
-                    </Form>
+                                <TagsInput allKnownTags={tagNames} initialTags={account.tags} tagsInputRef={tagsInputRef} />
+                            </VStack>
+                        </Form>
+                    </Box>
                 </VStack>
 
                 <AlertDialog
@@ -155,6 +157,6 @@ export default function EditAccount() {
                     <IconButton onClick={onDeleteOpen} aria-label='Delete account' colorScheme='red' variant='outline' icon={<DeleteIcon />}></IconButton>
                 </ButtonGroup>
             </Box>
-        </Flex>
+        </Flex >
     )
 }
