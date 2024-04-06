@@ -27,6 +27,9 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       {
+        // TODO: rethink routes. Can we put the accounts/tags/filtersEnabled on a base route, eg /accounts?
+        // then leaves just have their own required minimal loader?
+        // would redirect index.html to eg /accounts/home
         // chrome extension default path
         path: "/index.html",
         loader: homeLoader,

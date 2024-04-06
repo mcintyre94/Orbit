@@ -1,8 +1,7 @@
 import { UseCheckboxProps, useCheckbox, chakra, Tag, Box, CheckboxGroup, FormControl, FormLabel, Switch, VStack, Wrap, WrapItem, Input } from "@chakra-ui/react";
 import { PropsWithChildren } from "react";
 import { loader } from "../routes/Home";
-import { Fetcher, FetcherWithComponents, Form, SubmitFunction, useFetcher } from "react-router-dom";
-import { FilteredAccountsLoaderData } from "../routes/FilteredAccounts";
+import { FetcherWithComponents } from "react-router-dom";
 
 function TagCheckbox(props: PropsWithChildren<UseCheckboxProps>) {
     const { children } = props;
@@ -25,21 +24,15 @@ interface Props {
     tags: Awaited<ReturnType<typeof loader>>['tags'];
     filtersEnabled: boolean;
     fetcher: FetcherWithComponents<unknown>;
-    additionalSearchParams?: Record<string, string>
 }
 
-export default function TagFilters({ tags, filtersEnabled, fetcher, additionalSearchParams }: Props) {
+export default function TagFilters({ tags, filtersEnabled, fetcher }: Props) {
     if (tags.length === 0) return null;
 
     return (
         <Box>
             <fetcher.Form action="/filtered-accounts">
                 <VStack spacing={2}>
-                    {Object.entries(additionalSearchParams ?? {}).map(([name, value]) => (
-                        <FormControl hidden={true} aria-hidden={true}>
-                            <Input type='hidden' name={name} value={value} />
-                        </FormControl>
-                    ))}
                     <FormControl display='flex' alignItems='center'>
                         <FormLabel htmlFor='enableFilters' mb='0'>
                             Enable filtering

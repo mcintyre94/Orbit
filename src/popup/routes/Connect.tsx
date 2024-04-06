@@ -58,8 +58,7 @@ export default function Connect() {
             <VStack spacing={8} alignItems='flex-start'>
                 <Heading as='h3' size='lg'>Connect to {forOrigin}</Heading>
 
-                {/* TODO: can we remove this additional params? */}
-                <TagFilters tags={tags} filtersEnabled={filtersEnabled} fetcher={fetcher} additionalSearchParams={{ forOrigin }} />
+                <TagFilters tags={tags} filtersEnabled={filtersEnabled} fetcher={fetcher} />
 
                 <Flex direction='column' alignItems='flex-start' width='100%'>
                     {accounts.map(account => (
