@@ -124,12 +124,14 @@ export default function Connect() {
                 <TagFilters tags={tags} filtersEnabled={filtersEnabled} fetcher={filtersFetcher} />
 
                 <Flex direction='column' alignItems='flex-start' width='100%'>
-                    <Form method="post" id="accounts-form" onReset={() => sendAndClose(tabId, requestId, forOrigin, null)}>
-                        <input type='hidden' name='tabIdInput' value={tabId} />
-                        <input type='hidden' name='requestIdInput' value={requestId} />
-                        <input type='hidden' name='forOriginInput' value={forOrigin} />
-                        <AccountsList accounts={accounts} submit={submit} />
-                    </Form>
+                    <Box width='100%'>
+                        <Form method="post" id="accounts-form" onReset={() => sendAndClose(tabId, requestId, forOrigin, null)}>
+                            <input type='hidden' name='tabIdInput' value={tabId} />
+                            <input type='hidden' name='requestIdInput' value={requestId} />
+                            <input type='hidden' name='forOriginInput' value={forOrigin} />
+                            <AccountsList accounts={accounts} submit={submit} />
+                        </Form>
+                    </Box>
                 </Flex>
 
             </VStack>
