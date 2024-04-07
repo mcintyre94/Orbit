@@ -31,6 +31,10 @@ const router = createBrowserRouter([
     path: "/",
     children: [
       {
+        index: true,
+        element: <Navigate to='/accounts/home' replace />
+      },
+      {
         // chrome extension default path
         path: "index.html",
         element: <Navigate to='/accounts/home' replace />
