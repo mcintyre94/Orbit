@@ -5,9 +5,14 @@ type ContentEventBase = {
   requestId: number;
 };
 
+export type AccountToConnect = {
+  address: Address;
+  label: string;
+};
+
 export type ConnectAccountsEvent = ContentEventBase & {
   type: "connectAccounts";
-  addresses: Address[];
+  accounts: AccountToConnect[];
 };
 
 type DisconnectCompleteEvent = ContentEventBase & {
@@ -16,13 +21,13 @@ type DisconnectCompleteEvent = ContentEventBase & {
 
 export function makeConnectAccountsEvent(
   requestId: number,
-  addresses: Address[]
+  accounts: AccountToConnect[]
 ): ConnectAccountsEvent {
   return {
     origin: "content",
     requestId,
     type: "connectAccounts",
-    addresses,
+    accounts,
   };
 }
 

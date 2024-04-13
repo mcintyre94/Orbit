@@ -13,7 +13,13 @@ import {
   removeConnection,
   saveConnection,
 } from "../connections/storage";
-import { makeConnectAccountsEvent, makeDisconnectCompleteEvent } from "./event";
+import {
+  AccountToConnect,
+  makeConnectAccountsEvent,
+  makeDisconnectCompleteEvent,
+} from "./event";
+import { getSavedAccounts } from "../accounts/storage";
+import { Address } from "@solana/addresses";
 
 /** Inject the wallet into the page */
 const script = document.createElement("script");
@@ -24,6 +30,19 @@ script.type = "module";
 const element = document.head || document.documentElement;
 element.prepend(script);
 script.remove();
+
+async function convertAddressesToAccountsToConnect(
+  addresses: Address[]
+): Promise<AccountToConnect[]> {
+  const allSavedAccounts = await getSavedAccounts();
+  const accountLabels = Object.fromEntries(
+    allSavedAccounts.map((account) => [account.address, account.label])
+  );
+  return addresses.map((address) => ({
+    address,
+    label: accountLabels[address],
+  }));
+}
 
 /** Receive messages from the page and forward to background unchanged */
 window.addEventListener(
@@ -49,10 +68,13 @@ window.addEventListener(
           origin,
           existingAddresses,
         });
+        const accountsToConnect = await convertAddressesToAccountsToConnect(
+          existingAddresses
+        );
         // create a connect accounts event with these addresses + send back to page
         const connectAccountsEvent = makeConnectAccountsEvent(
           event.data.requestId,
-          existingAddresses
+          accountsToConnect
         );
         window.postMessage(connectAccountsEvent);
         return;
@@ -65,9 +87,12 @@ window.addEventListener(
     if (event.data.type === "silentConnection") {
       const origin = event.origin;
       const existingAddresses = (await getSavedConnection(origin)) ?? [];
+      const accountsToConnect = await convertAddressesToAccountsToConnect(
+        existingAddresses
+      );
       const connectAccountsEvent = makeConnectAccountsEvent(
         event.data.requestId,
-        existingAddresses
+        accountsToConnect
       );
       window.postMessage(connectAccountsEvent);
       return;
@@ -105,9 +130,12 @@ chrome.runtime.onMessage.addListener(async function (request) {
 
   if (event.type === "connectionSubmitForwarded") {
     await saveConnection(event.forOrigin, event.addresses);
+    const accountsToConnect = await convertAddressesToAccountsToConnect(
+      event.addresses
+    );
     const connectAccountsEvent = makeConnectAccountsEvent(
       event.requestId,
-      event.addresses
+      accountsToConnect
     );
     window.postMessage(connectAccountsEvent);
   }

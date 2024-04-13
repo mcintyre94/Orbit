@@ -31,7 +31,11 @@ import {
   makeRequestConnectionEvent,
   makeSilentConnectionEvent,
 } from "./events";
-import { ContentEvent, ConnectAccountsEvent } from "../content/event";
+import {
+  ContentEvent,
+  ConnectAccountsEvent,
+  AccountToConnect,
+} from "../content/event";
 
 class RequestManager {
   constructor() {
@@ -86,10 +90,11 @@ class OrbitWallet implements Wallet {
     [E in StandardEventsNames]?: StandardEventsListeners[E][];
   } = {};
 
-  makeAccounts(addresses: string[]): WalletAccount[] {
-    return addresses.map((address) => ({
-      address,
-      publicKey: this.#base58Encoder.encode(address) as Uint8Array,
+  makeAccounts(accounts: AccountToConnect[]): WalletAccount[] {
+    return accounts.map((account) => ({
+      address: account.address,
+      publicKey: this.#base58Encoder.encode(account.address) as Uint8Array,
+      label: account.label,
       chains: this.chains,
       features: [StandardConnect, StandardEvents],
     }));
@@ -160,15 +165,15 @@ class OrbitWallet implements Wallet {
     console.log({ silent, requestConnectionEvent });
     window.postMessage(requestConnectionEvent);
 
-    const { addresses } = await promise;
-    const accounts: WalletAccount[] = this.makeAccounts(addresses);
+    const { accounts } = await promise;
+    const walletAccounts: WalletAccount[] = this.makeAccounts(accounts);
 
-    if (accounts.length === 0 && !silent) {
+    if (walletAccounts.length === 0 && !silent) {
       throw new Error("The user rejected the request.");
     }
 
-    const changed = this.#accounts !== accounts;
-    this.#accounts = accounts;
+    const changed = this.#accounts !== walletAccounts;
+    this.#accounts = walletAccounts;
 
     if (changed) {
       this.#emit("change", { accounts: this.accounts });

@@ -69,6 +69,20 @@ export default function CreateAccount() {
     const [addressError, setAddressError] = useState<string | undefined>(undefined);
     const [labelError, setLabelError] = useState<string | undefined>(undefined);
 
+    const [addressInputValue, setAddressInputValue] = useState('')
+    const [labelInputValue, setLabelInputValue] = useState('')
+
+    const [isSubmitDisabled, setIsSubmitDisabled] = useState(true)
+
+    useMemo(() => {
+        setIsSubmitDisabled(
+            addressError !== undefined ||
+            labelError !== undefined ||
+            addressInputValue.length === 0 ||
+            labelInputValue.length === 0
+        )
+    }, [addressError, labelError, addressInputValue, labelInputValue])
+
     // Display error as toast if there is one
     useEffect(() => {
         if (actionData) {
@@ -84,6 +98,7 @@ export default function CreateAccount() {
 
     const validateAddress = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const newMaybeAddress = e.currentTarget.value;
+        setAddressInputValue(newMaybeAddress);
 
         // clear error when empty
         if (newMaybeAddress.length === 0) {
@@ -108,6 +123,7 @@ export default function CreateAccount() {
 
     const validateLabel = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const newLabel = e.currentTarget.value;
+        setLabelInputValue(newLabel);
         if (accountLabels.has(newLabel)) {
             setLabelError('Label already exists')
         } else {
@@ -147,7 +163,7 @@ export default function CreateAccount() {
                     <Spacer marginBottom={12} />
 
                     <ButtonGroup spacing={4}>
-                        <Button type='submit' leftIcon={<AddIcon />} colorScheme='blue' variant='solid' isDisabled={addressError}>
+                        <Button type='submit' title={addressError ?? labelError} leftIcon={<AddIcon />} colorScheme='blue' variant='solid' isDisabled={isSubmitDisabled}>
                             Save Account
                         </Button>
                         <Button type='reset' colorScheme='red' variant='outline'>
