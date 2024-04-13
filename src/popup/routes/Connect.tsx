@@ -1,4 +1,4 @@
-import type { Address } from "@solana/web3.js";
+import type { Address } from "@solana/addresses";
 import { makeConnectionSubmitEvent } from "../events";
 import { ActionFunctionArgs, FetcherWithComponents, Form, LoaderFunctionArgs, SubmitFunction, useFetcher, useLoaderData, useRouteLoaderData, useSubmit } from "react-router-dom";
 import { Box, Button, Flex, HStack, Heading, RadioProps, Spacer, VStack, useRadio, useRadioGroup } from "@chakra-ui/react";

@@ -1,7 +1,7 @@
 import { VStack, HStack, Tooltip, Wrap, WrapItem, Tag, Text, useClipboard } from "@chakra-ui/react";
 import { loader as filteredAccountsLoader } from '../routes/FilteredAccounts'
 import { shortAddress } from "../utils/address";
-import { Address } from "@solana/web3.js";
+import { Address } from "@solana/addresses";
 import { CopyIcon } from "@chakra-ui/icons";
 
 function CopyButton({ address }: { address: Address }) {

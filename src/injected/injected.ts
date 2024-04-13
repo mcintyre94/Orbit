@@ -89,7 +89,7 @@ class OrbitWallet implements Wallet {
   makeAccounts(addresses: string[]): WalletAccount[] {
     return addresses.map((address) => ({
       address,
-      publicKey: this.#base58Encoder.encode(address),
+      publicKey: this.#base58Encoder.encode(address) as Uint8Array,
       chains: this.chains,
       features: [StandardConnect, StandardEvents],
     }));

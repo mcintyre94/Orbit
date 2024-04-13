@@ -1,4 +1,4 @@
-import type { Address } from "@solana/web3.js";
+import type { Address } from "@solana/addresses";
 
 type PopupEventBase = {
   origin: "popup";

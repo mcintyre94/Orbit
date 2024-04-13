@@ -1,4 +1,4 @@
-import { Address, isAddress } from "@solana/web3.js";
+import { Address, isAddress } from "@solana/addresses";
 import { SavedAccount } from "./savedAccount";
 
 const SAVED_ACCOUNTS_KEY = "accounts";

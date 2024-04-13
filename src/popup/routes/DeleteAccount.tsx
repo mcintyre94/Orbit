@@ -1,5 +1,5 @@
 import { deleteAccount } from '../../accounts/storage'
-import { Address } from '@solana/web3.js'
+import { Address } from '@solana/addresses'
 import { LoaderFunctionArgs, redirect } from 'react-router-dom';
 
 interface Params {

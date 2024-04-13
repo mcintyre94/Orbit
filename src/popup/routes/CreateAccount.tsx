@@ -1,6 +1,6 @@
 import { AddIcon } from '@chakra-ui/icons';
 import { Button, ButtonGroup, FormControl, FormErrorMessage, FormLabel, Heading, Input, Spacer, Textarea, VStack, useToast } from '@chakra-ui/react'
-import { isAddress } from '@solana/web3.js';
+import { isAddress } from '@solana/addresses';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { saveNewAccount } from '../../accounts/storage';
 import { SavedAccount } from '../../accounts/savedAccount';

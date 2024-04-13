@@ -1,6 +1,6 @@
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Box, Button, ButtonGroup, Flex, FormControl, FormLabel, Heading, IconButton, Input, Spacer, Textarea, VStack, useDisclosure, useToast } from '@chakra-ui/react'
-import { type Address } from '@solana/web3.js';
+import { type Address } from '@solana/addresses';
 import { RefObject, useCallback, useEffect, useRef } from 'react';
 import { getAccount, getTags, updateAccount } from '../../accounts/storage';
 import { SavedAccount } from '../../accounts/savedAccount';
@@ -131,7 +131,7 @@ export default function EditAccount() {
                             <AlertDialogFooter>
                                 <Form
                                     method='post'
-                                    action={`/account/${account.address}/delete`}
+                                    action={`/accounts/${account.address}/delete`}
                                     onReset={onDeleteClose}
                                 >
                                     <ButtonGroup spacing={4}>

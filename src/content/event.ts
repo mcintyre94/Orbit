@@ -1,4 +1,4 @@
-import { Address } from "@solana/web3.js";
+import { Address } from "@solana/addresses";
 
 type ContentEventBase = {
   origin: "content";

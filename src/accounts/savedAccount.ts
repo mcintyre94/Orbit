@@ -1,4 +1,4 @@
-import { Address, isAddress } from "@solana/web3.js";
+import { Address, isAddress } from "@solana/addresses";
 import { z } from "zod";
 
 export type SavedAccount = {

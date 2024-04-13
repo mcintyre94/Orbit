@@ -13,12 +13,7 @@ import {
   removeConnection,
   saveConnection,
 } from "../connections/storage";
-import {
-  ConnectAccountsEvent,
-  DisconnectCompleteEvent,
-  makeConnectAccountsEvent,
-  makeDisconnectCompleteEvent,
-} from "./event";
+import { makeConnectAccountsEvent, makeDisconnectCompleteEvent } from "./event";
 
 /** Inject the wallet into the page */
 const script = document.createElement("script");

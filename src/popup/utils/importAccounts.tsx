@@ -1,5 +1,5 @@
 import { useToast } from "@chakra-ui/react";
-import { Address } from "@solana/web3.js";
+import { Address } from "@solana/addresses";
 import ImportDescription from "../components/ImportDescription";
 
 export type ActionData = {
