@@ -1,7 +1,7 @@
 import { AddIcon } from '@chakra-ui/icons';
-import { Button, ButtonGroup, FormControl, FormErrorMessage, FormLabel, Heading, Input, Spacer, Textarea, VStack, useToast } from '@chakra-ui/react'
-import { isAddress } from '@solana/addresses';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Accordion, Button, ButtonGroup, FormControl, FormErrorMessage, FormLabel, Heading, Input, Spacer, Textarea, VStack, useToast } from '@chakra-ui/react'
+import { Address, isAddress } from '@solana/addresses';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { saveNewAccount } from '../../accounts/storage';
 import { SavedAccount } from '../../accounts/savedAccount';
 import { ActionFunctionArgs, Form, redirect, useActionData, useNavigate, useRouteLoaderData } from 'react-router-dom';
@@ -51,13 +51,23 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function CreateAccount() {
-    const [addressError, setAddressError] = useState(false);
     const actionData = useActionData() as ActionData | undefined;
-    const { tags } = useRouteLoaderData('accounts-route') as FilteredAccountsLoaderData;
+    const { accounts, tags } = useRouteLoaderData('accounts-route') as FilteredAccountsLoaderData;
+    const accountAddresses = useMemo(() => {
+        return new Set(accounts.map(a => a.address))
+    }, [accounts]);
+    const accountLabels = useMemo(() => {
+        return new Set(accounts.map(a => a.label))
+    }, [accounts]);
+
     const tagNames = tags.map(t => t.tagName);
     const tagsInputRef = useRef<HTMLInputElement | null>(null);
+
     const toast = useToast();
     const navigate = useNavigate();
+
+    const [addressError, setAddressError] = useState<string | undefined>(undefined);
+    const [labelError, setLabelError] = useState<string | undefined>(undefined);
 
     // Display error as toast if there is one
     useEffect(() => {
@@ -73,9 +83,37 @@ export default function CreateAccount() {
     }, [actionData])
 
     const validateAddress = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        const isValid = isAddress(e.currentTarget.value);
-        setAddressError(!isValid);
-    }, [])
+        const newMaybeAddress = e.currentTarget.value;
+
+        // clear error when empty
+        if (newMaybeAddress.length === 0) {
+            setAddressError(undefined)
+            return;
+        }
+
+        // flag invalid address
+        if (!isAddress(newMaybeAddress)) {
+            setAddressError('Invalid address');
+            return;
+        }
+
+        // flag address that alreaedy exists
+        if (accountAddresses.has(newMaybeAddress as Address)) {
+            setAddressError('Address already exists')
+            return;
+        }
+
+        setAddressError(undefined);
+    }, [accountAddresses])
+
+    const validateLabel = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        const newLabel = e.currentTarget.value;
+        if (accountLabels.has(newLabel)) {
+            setLabelError('Label already exists')
+        } else {
+            setLabelError(undefined)
+        }
+    }, [accountLabels])
 
     const cancel = useCallback(() => {
         navigate(-1);
@@ -87,15 +125,16 @@ export default function CreateAccount() {
 
             <Form method='post' onReset={cancel}>
                 <VStack spacing={4}>
-                    <FormControl isRequired isInvalid={addressError} id='addressInput'>
+                    <FormControl isRequired isInvalid={addressError !== undefined} id='addressInput'>
                         <FormLabel>Address</FormLabel>
                         <Input type='text' name='addressInput' onChange={validateAddress} />
-                        <FormErrorMessage>Invalid address</FormErrorMessage>
+                        <FormErrorMessage>{addressError}</FormErrorMessage>
                     </FormControl>
 
-                    <FormControl isRequired id='labelInput'>
+                    <FormControl isRequired isInvalid={labelError !== undefined} id='labelInput'>
                         <FormLabel>Label</FormLabel>
-                        <Input type='text' name='labelInput' />
+                        <Input type='text' name='labelInput' onChange={validateLabel} />
+                        <FormErrorMessage>{labelError}</FormErrorMessage>
                     </FormControl>
 
                     <FormControl id='notesInput'>
