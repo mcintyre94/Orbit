@@ -113,7 +113,7 @@ export default function Connect() {
     const { tabId, requestId, forOrigin } = loaderData;
     const filtersFetcher = useFetcher() as FetcherWithComponents<FilteredAccountsLoaderData>;
     const routeLoaderData = useRouteLoaderData('accounts-route') as FilteredAccountsLoaderData;
-    const { accounts, tags, filtersEnabled } = getFilteredAccountsData(routeLoaderData, filtersFetcher.data);
+    const { accounts, tags, filtersEnabled, searchQuery } = getFilteredAccountsData(routeLoaderData, filtersFetcher.data);
     const submit = useSubmit();
 
     return (
@@ -121,7 +121,7 @@ export default function Connect() {
             <VStack spacing={8} alignItems='flex-start'>
                 <Heading as='h3' size='lg'>Connect to {forOrigin}</Heading>
 
-                <TagFilters tags={tags} filtersEnabled={filtersEnabled} fetcher={filtersFetcher} />
+                <TagFilters tags={tags} filtersEnabled={filtersEnabled} searchQuery={searchQuery} fetcher={filtersFetcher} />
 
                 <Flex direction='column' alignItems='flex-start' width='100%'>
                     <Box width='100%'>

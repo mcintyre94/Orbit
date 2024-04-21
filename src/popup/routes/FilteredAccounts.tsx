@@ -1,5 +1,6 @@
 import { LoaderFunctionArgs } from "react-router-dom";
 import { getAccountsAndTags } from '../utils/filterAccounts'
+import { searchAccounts } from '../utils/searchAccounts'
 
 // Shared loader used for filtering accounts based on tags
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -9,8 +10,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const filtersEnabled = enableFilters === "enabled";
     let tagsInSearch = new Set(searchParams.getAll("tag"));
 
-    const { accounts, tags } = await getAccountsAndTags(filtersEnabled, tagsInSearch);
-    return { accounts, filtersEnabled, tags };
+    let { accounts, tags } = await getAccountsAndTags(filtersEnabled, tagsInSearch);
+
+    const searchQuery = searchParams.get("search") ?? "";
+    if (searchQuery) {
+        accounts = searchAccounts(accounts, searchQuery)
+    }
+
+    return { accounts, filtersEnabled, searchQuery, tags };
 }
 
 export type FilteredAccountsLoaderData = Awaited<ReturnType<typeof loader>>;

@@ -7,14 +7,14 @@ import { FilteredAccountsLoaderData } from "./FilteredAccounts";
 export default function ExportAccounts() {
     const loaderData = useRouteLoaderData('accounts-route') as FilteredAccountsLoaderData;
     const fetcher = useFetcher({ key: 'export-accounts-fetcher' }) as FetcherWithComponents<FilteredAccountsLoaderData>;
-    const { filtersEnabled, tags } = getFilteredAccountsData(loaderData, fetcher.data)
+    const { filtersEnabled, tags, searchQuery } = getFilteredAccountsData(loaderData, fetcher.data)
 
     return (
         <Flex direction='column' minHeight='100vh'>
             <VStack spacing={8} alignItems='flex-start'>
                 <Heading alignSelf='center' as='h1' size='xl' noOfLines={1}>Export Accounts</Heading>
 
-                <TagFilters tags={tags} filtersEnabled={filtersEnabled} fetcher={fetcher} />
+                <TagFilters tags={tags} filtersEnabled={filtersEnabled} searchQuery={searchQuery} fetcher={fetcher} />
 
                 <HStack gap='8'>
                     <Link to='addresses' as={NavLink} fontSize='large' _activeLink={{ color: 'lightblue', fontWeight: 'bold', textDecoration: 'underline' }}>Addresses</Link>

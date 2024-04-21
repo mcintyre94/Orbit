@@ -9,7 +9,7 @@ import { FilteredAccountsLoaderData } from "./FilteredAccounts";
 export default function Home() {
     const loaderData = useRouteLoaderData('accounts-route') as FilteredAccountsLoaderData;
     const fetcher = useFetcher() as FetcherWithComponents<FilteredAccountsLoaderData>;
-    const { accounts, filtersEnabled, tags } = getFilteredAccountsData(loaderData, fetcher.data)
+    const { accounts, filtersEnabled, tags, searchQuery } = getFilteredAccountsData(loaderData, fetcher.data)
 
     return (
         <VStack spacing={8} alignItems='flex-start'>
@@ -27,7 +27,7 @@ export default function Home() {
                 </Menu>
             </ButtonGroup>
 
-            <TagFilters tags={tags} filtersEnabled={filtersEnabled} fetcher={fetcher} />
+            <TagFilters tags={tags} filtersEnabled={filtersEnabled} searchQuery={searchQuery} fetcher={fetcher} />
 
             <Flex direction='column' alignItems='flex-start' width='100%'>
                 {accounts.map(account => (
