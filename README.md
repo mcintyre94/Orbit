@@ -1,5 +1,7 @@
 # Orbit
 
+[Available free in the Chrome Web Store](https://chromewebstore.google.com/detail/orbit/amnodpohcllgfbhgoephohmhlfgichfa)
+
 Orbit is a Chrome extension for organising Solana wallets. It allows adding arbitrary tags and freeform notes to each account, in addition to a label.
 
 <div style="display: flex; flex-direction: row; gap: 20px">
