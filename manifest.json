@@ -5,6 +5,7 @@
     "action": {
         "default_title": "Organise your Solana wallets"
     },
+    "description": "Organise your Solana wallets",
     "background": {
         "service_worker": "src/background/background.ts",
         "type": "module"
@@ -20,7 +21,9 @@
         }
     ],
     "icons": {
-        "128": "public/orbit-logo-128-transparent.png"
+        "128": "public/orbit-logo-128-transparent.png",
+        "48": "public/orbit-logo-48-transparent.png",
+        "16": "public/orbit-logo-16-transparent.png"
     },
     "side_panel": {
         "default_path": "index.html"
