@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { ChakraProvider, ThemeConfig, extendTheme } from '@chakra-ui/react'
-import { Navigate, Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom'
+import { Navigate, Outlet, RouterProvider, createBrowserRouter, redirect } from 'react-router-dom'
 import ErrorPage from './error-page'
 import { loader as accountsLoader } from './routes/Accounts'
 import Home from './routes/Home'
@@ -36,8 +36,18 @@ const router = createBrowserRouter([
       },
       {
         // chrome extension default path
+        // we need to use this whenever we open the extension programatically
+        // currently we either do this on connect, or just opening the sidepanel
+        // note that when we connect we need to forward query params to /accounts/connect
         path: "index.html",
-        element: <Navigate to='/accounts/home' replace />
+        loader: ({ request }) => {
+          const { search, searchParams } = new URL(request.url);
+          if (searchParams.get('connect')) {
+            return redirect(`/accounts/connect${search}`)
+          } else {
+            return redirect('/accounts/home')
+          }
+        }
       },
       {
         path: "accounts",
@@ -103,7 +113,7 @@ const router = createBrowserRouter([
             action: deleteAccountAction
           },
           {
-            path: "connect/:tabId/:requestId",
+            path: "/accounts/connect",
             loader: connectLoader,
             action: connectAction,
             element: <Connect />

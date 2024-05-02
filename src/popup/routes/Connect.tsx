@@ -13,18 +13,21 @@ interface Params {
     requestId: string;
 }
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
-    const { tabId: tabIdString, requestId: requestIdString } = params as unknown as Params;
+export async function loader({ request }: LoaderFunctionArgs) {
+    const { searchParams } = new URL(request.url);
 
-    const tabId = Number(tabIdString);
-    if (Number.isNaN(tabId)) throw new Error(`tabId should be a number, got ${tabIdString}`)
+    const tabIdString = searchParams.get('tabId');
+    if (!tabIdString) throw new Error('tabId query param is required for connect')
+    const tabId = Number(tabIdString)
+    if (Number.isNaN(tabId)) throw new Error(`tabId query param should be a number, got ${tabIdString}`)
 
-    const requestId = Number(requestIdString);
+    const requestIdString = searchParams.get('requestId');
+    if (!requestIdString) throw new Error('requestId query param is required for connect')
+    const requestId = Number(requestIdString)
     if (Number.isNaN(requestId)) throw new Error(`requestId should be a number, got ${requestIdString}`)
 
-    const { searchParams } = new URL(request.url);
     const encodedForOrigin = searchParams.get('forOrigin');
-    if (!encodedForOrigin) throw new Error('forOrigin is required for connect')
+    if (!encodedForOrigin) throw new Error('forOrigin query param is required for connect')
     const forOrigin = decodeURIComponent(encodedForOrigin);
 
     return { tabId, requestId, forOrigin };

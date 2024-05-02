@@ -64,3 +64,17 @@ The extension can be created by running `npm run dev`. This will populate the `d
 ### Wallet Adapter and Wallet Standard
 
 As mentioned above, Orbit implements Wallet Standard, which means that it can be used to connect to any app without any code changes. In practice the implementation for this is going to be through [Wallet Adapter](https://github.com/anza-xyz/wallet-adapter), a library apps use to interact with Solana wallets. Currently wallet-adapter only displays wallet-standard wallets if they implement either `SolanaSignAndSendTransactionFeature` or `SolanaSignTransactionFeature` ([source](https://github.com/anza-xyz/wallet-adapter/blob/a8e4bdee26b4e4d1dd6b321999eb57c8516d775a/packages/core/base/src/standard.ts#L19)). Therefore, for now Orbit implements the `SolanaSignTransactionFeature` feature but throws an error if it is called.
+
+## Building for production
+
+Run `npm run build` to create a production build.
+
+There's an issue where `dist/assets/index.browser.<hash>.js` is including `process.env.NODE_ENV`. `process` is not defined in the browser environment. I'm not sure how to define it, using Vite's `define` doesn't work, presumably because that's defining it in the extension but not in the popup. As a workaround, we can use sed to remove this:
+
+```
+sed -i '' 's/=(()=>process.env.NODE_ENV==="development")()/=false/' dist/assets/index.browser.*.js
+```
+
+I'm also not yet sure where this injection is coming from or what it's for. But in production, it'll resolve to false. 
+
+After this, just zip the `dist/` directory and submit to the Chrome store! 
