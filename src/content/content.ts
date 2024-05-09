@@ -58,29 +58,6 @@ window.addEventListener(
       return;
     }
 
-    // if the message is connection request, check if we already have a connection
-    // if we do return that instead of passing through
-    if (event.data.type === "requestConnection") {
-      const origin = event.origin;
-      const existingAddresses = await getSavedConnection(origin);
-      if (existingAddresses && existingAddresses.length > 0) {
-        console.log("Found existing addresses for origin", {
-          origin,
-          existingAddresses,
-        });
-        const accountsToConnect = await convertAddressesToAccountsToConnect(
-          existingAddresses
-        );
-        // create a connect accounts event with these addresses + send back to page
-        const connectAccountsEvent = makeConnectAccountsEvent(
-          event.data.requestId,
-          accountsToConnect
-        );
-        window.postMessage(connectAccountsEvent);
-        return;
-      }
-    }
-
     // if the message is silent connection request, check if we already have a connection
     // if we do return it, else return empty accounts
     // never pass to background to prompt user
