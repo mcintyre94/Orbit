@@ -1,7 +1,7 @@
 import type { Address } from "@solana/addresses";
 import { makeConnectionSubmitEvent } from "../events";
 import { ActionFunctionArgs, FetcherWithComponents, Form, LoaderFunctionArgs, SubmitFunction, useFetcher, useLoaderData, useRouteLoaderData, useSubmit } from "react-router-dom";
-import { Box, Button, Flex, HStack, Heading, RadioProps, Spacer, VStack, useRadio, useRadioGroup } from "@chakra-ui/react";
+import { Box, Button, Center, Flex, HStack, Heading, RadioProps, Spacer, VStack, useRadio, useRadioGroup } from "@chakra-ui/react";
 import AccountDisplay from "../components/AccountDisplay";
 import TagFilters from "../components/TagFilters";
 import { getFilteredAccountsData } from "../utils/filterAccounts";
@@ -120,28 +120,36 @@ export default function Connect() {
     const submit = useSubmit();
 
     return (
-        <Flex direction='column' minHeight='100vh'>
-            <VStack spacing={8} alignItems='flex-start'>
-                <Heading as='h3' size='lg'>Connect to {forOrigin}</Heading>
+        <>
+            <Flex direction='column' minHeight='100vh'>
+                <VStack spacing={8} alignItems='flex-start'>
+                    <Heading as='h3' size='lg'>Connect to {forOrigin}</Heading>
 
-                <TagFilters tags={tags} filtersEnabled={filtersEnabled} searchQuery={searchQuery} fetcher={filtersFetcher} />
+                    <TagFilters tags={tags} filtersEnabled={filtersEnabled} searchQuery={searchQuery} fetcher={filtersFetcher} />
 
-                <Flex direction='column' alignItems='flex-start' width='100%'>
-                    <Box width='100%'>
-                        <Form method="post" id="accounts-form" onReset={() => sendAndClose(tabId, requestId, forOrigin, null)}>
-                            <input type='hidden' name='tabIdInput' value={tabId} />
-                            <input type='hidden' name='requestIdInput' value={requestId} />
-                            <input type='hidden' name='forOriginInput' value={forOrigin} />
-                            <AccountsList accounts={accounts} submit={submit} />
-                        </Form>
-                    </Box>
-                </Flex>
+                    <Flex direction='column' alignItems='flex-start' width='100%' marginBottom={4}>
+                        <Box width='100%'>
+                            <Form method="post" id="accounts-form" onReset={() => sendAndClose(tabId, requestId, forOrigin, null)}>
+                                <input type='hidden' name='tabIdInput' value={tabId} />
+                                <input type='hidden' name='requestIdInput' value={requestId} />
+                                <input type='hidden' name='forOriginInput' value={forOrigin} />
+                                <AccountsList accounts={accounts} submit={submit} />
+                            </Form>
+                        </Box>
+                    </Flex>
 
-            </VStack>
-            <Spacer />
-            <Box marginBottom={8}>
+                </VStack>
+                <Spacer />
+                {/* <Box marginBottom={8}>
                 <Button form='accounts-form' type='reset' colorScheme='blue' size='md' paddingY={4}>Cancel</Button>
+            </Box> */}
+            </Flex>
+            <Box maxW='48em' sx={{ position: 'sticky', bottom: '1em', }}>
+                <HStack justifyContent='center' gap={8}>
+                    <Button form='accounts-form' type='submit' colorScheme='blue' size='md' paddingY={4}>Connect X Accounts</Button>
+                    <Button form='accounts-form' type='reset' color='blue.100' size='md' paddingY={4}>Cancel</Button>
+                </HStack>
             </Box>
-        </Flex>
+        </>
     )
 }
