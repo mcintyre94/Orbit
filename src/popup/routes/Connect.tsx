@@ -1,17 +1,12 @@
 import type { Address } from "@solana/addresses";
 import { makeConnectionSubmitEvent } from "../events";
-import { ActionFunctionArgs, FetcherWithComponents, Form, LoaderFunctionArgs, SubmitFunction, useFetcher, useLoaderData, useRouteLoaderData, useSubmit } from "react-router-dom";
-import { Box, Button, Center, Flex, HStack, Heading, RadioProps, Spacer, VStack, useRadio, useRadioGroup } from "@chakra-ui/react";
+import { ActionFunctionArgs, FetcherWithComponents, Form, LoaderFunctionArgs, useFetcher, useLoaderData, useRouteLoaderData } from "react-router-dom";
+import { Box, Button, CheckboxProps, Flex, HStack, Heading, Spacer, UseCheckboxGroupReturn, VStack, useCheckbox, useCheckboxGroup } from "@chakra-ui/react";
 import AccountDisplay from "../components/AccountDisplay";
 import TagFilters from "../components/TagFilters";
 import { getFilteredAccountsData } from "../utils/filterAccounts";
 import { FilteredAccountsLoaderData } from "./FilteredAccounts";
 import { SavedAccount } from "../../accounts/savedAccount";
-
-interface Params {
-    tabId: string;
-    requestId: string;
-}
 
 export async function loader({ request }: LoaderFunctionArgs) {
     const { searchParams } = new URL(request.url);
@@ -37,7 +32,6 @@ interface FormDataUpdates {
     tabIdInput: string;
     requestIdInput: string;
     forOriginInput: string;
-    addressInput: Address;
 }
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -46,17 +40,20 @@ export async function action({ request }: ActionFunctionArgs) {
 
     const tabId = Number(updates.tabIdInput);
     const requestId = Number(updates.requestIdInput);
-    const { addressInput: address, forOriginInput: forOrigin } = updates;
+    const forOrigin = updates.forOriginInput;
 
-    await sendAndClose(tabId, requestId, forOrigin, address);
+    // Object.fromEntries doesn't get all for checkboxes
+    const addresses = formData.getAll('addressInput') as Address[];
+
+    await sendAndClose(tabId, requestId, forOrigin, addresses);
 }
 
-async function sendAndClose(tabId: number, requestId: number, forOrigin: string, address: Address | null) {
+async function sendAndClose(tabId: number, requestId: number, forOrigin: string, addresses: Address[]) {
     await chrome.runtime.sendMessage(makeConnectionSubmitEvent({
         tabId,
         requestId,
         forOrigin,
-        addresses: address ? [address] : []
+        addresses,
     }))
 
     // if in panel, this will make sure if user opens it from action button
@@ -67,44 +64,46 @@ async function sendAndClose(tabId: number, requestId: number, forOrigin: string,
     window.close();
 }
 
-function AccountAsRadio(props: RadioProps & { submit: SubmitFunction }) {
-    const { getInputProps, getRadioProps } = useRadio(props)
-
-    const input = getInputProps()
-    const checkbox = getRadioProps()
+function AccountAsCheckbox(props: CheckboxProps) {
+    const { state, getCheckboxProps, getInputProps, getLabelProps, htmlProps } =
+        useCheckbox(props)
 
     return (
-        <Box as='label'>
-            <input {...input} onChange={(event) => {
-                props.submit(event.currentTarget.form);
-            }} />
+        <Box paddingBottom={1}>
             <Box
-                {...checkbox}
-                width='100%'
-                cursor='pointer'
+                as='label'
+                {...htmlProps}
             >
-                {props.children}
+                <input {...getInputProps()} name='addressInput' hidden />
+                <Box
+                    width='100%'
+                    cursor='pointer'
+                    borderLeftColor={state.isChecked ? 'white' : 'transparent'}
+                    borderLeftWidth={4}
+                    {...getCheckboxProps()}
+                >
+                    {props.children}
+                </Box>
             </Box>
         </Box>
     )
 }
 
-// Custom radio button in Chakra: https://chakra-ui.com/docs/components/radio#custom-radio-buttons
-function AccountsList({ accounts, submit }: { accounts: SavedAccount[], submit: SubmitFunction }) {
-    const { getRootProps, getRadioProps } = useRadioGroup({
-        name: 'addressInput'
-    })
+type AccountsListProps = {
+    accounts: SavedAccount[];
+    getCheckboxProps: UseCheckboxGroupReturn['getCheckboxProps']
+}
 
-    const group = getRootProps()
-
+// Custom checkboxes in Chakra: https://v2.chakra-ui.com/docs/hooks/use-checkbox-group
+function AccountsList({ accounts, getCheckboxProps }: AccountsListProps) {
     return (
-        <Box {...group}>
+        <Box>
             {accounts.map((account) => {
-                const radio = getRadioProps({ value: account.address })
+                const checkbox = getCheckboxProps({ value: account.address })
                 return (
-                    <AccountAsRadio key={account.address} {...radio} submit={submit}>
+                    <AccountAsCheckbox key={account.address} {...checkbox} /* submit={submit} */>
                         <AccountDisplay account={account} />
-                    </AccountAsRadio>
+                    </AccountAsCheckbox>
                 )
             })}
         </Box>
@@ -117,7 +116,14 @@ export default function Connect() {
     const filtersFetcher = useFetcher() as FetcherWithComponents<FilteredAccountsLoaderData>;
     const routeLoaderData = useRouteLoaderData('accounts-route') as FilteredAccountsLoaderData;
     const { accounts, tags, filtersEnabled, searchQuery } = getFilteredAccountsData(routeLoaderData, filtersFetcher.data);
-    const submit = useSubmit();
+    const { value: selectedAddresses, getCheckboxProps } = useCheckboxGroup({
+        // TODO: for now we only do connect UI when there's no existing connections, probably will rework this a bit
+        // in that case, will need to pass the current selections in here
+        defaultValue: [],
+        onChange(value) {
+            console.log('checkbox changed!', { value })
+        }
+    });
 
     return (
         <>
@@ -127,26 +133,23 @@ export default function Connect() {
 
                     <TagFilters tags={tags} filtersEnabled={filtersEnabled} searchQuery={searchQuery} fetcher={filtersFetcher} />
 
-                    <Flex direction='column' alignItems='flex-start' width='100%' marginBottom={4}>
+                    <Flex direction='column' alignItems='flex-start' width='100%' marginBottom={2}>
                         <Box width='100%'>
-                            <Form method="post" id="accounts-form" onReset={() => sendAndClose(tabId, requestId, forOrigin, null)}>
+                            <Form method="post" id="accounts-form" onReset={() => sendAndClose(tabId, requestId, forOrigin, [])}>
                                 <input type='hidden' name='tabIdInput' value={tabId} />
                                 <input type='hidden' name='requestIdInput' value={requestId} />
                                 <input type='hidden' name='forOriginInput' value={forOrigin} />
-                                <AccountsList accounts={accounts} submit={submit} />
+                                <AccountsList accounts={accounts} getCheckboxProps={getCheckboxProps} />
                             </Form>
                         </Box>
                     </Flex>
 
                 </VStack>
                 <Spacer />
-                {/* <Box marginBottom={8}>
-                <Button form='accounts-form' type='reset' colorScheme='blue' size='md' paddingY={4}>Cancel</Button>
-            </Box> */}
             </Flex>
             <Box maxW='48em' sx={{ position: 'sticky', bottom: '1em', }}>
                 <HStack justifyContent='center' gap={8}>
-                    <Button form='accounts-form' type='submit' colorScheme='blue' size='md' paddingY={4}>Connect X Accounts</Button>
+                    <Button form='accounts-form' type='submit' isDisabled={selectedAddresses.length === 0} colorScheme='blue' size='md' paddingY={4}>Connect {selectedAddresses.length} Accounts</Button>
                     <Button form='accounts-form' type='reset' color='blue.100' size='md' paddingY={4}>Cancel</Button>
                 </HStack>
             </Box>
