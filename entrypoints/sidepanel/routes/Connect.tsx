@@ -162,7 +162,7 @@ export default function Connect() {
             </Flex>
             <Box maxW='48em' sx={{ position: 'sticky', bottom: '1em', }}>
                 <HStack justifyContent='center' gap={8}>
-                    <Button form='accounts-form' type='submit' isDisabled={selectedAddresses.length === 0} colorScheme='blue' size='md' paddingY={4}>Connect {selectedAddresses.length} Accounts</Button>
+                    <Button form='accounts-form' type='submit' isDisabled={selectedAddresses.length === 0} colorScheme='blue' size='md' paddingY={4}>Connect {selectedAddresses.length} {selectedAddresses.length === 1 ? "Account" : "Accounts"}</Button>
                     <Button form='accounts-form' type='reset' color='blue.100' size='md' paddingY={4}>Cancel</Button>
                 </HStack>
             </Box>
