@@ -51,7 +51,7 @@ This is used to import accounts that were exported using Orbit.
 
 ## Development
 
-Orbit is open source and built using [Vite](https://vitejs.dev/) and the [crxjs vite-plugin](https://crxjs.dev/vite-plugin).
+Orbit is open source and built using [Vite](https://vitejs.dev/) and [wxt](https://wxt.dev).
 
 All data is stored locally in extension storage.
 
@@ -59,7 +59,7 @@ The UI is built using [react-router](https://reactrouter.com/en/main).
 
 ### Running locally
 
-The extension can be created by running `npm run dev`. This will populate the `dist/` directory, which can be [imported into Chrome](https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world#load-unpacked). This will also watch the local repo for changes to the code and automatically update the installed extension.
+The extension can be created by running `npm run dev`. This will build the extension in development mode, and open a browser with it installed. This will also watch the local repo for changes to the code and automatically update the installed extension.
 
 ### Wallet Adapter and Wallet Standard
 
@@ -69,12 +69,6 @@ As mentioned above, Orbit implements Wallet Standard, which means that it can be
 
 Run `npm run build` to create a production build.
 
-There's an issue where `dist/assets/index.browser.<hash>.js` is including `process.env.NODE_ENV`. `process` is not defined in the browser environment. I'm not sure how to define it, using Vite's `define` doesn't work, presumably because that's defining it in the extension but not in the popup. As a workaround, we can use sed to remove this:
+After this, just zip the `.output/chrome-mv3` directory and submit to the Chrome store!
 
-```
-sed -i '' 's/=(()=>process.env.NODE_ENV==="development")()/=false/' dist/assets/index.browser.*.js
-```
-
-I'm also not yet sure where this injection is coming from or what it's for. But in production, it'll resolve to false. 
-
-After this, just zip the `dist/` directory and submit to the Chrome store! 
+Also see [publishing docs on wxt](https://wxt.dev/guide/publishing.html) for automation.
