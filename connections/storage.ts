@@ -1,22 +1,21 @@
 import { Address } from "@solana/addresses";
-
-// TODO: refactor to wxt/storage: https://wxt.dev/guide/storage.html
+import { storage } from "wxt/storage";
 
 type Connections = { [origin: string]: Address[] };
 
-const CONNECTIONS_KEY = "connections";
+const CONNECTIONS_KEY = "local:connections";
 
 async function getSavedConnections() {
-  return (await browser.storage.local
-    .get(CONNECTIONS_KEY)
-    .then((res) => res[CONNECTIONS_KEY])
-    .then((res) => (res ? JSON.parse(res) : {}))) as Connections;
+  const connectionsStringifiedOrNull = await storage.getItem<string>(
+    CONNECTIONS_KEY
+  );
+  return connectionsStringifiedOrNull
+    ? JSON.parse(connectionsStringifiedOrNull)
+    : {};
 }
 
 async function saveConnections(connections: Connections) {
-  await browser.storage.local.set({
-    [CONNECTIONS_KEY]: JSON.stringify(connections),
-  });
+  await storage.setItem<string>(CONNECTIONS_KEY, JSON.stringify(connections));
 }
 
 export async function saveConnection(origin: string, addresses: Address[]) {

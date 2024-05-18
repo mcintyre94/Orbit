@@ -1,19 +1,21 @@
 import { Address, isAddress } from "@solana/addresses";
+import { storage } from "wxt/storage";
 import { SavedAccount } from "./savedAccount";
 
-const SAVED_ACCOUNTS_KEY = "accounts";
+const SAVED_ACCOUNTS_KEY = "local:accounts";
 
 export async function getSavedAccounts(): Promise<SavedAccount[]> {
-  return (await browser.storage.local
-    .get(SAVED_ACCOUNTS_KEY)
-    .then((res) => res[SAVED_ACCOUNTS_KEY])
-    .then((res) => (res ? JSON.parse(res) : []))) as SavedAccount[];
+  const accountsAsJsonOrNull = await storage.getItem<string>(
+    SAVED_ACCOUNTS_KEY
+  );
+  return accountsAsJsonOrNull ? JSON.parse(accountsAsJsonOrNull) : [];
 }
 
 async function saveAccounts(savedAccounts: SavedAccount[]): Promise<void> {
-  await browser.storage.local.set({
-    [SAVED_ACCOUNTS_KEY]: JSON.stringify(savedAccounts),
-  });
+  await storage.setItem<string>(
+    SAVED_ACCOUNTS_KEY,
+    JSON.stringify(savedAccounts)
+  );
 }
 
 function validateAccount(savedAccount: SavedAccount) {
