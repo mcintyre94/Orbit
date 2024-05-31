@@ -172,8 +172,13 @@ function SelectDeselectAll({ allAddresses, filteredAddresses, setSelectedAddress
 
     return (
         <HStack spacing={4}>
-            <Text size='sm' cursor='pointer' onClick={selectAll}>Select all</Text>
-            <Text size='sm' cursor='pointer' onClick={deselectAll}>Deselect all</Text>
+            <Button size='sm' colorScheme='blue' variant='ghost' onClick={selectAll}>
+                Select all
+            </Button>
+
+            <Button size='sm' colorScheme='blue' variant='ghost' onClick={deselectAll}>
+                Deselect all
+            </Button>
         </HStack>
     )
 }
