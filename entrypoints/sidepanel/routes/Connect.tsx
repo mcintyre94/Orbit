@@ -8,6 +8,7 @@ import { getFilteredAccountsData } from "../utils/filterAccounts";
 import { FilteredAccountsLoaderData } from "./FilteredAccounts";
 import { SavedAccount } from "../../../accounts/savedAccount";
 import { useMemo } from "react";
+import { getSavedConnection } from "@/connections/storage";
 
 type SidePanel = {
     setOptions({
@@ -36,7 +37,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
     if (!encodedForOrigin) throw new Error('forOrigin query param is required for connect')
     const forOrigin = decodeURIComponent(encodedForOrigin);
 
-    return { tabId, requestId, forOrigin };
+    const connectedAddressesForOrigin = (await getSavedConnection(forOrigin)) ?? [];
+
+    return { tabId, requestId, forOrigin, connectedAddressesForOrigin };
 }
 
 interface FormDataUpdates {
@@ -139,7 +142,7 @@ function AccountsList({ allAccounts, filteredAddresses, getCheckboxProps }: Acco
 
 export default function Connect() {
     const loaderData = useLoaderData() as Awaited<ReturnType<typeof loader>>;
-    const { tabId, requestId, forOrigin } = loaderData;
+    const { tabId, requestId, forOrigin, connectedAddressesForOrigin } = loaderData;
     const filtersFetcher = useFetcher() as FetcherWithComponents<FilteredAccountsLoaderData>;
     const routeLoaderData = useRouteLoaderData('accounts-route') as FilteredAccountsLoaderData;
     const { accounts: filteredAccounts, tags, filtersEnabled, searchQuery } = getFilteredAccountsData(routeLoaderData, filtersFetcher.data);
@@ -147,7 +150,7 @@ export default function Connect() {
     const { value: selectedAddresses, getCheckboxProps } = useCheckboxGroup({
         // TODO: for now we only do connect UI when there's no existing connections, probably will rework this a bit
         // in that case, will need to pass the current selections in here
-        defaultValue: [],
+        defaultValue: connectedAddressesForOrigin,
         onChange(value) {
             console.log('checkbox changed!', { value })
         }
