@@ -1,5 +1,5 @@
 import { AddIcon } from '@chakra-ui/icons';
-import { Accordion, Button, ButtonGroup, FormControl, FormErrorMessage, FormLabel, Heading, Input, Spacer, Textarea, VStack, useToast } from '@chakra-ui/react'
+import { Button, ButtonGroup, FormControl, FormErrorMessage, FormLabel, Heading, Input, Spacer, Textarea, VStack, useToast } from '@chakra-ui/react'
 import { Address, isAddress } from '@solana/addresses';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { saveNewAccount } from '~/accounts/storage';

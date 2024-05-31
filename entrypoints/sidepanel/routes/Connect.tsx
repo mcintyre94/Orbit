@@ -7,6 +7,7 @@ import TagFilters from "../components/TagFilters";
 import { getFilteredAccountsData } from "../utils/filterAccounts";
 import { FilteredAccountsLoaderData } from "./FilteredAccounts";
 import { SavedAccount } from "../../../accounts/savedAccount";
+import { useMemo } from "react";
 
 type SidePanel = {
     setOptions({
@@ -91,7 +92,7 @@ function AccountAsCheckbox(props: CheckboxProps) {
                 <Box
                     width='100%'
                     cursor='pointer'
-                    borderLeftColor={state.isChecked ? 'white' : 'transparent'}
+                    borderLeftColor={state.isChecked ? 'blue.100' : 'transparent'}
                     borderLeftWidth={4}
                     {...getCheckboxProps()}
                 >
@@ -103,16 +104,29 @@ function AccountAsCheckbox(props: CheckboxProps) {
 }
 
 type AccountsListProps = {
-    accounts: SavedAccount[];
+    allAccounts: SavedAccount[];
+    filteredAddresses: Set<Address>;
     getCheckboxProps: UseCheckboxGroupReturn['getCheckboxProps']
 }
 
 // Custom checkboxes in Chakra: https://v2.chakra-ui.com/docs/hooks/use-checkbox-group
-function AccountsList({ accounts, getCheckboxProps }: AccountsListProps) {
+function AccountsList({ allAccounts, filteredAddresses, getCheckboxProps }: AccountsListProps) {
     return (
         <Box>
-            {accounts.map((account) => {
+            {allAccounts.map((account) => {
                 const checkbox = getCheckboxProps({ value: account.address })
+                if (!filteredAddresses.has(account.address)) {
+                    // If an address is filtered out but is checked, render a hidden input with its address
+                    // This ensures that we connect all checked accounts, not just visible ones
+                    if ('isChecked' in checkbox && checkbox.isChecked) {
+                        return (
+                            <input type='hidden' name='addressInput' value={account.address} />
+                        )
+                    } else {
+                        return null
+                    }
+                }
+
                 return (
                     <AccountAsCheckbox key={account.address} {...checkbox} /* submit={submit} */>
                         <AccountDisplay account={account} />
@@ -128,7 +142,8 @@ export default function Connect() {
     const { tabId, requestId, forOrigin } = loaderData;
     const filtersFetcher = useFetcher() as FetcherWithComponents<FilteredAccountsLoaderData>;
     const routeLoaderData = useRouteLoaderData('accounts-route') as FilteredAccountsLoaderData;
-    const { accounts, tags, filtersEnabled, searchQuery } = getFilteredAccountsData(routeLoaderData, filtersFetcher.data);
+    const { accounts: filteredAccounts, tags, filtersEnabled, searchQuery } = getFilteredAccountsData(routeLoaderData, filtersFetcher.data);
+    const filteredAddresses = useMemo(() => new Set(filteredAccounts.map(account => account.address)), [filteredAccounts]);
     const { value: selectedAddresses, getCheckboxProps } = useCheckboxGroup({
         // TODO: for now we only do connect UI when there's no existing connections, probably will rework this a bit
         // in that case, will need to pass the current selections in here
@@ -152,7 +167,7 @@ export default function Connect() {
                                 <input type='hidden' name='tabIdInput' value={tabId} />
                                 <input type='hidden' name='requestIdInput' value={requestId} />
                                 <input type='hidden' name='forOriginInput' value={forOrigin} />
-                                <AccountsList accounts={accounts} getCheckboxProps={getCheckboxProps} />
+                                <AccountsList allAccounts={routeLoaderData.accounts} filteredAddresses={filteredAddresses} getCheckboxProps={getCheckboxProps} />
                             </Form>
                         </Box>
                     </Flex>
