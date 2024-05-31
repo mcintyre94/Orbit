@@ -1,13 +1,13 @@
 import type { Address } from "@solana/addresses";
 import { makeConnectionSubmitEvent } from "../events";
 import { ActionFunctionArgs, FetcherWithComponents, Form, LoaderFunctionArgs, useFetcher, useLoaderData, useRouteLoaderData } from "react-router-dom";
-import { Box, Button, CheckboxProps, Flex, HStack, Heading, Spacer, UseCheckboxGroupReturn, VStack, useCheckbox, useCheckboxGroup } from "@chakra-ui/react";
+import { Box, Button, CheckboxProps, Flex, HStack, Heading, Spacer, UseCheckboxGroupReturn, VStack, useCheckbox, useCheckboxGroup, Text } from "@chakra-ui/react";
 import AccountDisplay from "../components/AccountDisplay";
 import TagFilters from "../components/TagFilters";
 import { getFilteredAccountsData } from "../utils/filterAccounts";
 import { FilteredAccountsLoaderData } from "./FilteredAccounts";
 import { SavedAccount } from "../../../accounts/savedAccount";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { getSavedConnection } from "@/connections/storage";
 
 type SidePanel = {
@@ -140,16 +140,54 @@ function AccountsList({ allAccounts, filteredAddresses, getCheckboxProps }: Acco
     )
 }
 
+type SelectDeselectAllProps = {
+    allAddresses: Address[];
+    filteredAddresses: Set<Address>;
+    setSelectedAddresses: ReturnType<typeof useCheckboxGroup>['setValue']
+}
+
+function SelectDeselectAll({ allAddresses, filteredAddresses, setSelectedAddresses }: SelectDeselectAllProps) {
+    // Note: not the same as filtersEnabled, we want to treat as filtered if search is being used
+    const filtered = allAddresses.length !== filteredAddresses.size;
+
+    const selectAll = useCallback(() => {
+        if (filtered) {
+            // add all filtered addresses to the current selection
+            return setSelectedAddresses(currentAddresses => currentAddresses.concat([...filteredAddresses]));
+        } else {
+            // no filters, just select all addresses
+            return setSelectedAddresses(allAddresses)
+        }
+    }, [allAddresses, filteredAddresses, filtered, setSelectedAddresses]);
+
+    const deselectAll = useCallback(() => {
+        if (filtered) {
+            // remove all filtered addresses from the current selection
+            return setSelectedAddresses(currentAddresses => currentAddresses.filter(address => !filteredAddresses.has(address as Address)))
+        } else {
+            // no filters, just deselect all addresses
+            return setSelectedAddresses([])
+        }
+    }, [allAddresses, filteredAddresses, filtered, setSelectedAddresses])
+
+    return (
+        <HStack spacing={4}>
+            <Text size='sm' cursor='pointer' onClick={selectAll}>Select all</Text>
+            <Text size='sm' cursor='pointer' onClick={deselectAll}>Deselect all</Text>
+        </HStack>
+    )
+}
+
 export default function Connect() {
     const loaderData = useLoaderData() as Awaited<ReturnType<typeof loader>>;
     const { tabId, requestId, forOrigin, connectedAddressesForOrigin } = loaderData;
     const filtersFetcher = useFetcher() as FetcherWithComponents<FilteredAccountsLoaderData>;
     const routeLoaderData = useRouteLoaderData('accounts-route') as FilteredAccountsLoaderData;
+    const { accounts: allAccounts } = routeLoaderData;
+    const allAddresses = useMemo(() => allAccounts.map(account => account.address), [allAccounts]);
     const { accounts: filteredAccounts, tags, filtersEnabled, searchQuery } = getFilteredAccountsData(routeLoaderData, filtersFetcher.data);
     const filteredAddresses = useMemo(() => new Set(filteredAccounts.map(account => account.address)), [filteredAccounts]);
-    const { value: selectedAddresses, getCheckboxProps } = useCheckboxGroup({
-        // TODO: for now we only do connect UI when there's no existing connections, probably will rework this a bit
-        // in that case, will need to pass the current selections in here
+    const { value: selectedAddresses, getCheckboxProps, setValue: setSelectedAddresses } = useCheckboxGroup({
         defaultValue: connectedAddressesForOrigin,
         onChange(value) {
             console.log('checkbox changed!', { value })
@@ -164,16 +202,19 @@ export default function Connect() {
 
                     <TagFilters tags={tags} filtersEnabled={filtersEnabled} searchQuery={searchQuery} fetcher={filtersFetcher} />
 
-                    <Flex direction='column' alignItems='flex-start' width='100%' marginBottom={2}>
-                        <Box width='100%'>
-                            <Form method="post" id="accounts-form" onReset={() => sendAndClose(tabId, requestId, forOrigin, [])}>
-                                <input type='hidden' name='tabIdInput' value={tabId} />
-                                <input type='hidden' name='requestIdInput' value={requestId} />
-                                <input type='hidden' name='forOriginInput' value={forOrigin} />
-                                <AccountsList allAccounts={routeLoaderData.accounts} filteredAddresses={filteredAddresses} getCheckboxProps={getCheckboxProps} />
-                            </Form>
-                        </Box>
-                    </Flex>
+                    {filteredAddresses.size > 0 ?
+                        <SelectDeselectAll allAddresses={allAddresses} filteredAddresses={filteredAddresses} setSelectedAddresses={setSelectedAddresses} />
+                        : null
+                    }
+
+                    <Box width='100%' marginBottom={2}>
+                        <Form method="post" id="accounts-form" onReset={() => sendAndClose(tabId, requestId, forOrigin, [])}>
+                            <input type='hidden' name='tabIdInput' value={tabId} />
+                            <input type='hidden' name='requestIdInput' value={requestId} />
+                            <input type='hidden' name='forOriginInput' value={forOrigin} />
+                            <AccountsList allAccounts={allAccounts} filteredAddresses={filteredAddresses} getCheckboxProps={getCheckboxProps} />
+                        </Form>
+                    </Box>
 
                 </VStack>
                 <Spacer />
