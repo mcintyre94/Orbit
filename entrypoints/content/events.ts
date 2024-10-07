@@ -8,6 +8,7 @@ type ContentEventBase = {
 export type AccountToConnect = {
   address: Address;
   label: string;
+  tags: string[];
 };
 
 export type ConnectAccountsEvent = ContentEventBase & {

@@ -28,13 +28,21 @@ async function convertAddressesToAccountsToConnect(
   addresses: Address[]
 ): Promise<AccountToConnect[]> {
   const allSavedAccounts = await getSavedAccounts();
-  const accountLabels = Object.fromEntries(
-    allSavedAccounts.map((account) => [account.address, account.label])
-  );
-  return addresses.map((address) => ({
-    address,
-    label: accountLabels[address],
-  }));
+  return addresses.flatMap((address) => {
+    const account = allSavedAccounts.find(
+      (account) => account.address === address
+    );
+    if (!account) {
+      return [];
+    }
+    return [
+      {
+        address,
+        label: account.label,
+        tags: account.tags,
+      },
+    ];
+  });
 }
 
 /** Receive messages from the page and forward to background unchanged */

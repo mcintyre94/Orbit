@@ -95,7 +95,8 @@ class OrbitWallet implements Wallet {
       publicKey: this.#base58Encoder.encode(account.address) as Uint8Array,
       label: account.label,
       chains: this.chains,
-      features: [StandardConnect, StandardEvents],
+      features: [StandardConnect, StandardEvents, "additionalField:tags"],
+      tags: account.tags,
     }));
   }
 
