@@ -162,7 +162,6 @@ class OrbitWallet implements Wallet {
     const requestConnectionEvent = silent
       ? makeSilentConnectionEvent(requestId)
       : makeRequestConnectionEvent(requestId);
-    console.log({ silent, requestConnectionEvent });
     window.postMessage(requestConnectionEvent);
 
     const { accounts } = await promise;
@@ -219,19 +218,16 @@ class OrbitWallet implements Wallet {
 }
 
 export function injected() {
-  console.log("GM, Orbit injected!");
   const requestManager = new RequestManager();
   const wallet = new OrbitWallet(requestManager);
   // this will expose accounts if there are any previously connected
   wallet["features"]["standard:connect"].connect({ silent: true });
   registerWallet(wallet);
-  console.log("registered!");
 
   window.addEventListener(
     "message",
     (event: MessageEvent<ContentEvent>) => {
       if (!event.isTrusted) {
-        console.log("dropping untrusted event", event);
         return;
       }
 
@@ -239,7 +235,6 @@ export function injected() {
         return;
       }
 
-      console.log("resolving request", event.data);
       requestManager.resolve(event.data);
     },
     false
