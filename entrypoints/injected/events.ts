@@ -15,6 +15,11 @@ type DisconnectEvent = InjectedEventBase & {
   type: "disconnect";
 };
 
+type GetTagsForAddressesEvent = InjectedEventBase & {
+  type: "getTagsForAddresses";
+  addresses: string[];
+};
+
 export function makeRequestConnectionEvent(
   requestId: number
 ): RequestConnectionEvent {
@@ -43,7 +48,20 @@ export function makeDisconnectEvent(requestId: number): DisconnectEvent {
   };
 }
 
+export function makeGetTagsForAddressesEvent(
+  requestId: number,
+  addresses: string[]
+): GetTagsForAddressesEvent {
+  return {
+    origin: "injected",
+    requestId,
+    type: "getTagsForAddresses",
+    addresses,
+  };
+}
+
 export type InjectedEvent =
   | RequestConnectionEvent
   | SilentConnectionEvent
-  | DisconnectEvent;
+  | DisconnectEvent
+  | GetTagsForAddressesEvent;

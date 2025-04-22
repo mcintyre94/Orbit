@@ -1,72 +1,22 @@
-"use strict";
-import {
-  SOLANA_DEVNET_CHAIN,
-  SOLANA_LOCALNET_CHAIN,
-  SOLANA_MAINNET_CHAIN,
-  SOLANA_TESTNET_CHAIN,
-} from "@solana/wallet-standard-chains";
-import {
-  SolanaSignTransaction,
-  SolanaSignTransactionFeature,
-} from "@solana/wallet-standard-features";
-import {
-  StandardConnect,
-  type StandardConnectFeature,
-  type StandardConnectMethod,
-  StandardDisconnect,
-  type StandardDisconnectFeature,
-  type StandardDisconnectMethod,
-  StandardEvents,
-  type StandardEventsFeature,
-  type StandardEventsListeners,
-  type StandardEventsNames,
-  type StandardEventsOnMethod,
-  type Wallet,
-  type WalletAccount,
-  registerWallet,
-} from "@wallet-standard/core";
 import { getBase58Encoder } from "@solana/codecs-strings";
 import {
-  makeDisconnectEvent,
-  makeRequestConnectionEvent,
-  makeSilentConnectionEvent,
-} from "./events";
-import type {
-  ContentEvent,
-  ConnectAccountsEvent,
-  AccountToConnect,
-} from "../content/events";
+  StandardConnect,
+  StandardEvents,
+import { SOLANA_DEVNET_CHAIN } from "@solana/wallet-standard-chains";
+  StandardEventsListeners,
+  StandardEventsNames,
+  Wallet,
+  WalletAccount,
+} from "@wallet-standard/core";
+import { RequestManager } from "./requestManager";
+import { AccountToConnect, ConnectAccountsEvent, FetchedTagsForAddressesEvent } from "@/entrypoints/content/events";
+import { AccountsTags, AccountsTagsFeature, GetTagsForAddressesMethod } from "./tagsFeature";
+import { SOLANA_DEVNET_CHAIN, SOLANA_LOCALNET_CHAIN, SOLANA_MAINNET_CHAIN, SOLANA_TESTNET_CHAIN } from "@solana/wallet-standard-chains";
+import { StandardConnectFeature, StandardConnectMethod, StandardDisconnect, StandardDisconnectFeature, StandardDisconnectMethod, StandardEventsFeature, StandardEventsListeners, StandardEventsNames, StandardEventsOnMethod, Wallet, WalletAccount } from "@wallet-standard/core";
+import { SolanaSignTransaction, SolanaSignTransactionFeature } from "@solana/wallet-standard-features";
+import { makeDisconnectEvent, makeGetTagsForAddressesEvent, makeRequestConnectionEvent, makeSilentConnectionEvent } from "@/entrypoints/injected/events";
 
-class RequestManager {
-  constructor() {
-    if (new.target === RequestManager) {
-      Object.freeze(this);
-    }
-  }
-
-  #requestId = 0;
-  #resolvers: { [requestId: number]: [any, any] } = {};
-
-  addResolver<T>() {
-    const requestId = this.#requestId++;
-    let resolve, reject;
-    const promise = new Promise<T>((_resolve, _reject) => {
-      resolve = _resolve;
-      reject = _reject;
-    });
-    this.#resolvers[requestId] = [resolve, reject];
-    return { requestId, promise };
-  }
-
-  resolve(event: ContentEvent) {
-    const requestId = event.requestId;
-    const [resolve, reject] = this.#resolvers[requestId];
-    // TODO: add error handling, we should be able to reject too - on some basis
-    resolve(event);
-  }
-}
-
-class OrbitWallet implements Wallet {
+export class OrbitWallet implements Wallet {
   constructor(requestManager: RequestManager) {
     if (new.target === OrbitWallet) {
       Object.freeze(this);
@@ -95,7 +45,7 @@ class OrbitWallet implements Wallet {
       publicKey: this.#base58Encoder.encode(account.address) as Uint8Array,
       label: account.label,
       chains: this.chains,
-      features: [StandardConnect, StandardEvents, "accounts:tags"],
+      features: [StandardConnect, StandardEvents, AccountsTags],
     }));
   }
 
@@ -123,7 +73,8 @@ class OrbitWallet implements Wallet {
   get features(): StandardConnectFeature &
     StandardDisconnectFeature &
     StandardEventsFeature &
-    SolanaSignTransactionFeature {
+    SolanaSignTransactionFeature &
+    AccountsTagsFeature {
     return {
       [StandardConnect]: {
         version: "1.0.0",
@@ -146,6 +97,10 @@ class OrbitWallet implements Wallet {
             new Error("Wallet does not support signing transactions")
           ),
         supportedTransactionVersions: [0],
+      },
+      [AccountsTags]: {
+        version: "1.0.0",
+        getTagsForAddresses: this.#getTagsForAddresses,
       },
     };
   }
@@ -193,6 +148,16 @@ class OrbitWallet implements Wallet {
     return promise;
   };
 
+  #getTagsForAddresses: GetTagsForAddressesMethod = async ({ addresses }) => {
+    const { requestId, promise } = this.#requestManager.addResolver<FetchedTagsForAddressesEvent>();
+
+    const getTagsForAddressesEvent = makeGetTagsForAddressesEvent(requestId, addresses);
+    window.postMessage(getTagsForAddressesEvent);
+
+    const { tags } = await promise;
+    return { tags };
+  };
+
   #on: StandardEventsOnMethod = (event, listener) => {
     this.#listeners[event]?.push(listener) ||
       (this.#listeners[event] = [listener]);
@@ -215,32 +180,4 @@ class OrbitWallet implements Wallet {
       (existingListener) => listener !== existingListener
     );
   }
-}
-
-export function injected() {
-  console.log("GM, Orbit injected!");
-  const requestManager = new RequestManager();
-  const wallet = new OrbitWallet(requestManager);
-  // this will expose accounts if there are any previously connected
-  wallet["features"]["standard:connect"].connect({ silent: true });
-  registerWallet(wallet);
-  console.log("registered!");
-
-  window.addEventListener(
-    "message",
-    (event: MessageEvent<ContentEvent>) => {
-      if (!event.isTrusted) {
-        console.log("dropping untrusted event", event);
-        return;
-      }
-
-      if (event.data.origin !== "content") {
-        return;
-      }
-
-      console.log("resolving request", event.data);
-      requestManager.resolve(event.data);
-    },
-    false
-  );
 }
