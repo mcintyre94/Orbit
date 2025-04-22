@@ -54,7 +54,6 @@ function openSidePanel({ event, tabId, forOrigin }: OpenSidePanelInput) {
 function main() {
   browser.runtime.onMessage.addListener(function (request, sender) {
     if (sender.url === undefined) {
-      console.log("dropping event with unknown origin", request, sender);
       return;
     }
 
@@ -62,9 +61,6 @@ function main() {
 
     if (event.origin === "injected") {
       // We handle events from the injected wallet by opening a sidepanel
-      console.log("sender tab", sender.tab);
-
-      console.log("background, opening window!");
       const tabId = sender.tab?.id ?? 0;
       openSidePanel({
         event,
@@ -73,10 +69,6 @@ function main() {
       });
     } else if (event.origin === "sidePanel") {
       // We handle events from the sidepanel by forwarding them to the content script
-      console.log(
-        "background received event from extension sidepanel, forwarding",
-        event
-      );
       browser.tabs.sendMessage(
         event.tabId,
         makeConnectionSubmitForwardedEvent({

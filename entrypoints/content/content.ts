@@ -51,7 +51,6 @@ function addWindowListener() {
     "message",
     async (event: MessageEvent<InjectedEvent>) => {
       if (!event.isTrusted) {
-        console.log("dropping untrusted event", event);
         return;
       }
 
@@ -66,9 +65,8 @@ function addWindowListener() {
       if (event.data.type === "silentConnection") {
         const origin = new URL(event.origin).hostname;
         const existingAddresses = (await getSavedConnection(origin)) ?? [];
-        const accountsToConnect = await convertAddressesToAccountsToConnect(
-          existingAddresses
-        );
+        const accountsToConnect =
+          await convertAddressesToAccountsToConnect(existingAddresses);
         const connectAccountsEvent = makeConnectAccountsEvent(
           event.data.requestId,
           accountsToConnect
@@ -89,11 +87,6 @@ function addWindowListener() {
       }
 
       // for anything we can't handle directly, pass to background script
-
-      console.log(
-        "forwarding event data from injected to background unchanged",
-        event.data
-      );
       browser.runtime.sendMessage(event.data);
     },
     false
