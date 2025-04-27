@@ -18,6 +18,7 @@ import { getBase58Encoder } from "@solana/codecs-strings";
 import {
   AccountToConnect,
   ConnectAccountsEvent,
+  TagsForAccountsEvent,
 } from "@/entrypoints/content/events";
 import { SOLANA_LOCALNET_CHAIN } from "@solana/wallet-standard-chains";
 import {
@@ -31,9 +32,16 @@ import {
 } from "@solana/wallet-standard-features";
 import {
   makeDisconnectEvent,
+  makeGetTagsForAccountsEvent,
   makeRequestConnectionEvent,
   makeSilentConnectionEvent,
 } from "@/entrypoints/injected/events";
+import {
+  AccountsTags,
+  AccountsTagsFeature,
+  AccountsTagsMethod,
+} from "./accountsTagsFeature";
+import { Address } from "@solana/addresses";
 
 export class OrbitWallet implements Wallet {
   constructor(requestManager: RequestManager) {
@@ -93,7 +101,8 @@ export class OrbitWallet implements Wallet {
   get features(): StandardConnectFeature &
     StandardDisconnectFeature &
     StandardEventsFeature &
-    SolanaSignTransactionFeature {
+    SolanaSignTransactionFeature &
+    AccountsTagsFeature {
     return {
       [StandardConnect]: {
         version: "1.0.0",
@@ -116,6 +125,10 @@ export class OrbitWallet implements Wallet {
             new Error("Wallet does not support signing transactions")
           ),
         supportedTransactionVersions: [0],
+      },
+      [AccountsTags]: {
+        version: "1.0.0",
+        getTags: this.#getTagsForAccounts,
       },
     };
   }
@@ -160,6 +173,26 @@ export class OrbitWallet implements Wallet {
     const disconnectEvent = makeDisconnectEvent(requestId);
     window.postMessage(disconnectEvent);
     return promise;
+  };
+
+  #getTagsForAccounts: AccountsTagsMethod = async ({ addresses }) => {
+    const { requestId, promise } =
+      this.#requestManager.addResolver<TagsForAccountsEvent>();
+
+    if (addresses.length === 0) {
+      return {
+        tagsForAccounts: {},
+      };
+    }
+
+    const tagsForAccountsEvent = makeGetTagsForAccountsEvent(
+      requestId,
+      addresses as Address[]
+    );
+    window.postMessage(tagsForAccountsEvent);
+
+    const { tagsForAccounts } = await promise;
+    return { tagsForAccounts };
   };
 
   #on: StandardEventsOnMethod = (event, listener) => {

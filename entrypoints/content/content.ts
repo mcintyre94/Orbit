@@ -11,6 +11,7 @@ import {
   type AccountToConnect,
   makeConnectAccountsEvent,
   makeDisconnectCompleteEvent,
+  makeTagsForAccountsEvent,
 } from "./events";
 import { getSavedAccounts } from "../../accounts/storage";
 
@@ -83,6 +84,30 @@ function addWindowListener() {
           event.data.requestId
         );
         window.postMessage(disconnectCompleteEvent);
+        return;
+      }
+
+      // if the message is getTagsForAccounts, return the tags for the accounts from storage
+      if (event.data.type === "getTagsForAccounts") {
+        const addresses = event.data.addresses;
+        const allAccounts = await getSavedAccounts();
+        const tagsForAccounts = addresses.reduce(
+          (acc, address) => {
+            const account = allAccounts.find(
+              (account) => account.address === address
+            );
+            if (account) {
+              acc[address] = account.tags;
+            }
+            return acc;
+          },
+          {} as Record<Address, string[]>
+        );
+        const tagsForAccountsEvent = makeTagsForAccountsEvent(
+          event.data.requestId,
+          tagsForAccounts
+        );
+        window.postMessage(tagsForAccountsEvent);
         return;
       }
 

@@ -20,6 +20,11 @@ type DisconnectCompleteEvent = ContentEventBase & {
   type: "disconnectComplete";
 };
 
+export type TagsForAccountsEvent = ContentEventBase & {
+  type: "tagsForAccounts";
+  tagsForAccounts: Record<Address, string[]>;
+};
+
 export function makeConnectAccountsEvent(
   requestId: number,
   accounts: AccountToConnect[]
@@ -42,4 +47,19 @@ export function makeDisconnectCompleteEvent(
   };
 }
 
-export type ContentEvent = ConnectAccountsEvent | DisconnectCompleteEvent;
+export function makeTagsForAccountsEvent(
+  requestId: number,
+  tagsForAccounts: Record<Address, string[]>
+): TagsForAccountsEvent {
+  return {
+    origin: "content",
+    requestId,
+    type: "tagsForAccounts",
+    tagsForAccounts,
+  };
+}
+
+export type ContentEvent =
+  | ConnectAccountsEvent
+  | DisconnectCompleteEvent
+  | TagsForAccountsEvent;
