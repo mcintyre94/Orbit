@@ -10,7 +10,7 @@ export class RequestManager {
   #requestId = 0;
   #resolvers: { [requestId: number]: [any, any] } = {};
 
-  addResolver<T>() {
+  addResolver<T extends ContentEvent | void>() {
     const requestId = this.#requestId++;
     let resolve, reject;
     const promise = new Promise<T>((_resolve, _reject) => {

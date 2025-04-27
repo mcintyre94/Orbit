@@ -1,3 +1,5 @@
+import { Address } from "@solana/addresses";
+
 type InjectedEventBase = {
   origin: "injected";
   requestId: number;
@@ -13,6 +15,11 @@ type SilentConnectionEvent = InjectedEventBase & {
 
 type DisconnectEvent = InjectedEventBase & {
   type: "disconnect";
+};
+
+type GetTagsForAccountsEvent = InjectedEventBase & {
+  type: "getTagsForAccounts";
+  addresses: Address[];
 };
 
 export function makeRequestConnectionEvent(
@@ -43,7 +50,20 @@ export function makeDisconnectEvent(requestId: number): DisconnectEvent {
   };
 }
 
+export function makeGetTagsForAccountsEvent(
+  requestId: number,
+  addresses: Address[]
+): GetTagsForAccountsEvent {
+  return {
+    origin: "injected",
+    requestId,
+    type: "getTagsForAccounts",
+    addresses,
+  };
+}
+
 export type InjectedEvent =
   | RequestConnectionEvent
   | SilentConnectionEvent
-  | DisconnectEvent;
+  | DisconnectEvent
+  | GetTagsForAccountsEvent;
