@@ -40,7 +40,6 @@ async function convertAddressesToAccountsToConnect(
       {
         address,
         label: account.label,
-        tags: account.tags,
       },
     ];
   });
