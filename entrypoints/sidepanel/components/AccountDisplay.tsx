@@ -1,22 +1,7 @@
 import { VStack, HStack, Tooltip, Wrap, WrapItem, Tag, Text, useClipboard } from "@chakra-ui/react";
 import { loader as filteredAccountsLoader } from '../routes/FilteredAccounts'
 import { shortAddress } from "../utils/address";
-import { Address } from "@solana/addresses";
-import { CopyIcon } from "@chakra-ui/icons";
-
-function CopyButton({ address }: { address: Address }) {
-    const { onCopy, hasCopied } = useClipboard(address);
-
-    if (hasCopied) {
-        return <Text fontSize='sm'>Copied</Text>
-    } else {
-        return <CopyIcon cursor='pointer' boxSize={4} onClick={(event) => {
-            // prevent following the link it's nested in
-            event.preventDefault();
-            onCopy();
-        }} />
-    }
-}
+import CopyButton from "./CopyButton";
 
 interface Props {
     account: Awaited<ReturnType<typeof filteredAccountsLoader>>['accounts'][0]

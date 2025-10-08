@@ -32,7 +32,7 @@ export default function Home() {
             <Flex direction='column' alignItems='flex-start' width='100%'>
                 {accounts.map(account => (
                     <Box width='100%' key={account.address} paddingBottom={1}>
-                        <Link to={`/accounts/${account.address}/edit`}>
+                        <Link to={`/accounts/${account.address}`}>
                             <AccountDisplay account={account} />
                         </Link>
                     </Box>

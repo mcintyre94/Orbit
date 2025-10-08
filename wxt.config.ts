@@ -25,7 +25,7 @@ export default defineConfig({
   manifest: {
     name: "Orbit",
     description: "Organise your Solana wallets",
-    version: "1.1.0",
+    version: "1.1.2",
     web_accessible_resources: [
       {
         matches: ["<all_urls>"],
