@@ -31,6 +31,14 @@ const theme = extendTheme({ config })
 const mantineTheme = createTheme({
   primaryColor: 'blue',
   primaryShade: 2,
+  spacing: {
+    xxs: '4px',
+    xs: '6px',
+    sm: '12px',
+    md: '16px',
+    lg: '20px',
+    xl: '32px',
+  },
 });
 
 const router = createBrowserRouter([

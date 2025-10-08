@@ -1,23 +1,46 @@
-import { UseCheckboxProps, useCheckbox, chakra, Tag, Box, CheckboxGroup, FormControl, FormLabel, Switch, VStack, Wrap, WrapItem, Input, HStack, InputGroup, InputLeftElement, ResponsiveValue } from "@chakra-ui/react";
+import { Box, Switch, Stack, Group, TextInput, Badge, Checkbox, Flex, Input } from "@mantine/core";
+import { IconSearch } from "@tabler/icons-react";
 import { PropsWithChildren } from "react";
 import { loader } from "../routes/Accounts";
 import { FetcherWithComponents } from "react-router-dom";
-import { SearchIcon } from "@chakra-ui/icons";
 
-function TagCheckbox(props: PropsWithChildren<UseCheckboxProps>) {
-    const { children } = props;
-    const { state, getInputProps, htmlProps } = useCheckbox(props)
+interface TagCheckboxProps {
+    name: string;
+    value: string;
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    isChecked: boolean;
+    isDisabled: boolean;
+}
 
+function TagCheckbox({ name, value, onChange, isChecked, isDisabled, children }: PropsWithChildren<TagCheckboxProps>) {
     return (
-        <chakra.label
-            cursor={props.isDisabled ? 'not-allowed' : 'pointer'}
-            {...htmlProps}
-        >
-            <>
-                <input {...getInputProps()} hidden />
-                <Tag colorScheme='blue' variant={state.isChecked ? 'solid' : 'outline'}>{children}</Tag>
-            </>
-        </chakra.label>
+        <label style={{ cursor: isDisabled ? 'not-allowed' : 'pointer' }}>
+            <input
+                type="checkbox"
+                name={name}
+                value={value}
+                onChange={onChange}
+                checked={isChecked}
+                disabled={isDisabled}
+                hidden
+            />
+            <Badge
+                autoContrast
+                radius="sm"
+                color="blue.5"
+                variant={isChecked ? 'filled' : 'outline'}
+                style={{ cursor: isDisabled ? 'not-allowed' : 'pointer' }}
+                styles={(theme) => ({
+                    root: {
+                        cursor: isDisabled ? 'not-allowed' : 'pointer',
+                        textTransform: 'none',
+                        padding: theme.spacing.xs,
+                    }
+                })}
+            >
+                {children}
+            </Badge>
+        </label>
     )
 }
 
@@ -34,65 +57,64 @@ export default function TagFilters({ tags, filtersEnabled, searchQuery, fetcher 
     return (
         <Box>
             <fetcher.Form action="/filtered-accounts">
-                <VStack spacing={4} alignItems='flex-start'>
-                    <HStack spacing={2}>
-                        <FormControl display='flex' alignItems='center'>
-                            <FormLabel htmlFor='enableFilters' mb='0'>
-                                Enable tag filtering
-                            </FormLabel>
-                            <Switch
-                                name='enableFilters'
-                                id='enableFilters'
-                                value='enabled'
-                                defaultChecked={filtersEnabled}
-                                onChange={(event) => {
-                                    fetcher.submit(event.currentTarget.form);
-                                }}
-                            />
-                        </FormControl>
+                <Stack gap="md" align="flex-start">
+                    <Group gap="sm" align="center" wrap="nowrap" style={{ width: '100%' }}>
+                        <Switch
+                            withThumbIndicator={false}
+                            labelPosition="left"
+                            label="Enable tag filtering"
+                            size="md"
+                            name='enableFilters'
+                            id='enableFilters'
+                            value='enabled'
+                            defaultChecked={filtersEnabled}
+                            color="blue.5"
+                            styles={{
+                                label: { whiteSpace: 'pre-wrap', maxWidth: '120px' },
+                                body: { alignItems: 'center' },
+                            }}
+                            onChange={(event) => {
+                                fetcher.submit(event.currentTarget.form);
+                            }}
+                        />
 
-                        <InputGroup>
-                            <InputLeftElement pointerEvents='none'>
-                                <SearchIcon />
-                            </InputLeftElement>
-                            <Input
-                                type='search'
-                                placeholder='Search accounts'
-                                name='search'
-                                rounded={8}
-                                defaultValue={searchQuery}
-                                role='search'
-                                aria-label='Search accounts'
-                                onChange={(event) => {
-                                    fetcher.submit(event.currentTarget.form);
-                                }}
-                                _placeholder={{ color: 'gray.500' }}
-                                borderColor='gray.400'
-                                autoComplete='off'
-                            />
-                        </InputGroup>
-                    </HStack>
+                        <TextInput
+                            type='search'
+                            placeholder='Search'
+                            name='search'
+                            defaultValue={searchQuery}
+                            role='search'
+                            aria-label='Search accounts'
+                            onChange={(event) => {
+                                fetcher.submit(event.currentTarget.form);
+                            }}
+                            leftSection={<IconSearch size={16} />}
+                            radius="md"
+                            autoComplete='off'
+                            variant="default"
+                            styles={{
+                                input: { background: 'transparent' }
+                            }}
+                        />
+                    </Group>
                     {filtersEnabled ?
-                        <Wrap alignSelf='center'>
-                            <CheckboxGroup colorScheme='blue'>
-                                {tags.map(tag =>
-                                    <WrapItem key={tag.tagName}>
-                                        <TagCheckbox
-                                            name='tag'
-                                            value={tag.tagName}
-                                            onChange={(event) => {
-                                                fetcher.submit(event.currentTarget.form);
-                                            }}
-                                            isChecked={tag.selected}
-                                            isDisabled={!filtersEnabled}
-                                        >{tag.tagName}</TagCheckbox>
-                                    </WrapItem>
-                                )}
-                            </CheckboxGroup>
-                        </Wrap>
+                        <Group gap="xs">
+                            {tags.map(tag =>
+                                <TagCheckbox
+                                    key={tag.tagName}
+                                    name='tag'
+                                    value={tag.tagName}
+                                    onChange={(event) => {
+                                        fetcher.submit(event.currentTarget.form);
+                                    }}
+                                    isChecked={tag.selected}
+                                    isDisabled={!filtersEnabled}
+                                >{tag.tagName}</TagCheckbox>
+                            )}
+                        </Group>
                         : null
                     }
-                </VStack>
+                </Stack>
             </fetcher.Form>
         </Box>
     )
