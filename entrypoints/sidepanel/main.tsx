@@ -19,11 +19,16 @@ import { loader as filteredAccountsLoader } from './routes/FilteredAccounts'
 import Layout from './layout'
 import Connect, { action as connectAction, loader as connectLoader } from './routes/Connect'
 
+import '@mantine/core/styles.css';
+import { createTheme, MantineProvider } from '@mantine/core'
+
 const config: ThemeConfig = {
   initialColorMode: 'dark',
   useSystemColorMode: false
 }
 const theme = extendTheme({ config })
+
+const mantineTheme = createTheme({});
 
 const router = createBrowserRouter([
   {
@@ -137,7 +142,9 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <ChakraProvider theme={theme}>
-      <RouterProvider router={router} />
+      <MantineProvider theme={mantineTheme} forceColorScheme='dark'>
+        <RouterProvider router={router} />
+      </MantineProvider>
     </ChakraProvider>
   </React.StrictMode>
 )
