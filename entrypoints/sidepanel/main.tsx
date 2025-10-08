@@ -28,7 +28,10 @@ const config: ThemeConfig = {
 }
 const theme = extendTheme({ config })
 
-const mantineTheme = createTheme({});
+const mantineTheme = createTheme({
+  primaryColor: 'blue',
+  primaryShade: 2,
+});
 
 const router = createBrowserRouter([
   {
