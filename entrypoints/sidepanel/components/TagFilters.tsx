@@ -1,8 +1,9 @@
-import { Box, Switch, Stack, Group, TextInput, Badge, Checkbox, Flex, Input } from "@mantine/core";
+import { Box, Switch, Stack, Group, TextInput } from "@mantine/core";
 import { IconSearch } from "@tabler/icons-react";
 import { PropsWithChildren } from "react";
 import { loader } from "../routes/Accounts";
 import { FetcherWithComponents } from "react-router-dom";
+import TagBadge from "./TagBadge";
 
 interface TagCheckboxProps {
     name: string;
@@ -24,22 +25,9 @@ function TagCheckbox({ name, value, onChange, isChecked, isDisabled, children }:
                 disabled={isDisabled}
                 hidden
             />
-            <Badge
-                autoContrast
-                radius="sm"
-                color="blue.5"
-                variant={isChecked ? 'filled' : 'outline'}
-                style={{ cursor: isDisabled ? 'not-allowed' : 'pointer' }}
-                styles={(theme) => ({
-                    root: {
-                        cursor: isDisabled ? 'not-allowed' : 'pointer',
-                        textTransform: 'none',
-                        padding: theme.spacing.xs,
-                    }
-                })}
-            >
+            <TagBadge isDisabled={isDisabled} isFilled={isChecked} color="blue.5">
                 {children}
-            </Badge>
+            </TagBadge>
         </label>
     )
 }
