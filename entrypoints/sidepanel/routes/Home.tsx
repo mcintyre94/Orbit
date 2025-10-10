@@ -37,15 +37,15 @@ export default function Home() {
 
             <TagFilters tags={tags} filtersEnabled={filtersEnabled} searchQuery={searchQuery} fetcher={fetcher} />
 
-            <Flex direction="column" align="flex-start" w="100%">
+            <Stack align="flex-start" w="100%" gap={0}>
                 {accounts.map(account => (
-                    <Box w="100%" key={account.address} pb="xs">
+                    <Box w="100%" key={account.address}>
                         <Link to={`/accounts/${account.address}`}>
                             <AccountDisplay account={account} />
                         </Link>
                     </Box>
                 ))}
-            </Flex>
+            </Stack>
         </Stack>
     )
 }

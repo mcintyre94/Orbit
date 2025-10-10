@@ -1,7 +1,9 @@
-import { VStack, HStack, Tooltip, Wrap, WrapItem, Tag, Text, useClipboard } from "@chakra-ui/react";
+import { Stack, Group, Tooltip, Text } from "@mantine/core";
 import { loader as filteredAccountsLoader } from '../routes/FilteredAccounts'
 import { shortAddress } from "../utils/address";
 import CopyButton from "./CopyButton";
+import TagBadge from "./TagBadge";
+import classes from "./AccountDisplay.module.css";
 
 interface Props {
     account: Awaited<ReturnType<typeof filteredAccountsLoader>>['accounts'][0]
@@ -9,22 +11,22 @@ interface Props {
 
 export default function AccountDisplay({ account }: Props) {
     return (
-        <VStack padding={4} key={account.address} spacing={1} alignItems='flex-start' _hover={{ backgroundColor: 'gray.700' }}>
-            <HStack>
-                <Text as='span' fontSize='lg'>{account.label}</Text>
-                <Tooltip label={account.address}>
-                    <Text as='span' fontSize='md' color='gray.400'>({shortAddress(account.address)})</Text>
+        <Stack gap="xs" className={classes.account}>
+            <Group gap="xs">
+                <Text span size="lg" >{account.label}</Text>
+                <Tooltip multiline maw="95%" label={account.address}>
+                    <Text span size="md" c="gray.3">({shortAddress(account.address)})</Text>
                 </Tooltip>
                 <CopyButton address={account.address} />
-            </HStack>
-            <Text fontSize='sm'>{account.notes.split('\n').join(', ')}</Text>
-            <Wrap>
+            </Group>
+            <Text size="sm">{account.notes.split('\n').join(', ')}</Text>
+            <Group gap="xs">
                 {account.tags.map(tag =>
-                    <WrapItem key={tag}>
-                        <Tag variant='outline' size='sm' key={tag}>{tag}</Tag>
-                    </WrapItem>
+                    <TagBadge key={tag} isFilled={false} isDisabled={false} color="gray.2">
+                        {tag}
+                    </TagBadge>
                 )}
-            </Wrap>
-        </VStack>
+            </Group>
+        </Stack>
     )
 }
