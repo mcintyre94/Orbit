@@ -1,5 +1,5 @@
 import { Address, isAddress } from "@solana/addresses";
-import { storage } from "wxt/storage";
+import { storage } from "#imports";
 import { SavedAccount } from "./savedAccount";
 
 const SAVED_ACCOUNTS_KEY = "local:accounts";
