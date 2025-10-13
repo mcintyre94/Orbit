@@ -1,57 +1,42 @@
-import { FormControl, FormLabel, Input } from "@chakra-ui/react";
-import { AutoComplete, AutoCompleteCreatable, AutoCompleteInput, AutoCompleteItem, AutoCompleteList, AutoCompleteTag } from "@choc-ui/chakra-autocomplete";
+import { TagsInput as MantineTagsInput, Input } from "@mantine/core";
+import { useCallback, useState } from "react";
 
 interface TagsInputProps {
     allKnownTags: string[];
     initialTags: string[];
-    tagsInputRef: React.MutableRefObject<HTMLInputElement | null>;
 }
 
-export default function TagsInput({ allKnownTags, initialTags, tagsInputRef }: TagsInputProps) {
+export default function TagsInput({ allKnownTags, initialTags }: TagsInputProps) {
+    const [tags, setTags] = useState<string[]>(initialTags);
+    const [hiddenValue, setHiddenValue] = useState<string>(JSON.stringify(initialTags));
+
+    const handleChange = useCallback((newTags: string[]) => {
+        setTags(newTags);
+        setHiddenValue(JSON.stringify(newTags));
+    }, []);
+
     return (
         <>
             {/* this is the input that actually gets passed to our action as tags values */}
-            <FormControl hidden={true} aria-hidden={true}>
-                <Input type='hidden' name='tagsInput' ref={tagsInputRef} defaultValue={JSON.stringify(initialTags)} />
-            </FormControl>
+            <input
+                type='hidden'
+                name='tagsInput'
+                value={hiddenValue}
+                onChange={() => { }} // empty onChange for controlled input
+            />
 
-            <FormControl id='tagsInput'>
-                <FormLabel>Tags</FormLabel>
-                <AutoComplete openOnFocus multiple creatable defaultValues={initialTags} onChange={(vals: string[]) => {
-                    // sync to the hidden input
-                    if (tagsInputRef.current) {
-                        tagsInputRef.current.value = JSON.stringify(vals);
-                    }
-                }}>
-                    <AutoCompleteInput variant="filled" name='tagsInputUI' autoComplete="off" type="search">
-                        {({ tags }) =>
-                            tags.map((tag, tid) => (
-                                <AutoCompleteTag
-                                    key={tid}
-                                    label={tag.label}
-                                    onRemove={tag.onRemove}
-                                    colorScheme='blue'
-                                />
-                            ))
-                        }
-                    </AutoCompleteInput>
-                    <AutoCompleteList>
-                        {allKnownTags.map((tag) => (
-                            <AutoCompleteItem
-                                key={tag}
-                                value={tag}
-                                _selected={{ bg: "whiteAlpha.50" }}
-                                _focus={{ bg: "whiteAlpha.100" }}
-                            >
-                                {tag}
-                            </AutoCompleteItem>
-                        ))}
-                        <AutoCompleteCreatable>
-                            {({ value }) => <span>Add {value} to List</span>}
-                        </AutoCompleteCreatable>
-                    </AutoCompleteList>
-                </AutoComplete>
-            </FormControl>
+            <MantineTagsInput
+                label="Tags"
+                placeholder="Add tags"
+                data={allKnownTags}
+                value={tags}
+                onChange={handleChange}
+                acceptValueOnBlur
+                w="100%"
+                styles={{
+                    input: { background: 'transparent' }
+                }}
+            />
         </>
     )
 }
