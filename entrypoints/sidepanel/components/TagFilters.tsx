@@ -25,7 +25,7 @@ function TagCheckbox({ name, value, onChange, isChecked, isDisabled, children }:
                 disabled={isDisabled}
                 hidden
             />
-            <TagBadge isDisabled={isDisabled} isFilled={isChecked} color="blue.5">
+            <TagBadge isDisabled={isDisabled} isFilled={isChecked} color="blue.2" >
                 {children}
             </TagBadge>
         </label>

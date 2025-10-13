@@ -1,8 +1,10 @@
-import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
-import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Box, Button, ButtonGroup, Flex, FormControl, FormLabel, Heading, IconButton, Input, Spacer, Textarea, VStack, useDisclosure, useToast } from '@chakra-ui/react'
+import { Button, Group, TextInput, Title, Stack, Textarea, Space, Modal, Text, ActionIcon } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
+import { useDisclosure } from '@mantine/hooks';
+import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { type Address } from '@solana/addresses';
-import { RefObject, useCallback, useEffect, useRef } from 'react';
-import { getAccount, getTags, updateAccount } from '../../../accounts/storage';
+import { useCallback, useEffect } from 'react';
+import { getAccount, updateAccount } from '../../../accounts/storage';
 import { SavedAccount } from '~/accounts/savedAccount';
 import { ActionFunctionArgs, Form, LoaderFunctionArgs, redirect, useActionData, useLoaderData, useNavigate, useRouteLoaderData } from 'react-router-dom';
 import TagsInput from '../components/TagsInput';
@@ -63,16 +65,18 @@ export default function EditAccount() {
     const { account } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
     const { tags } = useRouteLoaderData('accounts-route') as FilteredAccountsLoaderData;
     const tagNames = tags.map(t => t.tagName);
-    const toast = useToast();
     const navigate = useNavigate();
 
-    // Display error as toast if there is one
+    const [isDeleteOpen, { open: openDelete, close: closeDelete }] = useDisclosure(false);
+
+    // Display error notification if there is one
     useEffect(() => {
         if (actionData) {
-            toast({
-                title: actionData.error,
-                status: 'error',
-                isClosable: true,
+            notifications.show({
+                title: 'Error updating account',
+                message: actionData.error,
+                color: 'red',
+                autoClose: 10_000,
             })
         }
     }, [actionData])
@@ -81,81 +85,101 @@ export default function EditAccount() {
         navigate(-1);
     }, [])
 
-    const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure()
-    const cancelDeleteRef: RefObject<HTMLButtonElement> = useRef() as RefObject<HTMLButtonElement>;
-
     return (
-        <Flex direction='column' minHeight='100vh'>
-            <>
-                <VStack spacing={8}>
-                    <Heading as='h1' size='xl' noOfLines={1}>Edit Account</Heading>
+        <Stack gap="lg">
+            <Title order={1} lineClamp={1}>Edit Account</Title>
 
-                    <Box width='100%' maxWidth={400}>
-                        <Form method='post' onReset={cancel} id='editForm'>
-                            <VStack spacing={4}>
-                                <FormControl isReadOnly isDisabled>
-                                    <FormLabel>Address</FormLabel>
-                                    <Input type='text' name='addressInput' value={account.address} />
-                                </FormControl>
+            <Form method='post' onReset={cancel}>
+                <Stack gap="md">
+                    <TextInput
+                        label="Address"
+                        name="addressInput"
+                        type="text"
+                        value={account.address}
+                        readOnly
+                        disabled
+                        styles={{
+                            input: {
+                                backgroundColor: 'transparent'
+                            }
+                        }}
+                    />
 
-                                <FormControl isRequired id='labelInput'>
-                                    <FormLabel>Label</FormLabel>
-                                    <Input type='text' name='labelInput' defaultValue={account.label} />
-                                </FormControl>
+                    <TextInput
+                        label="Label"
+                        name="labelInput"
+                        type="text"
+                        defaultValue={account.label}
+                        required
+                        withAsterisk
+                        styles={{
+                            input: {
+                                backgroundColor: 'transparent'
+                            }
+                        }}
+                    />
 
-                                <FormControl id='notesInput'>
-                                    <FormLabel optionalIndicator>Notes</FormLabel>
-                                    <Textarea name='notesInput' defaultValue={account.notes} />
-                                </FormControl>
+                    <Textarea
+                        label="Notes"
+                        name="notesInput"
+                        defaultValue={account.notes}
+                        minRows={3}
+                        resize="vertical"
+                        autosize
+                        styles={{
+                            input: {
+                                backgroundColor: 'transparent'
+                            }
+                        }}
+                    />
 
-                                <TagsInput allKnownTags={tagNames} initialTags={account.tags} />
-                            </VStack>
-                        </Form>
-                    </Box>
-                </VStack>
+                    <TagsInput allKnownTags={tagNames} initialTags={account.tags} />
 
-                <AlertDialog
-                    isOpen={isDeleteOpen}
-                    leastDestructiveRef={cancelDeleteRef}
-                    onClose={onDeleteClose}
-                >
-                    <AlertDialogOverlay>
-                        <AlertDialogContent>
-                            <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-                                Delete Account?
-                            </AlertDialogHeader>
+                    <Space h="md" />
 
-                            <AlertDialogBody>Are you sure you want to delete <b>{account.label}</b> ({shortAddress(account.address)})?</AlertDialogBody>
+                    <Group gap="md">
+                        <Button
+                            type='submit'
+                            variant='filled'
+                            leftSection={<IconEdit size={16} />}
+                            autoContrast
+                        >
+                            Update Account
+                        </Button>
+                        <Button type='reset' variant='outline'>
+                            Cancel
+                        </Button>
+                        <ActionIcon
+                            onClick={openDelete}
+                            aria-label='Delete account'
+                            variant='outline'
+                            color='red.2'
+                            size="lg"
+                        >
+                            <IconTrash size={16} />
+                        </ActionIcon>
+                    </Group>
+                </Stack>
+            </Form>
 
-                            <AlertDialogFooter>
-                                <Form
-                                    method='post'
-                                    action={`/accounts/${account.address}/delete`}
-                                    onReset={onDeleteClose}
-                                >
-                                    <ButtonGroup spacing={4}>
-                                        <Button ref={cancelDeleteRef} type='reset'>Cancel</Button>
-                                        <Button colorScheme='red' type='submit'>Delete</Button>
-                                    </ButtonGroup>
-                                </Form>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialogOverlay>
-                </AlertDialog>
-            </>
-            <Spacer />
-            <Box marginBottom={8}>
-                <ButtonGroup spacing={4}>
-                    <Button form='editForm' type='submit' leftIcon={<AddIcon />} colorScheme='blue' variant='solid'>
-                        Update Account
-                    </Button>
-                    <Button form='editForm' type='reset' colorScheme='red' variant='outline'>
-                        Cancel
-                    </Button>
-                    {/* delete button opens the delete confirm */}
-                    <IconButton onClick={onDeleteOpen} aria-label='Delete account' colorScheme='red' variant='outline' icon={<DeleteIcon />}></IconButton>
-                </ButtonGroup>
-            </Box>
-        </Flex >
+            <Modal opened={isDeleteOpen} onClose={closeDelete} title="Delete Account?" centered>
+                <Stack gap="md">
+                    <Text>
+                        Are you sure you want to delete <strong>{account.label}</strong> ({shortAddress(account.address)})?
+                    </Text>
+
+                    <Form
+                        method='post'
+                        action={`/accounts/${account.address}/delete`}
+                        onReset={closeDelete}
+                    >
+                        <Group gap="md">
+                            <Button type='reset' variant='outline' autoContrast>Cancel</Button>
+                            <Button type='submit' color='red.2' autoContrast>Delete</Button>
+                        </Group>
+                    </Form>
+                </Stack>
+            </Modal>
+        </Stack>
     )
 }

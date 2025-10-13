@@ -30,34 +30,6 @@ const config: ThemeConfig = {
 }
 const theme = extendTheme({ config })
 
-const mantineTheme = createTheme({
-  primaryColor: 'blue',
-  primaryShade: 2,
-  spacing: {
-    xxs: '4px',
-    xs: '6px',
-    sm: '12px',
-    md: '16px',
-    lg: '20px',
-    xl: '32px',
-  },
-  colors: {
-    // blue gray preset from https://mantine.dev/colors-generator/?color=63687C
-    gray: [
-      "#f1f4fe",
-      "#e4e6ed",
-      "#c8cad3",
-      "#a9adb9",
-      "#9094a3",
-      "#7f8496",
-      "#777c91",
-      "#63687c",
-      "#595e72",
-      "#4a5167"
-    ]
-  },
-});
-
 const router = createBrowserRouter([
   {
     element: <Layout />,
@@ -166,6 +138,26 @@ const router = createBrowserRouter([
     ]
   }
 ]);
+
+const mantineTheme = createTheme({
+  primaryColor: 'blue',
+  primaryShade: 2,
+  colors: {
+    // blue gray preset from https://mantine.dev/colors-generator/?color=63687C
+    gray: [
+      "#f1f4fe",
+      "#e4e6ed",
+      "#c8cad3",
+      "#a9adb9",
+      "#9094a3",
+      "#7f8496",
+      "#777c91",
+      "#63687c",
+      "#595e72",
+      "#4a5167"
+    ]
+  },
+});
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>

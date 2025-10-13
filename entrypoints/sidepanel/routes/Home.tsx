@@ -15,7 +15,7 @@ export default function Home() {
         <Stack gap="lg" align="flex-start">
             <Group>
                 <Link to='/accounts/new'>
-                    <Button leftSection={<IconPlus size={16} />} c="dark">Add Account</Button>
+                    <Button leftSection={<IconPlus size={16} />} autoContrast>Add Account</Button>
                 </Link>
 
                 <Menu>
