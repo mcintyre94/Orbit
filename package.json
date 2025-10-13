@@ -36,6 +36,9 @@
     "@vitejs/plugin-react": "^4.2.1",
     "dotenv": "^16.4.5",
     "typescript": "^5.3.3",
-    "wxt": "^0.18.15"
+    "wxt": "^0.19.29"
+  },
+  "overrides": {
+    "@wxt-dev/storage": "1.2.0"
   }
 }
