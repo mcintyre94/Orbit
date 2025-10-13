@@ -72,6 +72,9 @@ importers:
       typescript:
         specifier: ^5.3.3
         version: 5.9.3
+      vite:
+        specifier: ^7.1.9
+        version: 7.1.9(@types/node@24.7.2)(jiti@2.6.1)
       wxt:
         specifier: ^0.20.11
         version: 0.20.11(@types/node@24.7.2)(jiti@2.6.1)(rollup@4.52.4)
