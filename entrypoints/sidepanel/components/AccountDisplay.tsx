@@ -3,7 +3,7 @@ import { loader as filteredAccountsLoader } from '../routes/FilteredAccounts'
 import { shortAddress } from "../utils/address";
 import CopyButton from "./CopyButton";
 import TagBadge from "./TagBadge";
-import classes from "./HoverListItem.module.css";
+import classes from "../styles/HoverListItem.module.css";
 
 interface Props {
     account: Awaited<ReturnType<typeof filteredAccountsLoader>>['accounts'][0]

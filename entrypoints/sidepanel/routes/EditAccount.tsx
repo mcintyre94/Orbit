@@ -63,7 +63,6 @@ export default function EditAccount() {
     const { account } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
     const { tags } = useRouteLoaderData('accounts-route') as FilteredAccountsLoaderData;
     const tagNames = tags.map(t => t.tagName);
-    const tagsInputRef = useRef<HTMLInputElement | null>(null);
     const toast = useToast();
     const navigate = useNavigate();
 
@@ -109,7 +108,7 @@ export default function EditAccount() {
                                     <Textarea name='notesInput' defaultValue={account.notes} />
                                 </FormControl>
 
-                                <TagsInput allKnownTags={tagNames} initialTags={account.tags} tagsInputRef={tagsInputRef} />
+                                <TagsInput allKnownTags={tagNames} initialTags={account.tags} />
                             </VStack>
                         </Form>
                     </Box>

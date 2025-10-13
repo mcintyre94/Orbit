@@ -61,7 +61,6 @@ export default function CreateAccount() {
     }, [accounts]);
 
     const tagNames = tags.map(t => t.tagName);
-    const tagsInputRef = useRef<HTMLInputElement | null>(null);
 
     const toast = useToast();
     const navigate = useNavigate();
@@ -158,7 +157,7 @@ export default function CreateAccount() {
                         <Textarea name='notesInput' />
                     </FormControl>
 
-                    <TagsInput allKnownTags={tagNames} initialTags={[]} tagsInputRef={tagsInputRef} />
+                    <TagsInput allKnownTags={tagNames} initialTags={[]} />
 
                     <Spacer marginBottom={12} />
 

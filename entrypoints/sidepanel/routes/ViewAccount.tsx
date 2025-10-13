@@ -8,7 +8,7 @@ import { getTokensForAddress, TokenData } from "../utils/tokenData";
 import { SavedAccount } from "@/accounts/savedAccount";
 import { formatDollars, formatNumber, formatPercent } from "../utils/numberFormatter";
 import CopyButton from "../components/CopyButton";
-import classes from "../components/HoverListItem.module.css"
+import classes from "../styles/HoverListItem.module.css"
 
 interface Params {
     address: Address
@@ -106,8 +106,6 @@ export default function ViewAccount() {
 }
 
 function TokenDataDisplay({ tokenData }: { tokenData: TokenData }) {
-    console.log('Rendering token data', tokenData);
-
     const usdPriceUnitFormatted = useMemo(() => {
         return tokenData.usdPriceUnit ? formatDollars(tokenData.usdPriceUnit) : null;
     }, [tokenData.usdPriceUnit]);
