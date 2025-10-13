@@ -1,15 +1,12 @@
-.account {
+.listitem {
   padding-left: var(--mantine-spacing-md);
   padding-right: var(--mantine-spacing-md);
   margin-left: calc(-1 * var(--mantine-spacing-md));
   margin-right: calc(-1 * var(--mantine-spacing-md));
   padding-top: var(--mantine-spacing-sm);
   padding-bottom: var(--mantine-spacing-md);
-  /* margin-top: calc(-1 * var(--mantine-spacing-sm)); */
-  /* margin-bottom: calc(-1 * var(--mantine-spacing-sm)); */
   align-items: flex-start;
-  cursor: pointer;
   &:hover {
-    background-color: var(--mantine-color-gray-9);
+    background-color: var(--mantine-color-gray-light-hover);
   }
 }
