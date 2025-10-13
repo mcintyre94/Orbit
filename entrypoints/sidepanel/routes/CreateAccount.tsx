@@ -1,7 +1,8 @@
-import { AddIcon } from '@chakra-ui/icons';
-import { Button, ButtonGroup, FormControl, FormErrorMessage, FormLabel, Heading, Input, Spacer, Textarea, VStack, useToast } from '@chakra-ui/react'
+import { Button, Group, TextInput, Title, Stack, Textarea, Space } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
+import { IconPlus } from '@tabler/icons-react';
 import { Address, isAddress } from '@solana/addresses';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { saveNewAccount } from '~/accounts/storage';
 import { SavedAccount } from '~/accounts/savedAccount';
 import { ActionFunctionArgs, Form, redirect, useActionData, useNavigate, useRouteLoaderData } from 'react-router-dom';
@@ -62,7 +63,6 @@ export default function CreateAccount() {
 
     const tagNames = tags.map(t => t.tagName);
 
-    const toast = useToast();
     const navigate = useNavigate();
 
     const [addressError, setAddressError] = useState<string | undefined>(undefined);
@@ -82,15 +82,14 @@ export default function CreateAccount() {
         )
     }, [addressError, labelError, addressInputValue, labelInputValue])
 
-    // Display error as toast if there is one
+    // Display error notification if there is one
     useEffect(() => {
         if (actionData) {
-            toast({
+            notifications.show({
                 title: 'Error creating account',
-                description: actionData.error,
-                status: 'error',
-                duration: 10_000,
-                isClosable: true,
+                message: actionData.error,
+                color: 'red',
+                autoClose: 10_000,
             })
         }
     }, [actionData])
@@ -135,42 +134,75 @@ export default function CreateAccount() {
     }, [])
 
     return (
-        <VStack spacing={8}>
-            <Heading as='h1' size='xl' noOfLines={1}>Add New Account</Heading>
+        <Stack gap="lg">
+            <Title order={1} lineClamp={1}>Add New Account</Title>
 
             <Form method='post' onReset={cancel}>
-                <VStack spacing={4}>
-                    <FormControl isRequired isInvalid={addressError !== undefined} id='addressInput'>
-                        <FormLabel>Address</FormLabel>
-                        <Input type='text' name='addressInput' onChange={validateAddress} />
-                        <FormErrorMessage>{addressError}</FormErrorMessage>
-                    </FormControl>
+                <Stack gap="md">
+                    <TextInput
+                        label="Address"
+                        name="addressInput"
+                        type="text"
+                        onChange={validateAddress}
+                        error={addressError}
+                        required
+                        withAsterisk
+                        styles={{
+                            input: {
+                                backgroundColor: 'transparent'
+                            }
+                        }}
+                    />
 
-                    <FormControl isRequired isInvalid={labelError !== undefined} id='labelInput'>
-                        <FormLabel>Label</FormLabel>
-                        <Input type='text' name='labelInput' onChange={validateLabel} />
-                        <FormErrorMessage>{labelError}</FormErrorMessage>
-                    </FormControl>
+                    <TextInput
+                        label="Label"
+                        name="labelInput"
+                        type="text"
+                        onChange={validateLabel}
+                        error={labelError}
+                        required
+                        withAsterisk
+                        styles={{
+                            input: {
+                                backgroundColor: 'transparent'
+                            }
+                        }}
+                    />
 
-                    <FormControl id='notesInput'>
-                        <FormLabel optionalIndicator>Notes</FormLabel>
-                        <Textarea name='notesInput' />
-                    </FormControl>
+                    <Textarea
+                        label="Notes"
+                        name="notesInput"
+                        minRows={3}
+                        resize="vertical"
+                        autosize
+                        styles={{
+                            input: {
+                                backgroundColor: 'transparent'
+                            }
+                        }}
+                    />
 
                     <TagsInput allKnownTags={tagNames} initialTags={[]} />
 
-                    <Spacer marginBottom={12} />
+                    <Space h="md" />
 
-                    <ButtonGroup spacing={4}>
-                        <Button type='submit' title={addressError ?? labelError} leftIcon={<AddIcon />} colorScheme='blue' variant='solid' isDisabled={isSubmitDisabled}>
+                    <Group gap="md">
+                        <Button
+                            type='submit'
+                            variant='filled'
+                            title={addressError ?? labelError}
+                            leftSection={<IconPlus size={16} />}
+                            autoContrast
+                            disabled={isSubmitDisabled}
+                        >
                             Save Account
                         </Button>
-                        <Button type='reset' colorScheme='red' variant='outline'>
+                        <Button type='reset' variant='outline'>
                             Cancel
                         </Button>
-                    </ButtonGroup>
-                </VStack>
+                    </Group>
+                </Stack>
             </Form>
-        </VStack>
+        </Stack>
     )
 }

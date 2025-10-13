@@ -34,7 +34,8 @@ export default function TagsInput({ allKnownTags, initialTags }: TagsInputProps)
                 acceptValueOnBlur
                 w="100%"
                 styles={{
-                    input: { background: 'transparent' }
+                    input: { background: 'transparent' },
+                    pill: { backgroundColor: 'var(--mantine-color-blue-1)', color: 'var(--mantine-color-black)' },
                 }}
             />
         </>
