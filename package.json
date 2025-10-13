@@ -38,7 +38,9 @@
     "typescript": "^5.3.3",
     "wxt": "^0.20.11"
   },
-  "overrides": {
-    "@wxt-dev/storage": "1.2.0"
+  "pnpm": {
+    "overrides": {
+      "@wxt-dev/storage": "1.2.0"
+    }
   }
 }

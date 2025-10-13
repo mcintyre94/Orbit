@@ -59,7 +59,9 @@ The UI is built using [react-router](https://reactrouter.com/en/main).
 
 ### Running locally
 
-The extension can be created by running `npm run dev`. This will build the extension in development mode, and open a browser with it installed. This will also watch the local repo for changes to the code and automatically update the installed extension.
+Install dependencies by running `pnpm install`.
+
+The extension can be created by running `pnpm dev`. This will build the extension in development mode, and open a browser with it installed. This will also watch the local repo for changes to the code and automatically update the installed extension.
 
 ### Wallet Adapter and Wallet Standard
 
@@ -67,7 +69,7 @@ As mentioned above, Orbit implements Wallet Standard, which means that it can be
 
 ## Building for production
 
-Run `npm run build` to create a production build.
+Run `pnpm build` to create a production build.
 
 After this, just zip the `.output/chrome-mv3` directory and submit to the Chrome store!
 
