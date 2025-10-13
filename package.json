@@ -33,10 +33,10 @@
   "devDependencies": {
     "@types/react": "^18.2.46",
     "@types/react-dom": "^18.2.18",
-    "@vitejs/plugin-react": "^4.2.1",
+    "@vitejs/plugin-react": "^5.0.4",
     "dotenv": "^16.4.5",
     "typescript": "^5.3.3",
-    "wxt": "^0.19.29"
+    "wxt": "^0.20.11"
   },
   "overrides": {
     "@wxt-dev/storage": "1.2.0"
