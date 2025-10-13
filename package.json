@@ -21,6 +21,7 @@
     "@emotion/styled": "^11.11.0",
     "@mantine/core": "^8.3.3",
     "@mantine/hooks": "^8.3.3",
+    "@mantine/notifications": "^8.3.4",
     "@solana/addresses": "^4.0.0",
     "@solana/codecs-strings": "^4.0.0",
     "@solana/wallet-standard-chains": "^1.1.0",
