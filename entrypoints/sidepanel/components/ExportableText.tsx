@@ -28,7 +28,7 @@ export default function ExportableText({ text, contentType }: Props) {
             <ButtonGroup size='xs'>
                 <Button leftIcon={<CopyIcon />} onClick={() => clipboard.onCopy()}>{clipboard.hasCopied ? 'Copied' : 'Copy'}</Button>
                 <Button leftIcon={<DownloadIcon />} onClick={async () => {
-                    await chrome.downloads.download({
+                    await browser.downloads.download({
                         url: downloadUrl,
                         filename: downloadFilename,
                         saveAs: true,

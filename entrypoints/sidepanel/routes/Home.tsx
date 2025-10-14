@@ -25,7 +25,7 @@ export default function Home() {
                         </ActionIcon>
                     </Menu.Target>
                     <Menu.Dropdown>
-                        <Link to='/accounts/export'>
+                        <Link to='/accounts/export/addresses'>
                             <Menu.Item disabled={accounts.length === 0 && !filtersEnabled}>Export</Menu.Item>
                         </Link>
                         <Link to='/accounts/import'>
