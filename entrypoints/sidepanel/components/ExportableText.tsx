@@ -1,5 +1,6 @@
-import { CopyIcon, DownloadIcon } from "@chakra-ui/icons";
-import { Button, ButtonGroup, Text, VStack, useClipboard } from "@chakra-ui/react";
+import { Button, Group, Stack, Code } from "@mantine/core";
+import { useClipboard } from "@mantine/hooks";
+import { IconCopy, IconDownload, IconCheck } from "@tabler/icons-react";
 import { useMemo } from "react";
 
 type Props = {
@@ -8,7 +9,7 @@ type Props = {
 }
 
 export default function ExportableText({ text, contentType }: Props) {
-    const clipboard = useClipboard(text);
+    const clipboard = useClipboard();
 
     const downloadUrl = useMemo(() => {
         const blob = new Blob([text], { type: contentType });
@@ -24,19 +25,42 @@ export default function ExportableText({ text, contentType }: Props) {
     }, [contentType]);
 
     return (
-        <VStack spacing={4} alignItems='flex-start'>
-            <ButtonGroup size='xs'>
-                <Button leftIcon={<CopyIcon />} onClick={() => clipboard.onCopy()}>{clipboard.hasCopied ? 'Copied' : 'Copy'}</Button>
-                <Button leftIcon={<DownloadIcon />} onClick={async () => {
-                    await browser.downloads.download({
-                        url: downloadUrl,
-                        filename: downloadFilename,
-                        saveAs: true,
-                    })
-                }}>Download</Button>
-            </ButtonGroup>
+        <Stack gap="md" align="flex-start">
+            <Group gap="xs">
+                <Button
+                    size="xs"
+                    variant="light"
+                    leftSection={clipboard.copied ? <IconCheck size={14} /> : <IconCopy size={14} />}
+                    onClick={() => clipboard.copy(text)}
+                >
+                    {clipboard.copied ? 'Copied' : 'Copy'}
+                </Button>
+                <Button
+                    size="xs"
+                    variant="light"
+                    leftSection={<IconDownload size={14} />}
+                    onClick={async () => {
+                        await browser.downloads.download({
+                            url: downloadUrl,
+                            filename: downloadFilename,
+                            saveAs: true,
+                        })
+                    }}
+                >
+                    Download
+                </Button>
+            </Group>
 
-            <Text fontSize='md' whiteSpace='pre-wrap' borderWidth='1px' borderRadius='md' padding={2}>{text}</Text>
-        </VStack >
+            <Code block c="white" styles={{
+                root: {
+                    background: 'transparent',
+                    borderRadius: 'var(--mantine-radius-md)',
+                    borderWidth: '1px',
+                    fontSize: 'var(--mantine-font-size-sm)',
+                    padding: 'var(--mantine-spacing-sm)',
+                    whiteSpace: 'pre-wrap',
+                }
+            }}>{text}</Code>
+        </Stack>
     )
 }
