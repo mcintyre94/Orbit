@@ -1,4 +1,4 @@
-import { useToast } from "@chakra-ui/react";
+import { notifications } from '@mantine/notifications';
 import { Address } from "@solana/addresses";
 import ImportDescription from "../components/ImportDescription";
 
@@ -12,31 +12,28 @@ export type ActionData = {
     error: string;
 }
 
-export function displayToast(actionData: ActionData, toast: ReturnType<typeof useToast>) {
+export function displayNotification(actionData: ActionData) {
     if (actionData.responseType === 'error') {
-        toast({
+        notifications.show({
             title: 'Error importing',
-            description: actionData.error,
-            status: 'error',
-            duration: 10_000,
-            isClosable: true,
+            message: actionData.error,
+            color: 'red',
+            autoClose: 10_000,
         })
     } else {
         const { importedCount, skipped, invalid } = actionData;
 
         if (importedCount > 0) {
-            toast({
+            notifications.show({
                 title: 'Imported',
-                description: <ImportDescription importedCount={importedCount} skipped={skipped} invalid={invalid} />,
-                status: 'success',
-                isClosable: true,
+                message: <ImportDescription importedCount={importedCount} skipped={skipped} invalid={invalid} />,
+                color: 'green',
             });
         } else {
-            toast({
+            notifications.show({
                 title: 'Could not import',
-                description: <ImportDescription importedCount={0} skipped={skipped} invalid={invalid} />,
-                status: 'info',
-                isClosable: true,
+                message: <ImportDescription importedCount={0} skipped={skipped} invalid={invalid} />,
+                color: 'blue',
             });
         }
     }
