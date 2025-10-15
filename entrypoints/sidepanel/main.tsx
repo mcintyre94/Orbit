@@ -1,6 +1,5 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { ChakraProvider, ThemeConfig, extendTheme } from '@chakra-ui/react'
 import { Navigate, Outlet, RouterProvider, createBrowserRouter, redirect } from 'react-router-dom'
 import ErrorPage from './error-page'
 import { loader as accountsLoader } from './routes/Accounts'
@@ -18,17 +17,11 @@ import ViewAccount, { loader as viewAccountLoader } from './routes/ViewAccount'
 import { loader as filteredAccountsLoader } from './routes/FilteredAccounts'
 import Layout from './layout'
 import Connect, { action as connectAction, loader as connectLoader } from './routes/Connect'
-import { Button, createTheme, MantineProvider, rem } from '@mantine/core'
+import { createTheme, MantineProvider, rem } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
-
-const config: ThemeConfig = {
-  initialColorMode: 'dark',
-  useSystemColorMode: false
-}
-const theme = extendTheme({ config })
 
 const router = createBrowserRouter([
   {
@@ -164,11 +157,9 @@ const mantineTheme = createTheme({
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <ChakraProvider theme={theme}>
-      <MantineProvider theme={mantineTheme} forceColorScheme='dark'>
-        <Notifications />
-        <RouterProvider router={router} />
-      </MantineProvider>
-    </ChakraProvider>
+    <MantineProvider theme={mantineTheme} forceColorScheme='dark'>
+      <Notifications />
+      <RouterProvider router={router} />
+    </MantineProvider>
   </React.StrictMode>
 )
