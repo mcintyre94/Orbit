@@ -18,7 +18,7 @@ export default function Home() {
                     <Button leftSection={<IconPlus size={16} />} autoContrast>Add Account</Button>
                 </Link>
 
-                <Menu>
+                <Menu width={150}>
                     <Menu.Target>
                         <ActionIcon variant="outline" aria-label="settings" size="lg" color="blue.2">
                             <IconSettings size={16} />
