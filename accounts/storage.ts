@@ -65,6 +65,11 @@ export async function importAddresses(addresses: string[]): Promise<{
 
   let labelNumber = accounts.length + 1;
   for (const address of addresses) {
+    // skip empty lines
+    if (address.trim().length === 0) {
+      continue;
+    }
+
     // filter out invalid addresses
     if (!isAddress(address)) {
       invalid.push(address);
