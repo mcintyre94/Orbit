@@ -1,4 +1,4 @@
-import { VStack, Input, Button, Text } from "@chakra-ui/react";
+import { Stack, FileInput, Button, Pill } from "@mantine/core";
 import { ActionFunctionArgs, Form, useActionData } from "react-router-dom";
 import { ActionData, displayNotification } from "../utils/importAccounts";
 import { z } from "zod";
@@ -52,14 +52,39 @@ export default function ImportAccountsAccount() {
     }, [actionData])
 
     return (
-        <VStack spacing={4} alignItems='flex-start'>
-            <Text fontSize='md'>Select a file with exported accounts to import them. Any account already added will be skipped.</Text>
+        <Stack gap="md" align="flex-start">
             <Form method='post' encType='multipart/form-data'>
-                <VStack spacing={4} alignItems='flex-start'>
-                    <Input type='file' isRequired={true} aria-required='true' name='accountsFile' accept=".json" />
-                    <Button type='submit'>Import</Button>
-                </VStack>
+                <Stack gap="md" align="flex-start">
+                    <FileInput
+                        name='accountsFile'
+                        accept=".json"
+                        size="md"
+                        required
+                        withAsterisk={false}
+                        label="Select a file with exported accounts to import them. Any account already added will be skipped."
+                        placeholder="Choose file"
+                        clearable
+                        valueComponent={FileValueComponent}
+                        styles={{
+                            input: {
+                                background: 'transparent'
+                            }
+                        }}
+                    />
+                    <Button type='submit' autoContrast>Import</Button>
+                </Stack>
             </Form>
-        </VStack>
+        </Stack>
     )
+}
+
+function FileValueComponent({ value }: { value: File | File[] | null }) {
+    if (value === null) return null;
+    if (Array.isArray(value)) return null; // just support single file
+    return <Pill styles={{
+        root: {
+            backgroundColor: "var(--mantine-color-blue-9)",
+            color: "var(--mantine-color-white)"
+        }
+    }}>{value.name}</Pill>
 }
