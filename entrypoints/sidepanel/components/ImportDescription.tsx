@@ -2,7 +2,7 @@ import { Box, Text } from "@chakra-ui/react"
 import type { Address } from "@solana/addresses"
 
 export default function ImportDescription({ importedCount, skipped, invalid }: { importedCount: number, skipped: Address[], invalid: string[] }) {
-    const summary = importedCount > 0 ? `Successfully imported ${importedCount} addresses` : 'Unable to import any addresses'
+    const summary = importedCount > 0 ? `Successfully imported ${importedCount} address${importedCount === 1 ? '' : 'es'}` : 'Unable to import any addresses'
 
     return (
         <Box>

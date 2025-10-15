@@ -4,12 +4,11 @@ import {
   Text,
   Textarea,
   Button,
-  useToast,
 } from "@chakra-ui/react";
 import { ActionFunctionArgs, Form, useActionData } from "react-router-dom";
 import { importAddresses } from "~/accounts/storage";
 import { useEffect } from "react";
-import { ActionData, displayToast } from "../utils/importAccounts";
+import { ActionData, displayNotification } from "../utils/importAccounts";
 
 type FormDataUpdates = {
   addresses: string;
@@ -43,12 +42,11 @@ export async function action({
 
 export default function ImportAccountAddresses() {
   const actionData = useActionData() as ActionData | undefined;
-  const toast = useToast();
 
-  // Display error as toast if there is one
+  // Display error as notification if there is one
   useEffect(() => {
     if (actionData) {
-      displayToast(actionData, toast);
+      displayNotification(actionData);
     }
   }, [actionData]);
 

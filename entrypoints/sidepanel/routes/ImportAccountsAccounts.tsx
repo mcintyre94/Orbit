@@ -1,6 +1,6 @@
-import { VStack, Input, Button, Text, useToast } from "@chakra-ui/react";
+import { VStack, Input, Button, Text } from "@chakra-ui/react";
 import { ActionFunctionArgs, Form, useActionData } from "react-router-dom";
-import { ActionData, displayToast } from "../utils/importAccounts";
+import { ActionData, displayNotification } from "../utils/importAccounts";
 import { z } from "zod";
 import { SavedAccount, savedAccountSchema } from "~/accounts/savedAccount";
 import { importAccounts } from "~/accounts/storage";
@@ -43,12 +43,11 @@ export async function action({ request }: ActionFunctionArgs): Promise<ActionDat
 
 export default function ImportAccountsAccount() {
     const actionData = useActionData() as ActionData | undefined;
-    const toast = useToast();
 
-    // Display error as toast if there is one
+    // Display error as notification if there is one
     useEffect(() => {
         if (actionData) {
-            displayToast(actionData, toast);
+            displayNotification(actionData);
         }
     }, [actionData])
 
