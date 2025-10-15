@@ -1,10 +1,4 @@
-import {
-  Box,
-  VStack,
-  Text,
-  Textarea,
-  Button,
-} from "@chakra-ui/react";
+import { Stack, Textarea, Button } from "@mantine/core";
 import { ActionFunctionArgs, Form, useActionData } from "react-router-dom";
 import { importAddresses } from "~/accounts/storage";
 import { useEffect } from "react";
@@ -51,33 +45,29 @@ export default function ImportAccountAddresses() {
   }, [actionData]);
 
   return (
-    <VStack spacing={4} alignItems="flex-start">
-      <Text fontSize="md">
-        Enter one address per line to bulk import. Any address already added
-        will be skipped.
-      </Text>
-      <Box width="100%">
-        <Form method="post">
-          <VStack spacing={4} alignItems="flex-start">
-            <Textarea
-              isRequired={true}
-              aria-required="true"
-              name="addresses"
-              fontSize="sm"
-              whiteSpace="pre"
-              overflowWrap="normal"
-              borderColor="white"
-              borderWidth={1}
-              rows={10}
-              width="100%"
-              resize="vertical"
-              colorScheme="blue"
-              size="lg"
-            />
-            <Button type="submit">Import</Button>
-          </VStack>
-        </Form>
-      </Box>
-    </VStack>
+    <Stack gap="md" align="flex-start">
+      <Form method="post">
+        <Stack gap="md" align="flex-start">
+          <Textarea
+            name="addresses"
+            label="Enter one address per line to bulk import. Any address already added will be skipped."
+            size="md"
+            required
+            withAsterisk={false}
+            rows={10}
+            resize="vertical"
+            styles={{
+              input: {
+                background: 'transparent',
+                whiteSpace: 'pre',
+                overflowWrap: 'normal',
+                overflowX: 'scroll',
+              }
+            }}
+          />
+          <Button type="submit" autoContrast>Import</Button>
+        </Stack>
+      </Form>
+    </Stack>
   );
 }
