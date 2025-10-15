@@ -9,26 +9,13 @@ import {
   useLoaderData,
   useRouteLoaderData,
 } from "react-router-dom";
-import {
-  Box,
-  Button,
-  CheckboxProps,
-  Flex,
-  HStack,
-  Heading,
-  Spacer,
-  UseCheckboxGroupReturn,
-  VStack,
-  useCheckbox,
-  useCheckboxGroup,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Button, Group, Stack, Title } from "@mantine/core";
 import AccountDisplay from "../components/AccountDisplay";
 import TagFilters from "../components/TagFilters";
 import { getFilteredAccountsData } from "../utils/filterAccounts";
 import { FilteredAccountsLoaderData } from "./FilteredAccounts";
 import { SavedAccount } from "../../../accounts/savedAccount";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { getSavedConnection } from "@/connections/storage";
 
 type SidePanel = {
@@ -115,50 +102,59 @@ async function sendAndClose(
   window.close();
 }
 
-function AccountAsCheckbox(props: CheckboxProps) {
-  const { state, getCheckboxProps, getInputProps, getLabelProps, htmlProps } =
-    useCheckbox(props);
-
+function AccountAsCheckbox({
+  value,
+  checked,
+  onChange,
+  children
+}: {
+  value: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  children: React.ReactNode;
+}) {
   return (
-    <Box paddingBottom={1}>
-      <Box as="label" {...htmlProps}>
-        <input {...getInputProps()} name="addressInput" hidden />
-        <Box
-          width="100%"
-          cursor="pointer"
-          borderLeftColor={state.isChecked ? "blue.100" : "transparent"}
-          borderLeftWidth={4}
-          {...getCheckboxProps()}
-        >
-          {props.children}
-        </Box>
-      </Box>
-    </Box>
+    <label style={{ cursor: 'pointer', display: 'block' }}>
+      <input
+        type="checkbox"
+        name="addressInput"
+        value={value}
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        hidden
+      />
+      {children}
+    </label>
   );
 }
 
 type AccountsListProps = {
   allAccounts: SavedAccount[];
   filteredAddresses: Set<Address>;
-  getCheckboxProps: UseCheckboxGroupReturn["getCheckboxProps"];
+  selectedAddresses: Address[];
+  onToggle: (address: Address) => void;
 };
 
-// Custom checkboxes in Chakra: https://v2.chakra-ui.com/docs/hooks/use-checkbox-group
 function AccountsList({
   allAccounts,
   filteredAddresses,
-  getCheckboxProps,
+  selectedAddresses,
+  onToggle,
 }: AccountsListProps) {
+  const selectedSet = useMemo(() => new Set(selectedAddresses), [selectedAddresses]);
+
   return (
-    <Box>
+    <Stack gap="xxs">
       {allAccounts.map((account) => {
-        const checkbox = getCheckboxProps({ value: account.address });
+        const isChecked = selectedSet.has(account.address);
+
         if (!filteredAddresses.has(account.address)) {
           // If an address is filtered out but is checked, render a hidden input with its address
           // This ensures that we connect all checked accounts, not just visible ones
-          if ("isChecked" in checkbox && checkbox.isChecked) {
+          if (isChecked) {
             return (
               <input
+                key={account.address}
                 type="hidden"
                 name="addressInput"
                 value={account.address}
@@ -172,20 +168,22 @@ function AccountsList({
         return (
           <AccountAsCheckbox
             key={account.address}
-            {...checkbox} /* submit={submit} */
+            value={account.address}
+            checked={isChecked}
+            onChange={() => onToggle(account.address)}
           >
-            <AccountDisplay account={account} />
+            <AccountDisplay account={account} isSelected={isChecked} />
           </AccountAsCheckbox>
         );
       })}
-    </Box>
+    </Stack>
   );
 }
 
 type SelectDeselectAllProps = {
   allAddresses: Address[];
   filteredAddresses: Set<Address>;
-  setSelectedAddresses: ReturnType<typeof useCheckboxGroup>["setValue"];
+  setSelectedAddresses: React.Dispatch<React.SetStateAction<Address[]>>;
 };
 
 function SelectDeselectAll({
@@ -199,7 +197,7 @@ function SelectDeselectAll({
   const selectAll = useCallback(() => {
     if (filtered) {
       // add all filtered addresses to the current selection
-      return setSelectedAddresses((currentAddresses) =>
+      return setSelectedAddresses((currentAddresses: Address[]) =>
         currentAddresses.concat([...filteredAddresses])
       );
     } else {
@@ -211,9 +209,9 @@ function SelectDeselectAll({
   const deselectAll = useCallback(() => {
     if (filtered) {
       // remove all filtered addresses from the current selection
-      return setSelectedAddresses((currentAddresses) =>
+      return setSelectedAddresses((currentAddresses: Address[]) =>
         currentAddresses.filter(
-          (address) => !filteredAddresses.has(address as Address)
+          (address: Address) => !filteredAddresses.has(address)
         )
       );
     } else {
@@ -223,20 +221,19 @@ function SelectDeselectAll({
   }, [allAddresses, filteredAddresses, filtered, setSelectedAddresses]);
 
   return (
-    <HStack spacing={4}>
-      <Button size="sm" colorScheme="blue" variant="ghost" onClick={selectAll}>
+    <Group gap="md">
+      <Button size="sm" variant="subtle" onClick={selectAll}>
         Select all
       </Button>
 
       <Button
         size="sm"
-        colorScheme="blue"
-        variant="ghost"
+        variant="subtle"
         onClick={deselectAll}
       >
         Deselect all
       </Button>
-    </HStack>
+    </Group>
   );
 }
 
@@ -264,65 +261,66 @@ export default function Connect() {
     () => new Set(filteredAccounts.map((account) => account.address)),
     [filteredAccounts]
   );
-  const {
-    value: selectedAddresses,
-    getCheckboxProps,
-    setValue: setSelectedAddresses,
-  } = useCheckboxGroup({
-    defaultValue: connectedAddressesForOrigin,
-  });
+
+  const [selectedAddresses, setSelectedAddresses] = useState<Address[]>(
+    connectedAddressesForOrigin
+  );
+
+  const handleToggle = useCallback((address: Address) => {
+    setSelectedAddresses(prev =>
+      prev.includes(address)
+        ? prev.filter(a => a !== address)
+        : [...prev, address]
+    );
+  }, []);
 
   return (
-    <>
-      <Flex direction="column" minHeight="100vh">
-        <VStack spacing={8} alignItems="flex-start">
-          <Heading as="h3" size="lg">
-            Connect to {forOrigin}
-          </Heading>
+    <Stack gap="lg" align="flex-start">
+      <Title order={3}>
+        Connect to {forOrigin}
+      </Title>
 
-          <TagFilters
-            tags={tags}
-            filtersEnabled={filtersEnabled}
-            searchQuery={searchQuery}
-            fetcher={filtersFetcher}
+      <TagFilters
+        tags={tags}
+        filtersEnabled={filtersEnabled}
+        searchQuery={searchQuery}
+        fetcher={filtersFetcher}
+      />
+
+      {filteredAddresses.size > 0 ? (
+        <SelectDeselectAll
+          allAddresses={allAddresses}
+          filteredAddresses={filteredAddresses}
+          setSelectedAddresses={setSelectedAddresses}
+        />
+      ) : null}
+
+      <Box w="100%" mb="xs">
+        <Form
+          method="post"
+          id="accounts-form"
+          onReset={() => sendAndClose(tabId, requestId, forOrigin, [])}
+        >
+          <input type="hidden" name="tabIdInput" value={tabId} />
+          <input type="hidden" name="requestIdInput" value={requestId} />
+          <input type="hidden" name="forOriginInput" value={forOrigin} />
+          <AccountsList
+            allAccounts={allAccounts}
+            filteredAddresses={filteredAddresses}
+            selectedAddresses={selectedAddresses}
+            onToggle={handleToggle}
           />
+        </Form>
+      </Box>
 
-          {filteredAddresses.size > 0 ? (
-            <SelectDeselectAll
-              allAddresses={allAddresses}
-              filteredAddresses={filteredAddresses}
-              setSelectedAddresses={setSelectedAddresses}
-            />
-          ) : null}
-
-          <Box width="100%" marginBottom={2}>
-            <Form
-              method="post"
-              id="accounts-form"
-              onReset={() => sendAndClose(tabId, requestId, forOrigin, [])}
-            >
-              <input type="hidden" name="tabIdInput" value={tabId} />
-              <input type="hidden" name="requestIdInput" value={requestId} />
-              <input type="hidden" name="forOriginInput" value={forOrigin} />
-              <AccountsList
-                allAccounts={allAccounts}
-                filteredAddresses={filteredAddresses}
-                getCheckboxProps={getCheckboxProps}
-              />
-            </Form>
-          </Box>
-        </VStack>
-        <Spacer />
-      </Flex>
-      <Box maxW="48em" sx={{ position: "sticky", bottom: "1em" }}>
-        <HStack justifyContent="center" gap={8}>
+      <Box maw="48em" style={{ position: "sticky", bottom: "1em" }}>
+        <Group justify="center" gap="lg">
           <Button
             form="accounts-form"
             type="submit"
-            isDisabled={selectedAddresses.length === 0}
-            colorScheme="blue"
+            disabled={selectedAddresses.length === 0}
             size="md"
-            paddingY={4}
+            autoContrast
           >
             Connect {selectedAddresses.length}{" "}
             {selectedAddresses.length === 1 ? "Account" : "Accounts"}
@@ -330,14 +328,13 @@ export default function Connect() {
           <Button
             form="accounts-form"
             type="reset"
-            color="blue.100"
+            variant="outline"
             size="md"
-            paddingY={4}
           >
             Cancel
           </Button>
-        </HStack>
+        </Group>
       </Box>
-    </>
+    </Stack>
   );
 }

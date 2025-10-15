@@ -6,12 +6,19 @@ import TagBadge from "./TagBadge";
 import classes from "../styles/HoverListItem.module.css";
 
 interface Props {
-    account: Awaited<ReturnType<typeof filteredAccountsLoader>>['accounts'][0]
+    account: Awaited<ReturnType<typeof filteredAccountsLoader>>['accounts'][0];
+    isSelected?: boolean;
 }
 
-export default function AccountDisplay({ account }: Props) {
+export default function AccountDisplay({ account, isSelected }: Props) {
     return (
-        <Stack gap="xs" className={classes.listitem}>
+        <Stack
+            gap="xs"
+            className={classes.listitem}
+            style={{
+                borderLeft: isSelected ? '4px solid var(--mantine-color-blue-2)' : undefined
+            }}
+        >
             <Group gap="xs">
                 <Text span size="lg" >{account.label}</Text>
                 <Tooltip multiline maw="95%" label={account.address}>

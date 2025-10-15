@@ -1,4 +1,4 @@
-import { TagsInput as MantineTagsInput, Input } from "@mantine/core";
+import { TagsInput as MantineTagsInput } from "@mantine/core";
 import { useCallback, useState } from "react";
 
 interface TagsInputProps {
