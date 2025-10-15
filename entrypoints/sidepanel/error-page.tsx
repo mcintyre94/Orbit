@@ -1,4 +1,4 @@
-import { Box, Button, Heading, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, Title, Text, Stack } from "@mantine/core";
 import { Link, useRouteError } from "react-router-dom";
 
 type ReactRouterError = {
@@ -11,18 +11,18 @@ export default function ErrorPage() {
     console.error(error);
 
     return (
-        <Box marginTop={4}>
-            <VStack spacing={8}>
-                <Heading as='h1' size='xl' noOfLines={1}>Oops!</Heading>
+        <Box mt="md">
+            <Stack gap="lg" ta='center'>
+                <Title order={1} lineClamp={1}>Oops!</Title>
 
-                <Text fontSize='md'>Sorry, an unexpected error has occurred.</Text>
-                <Text fontSize='md'>
-                    <i>{error.statusText || error.message}</i>
+                <Text size="md">Sorry, an unexpected error has occurred.</Text>
+                <Text size="md" fs="italic">
+                    {error.statusText || error.message}
                 </Text>
                 <Link to="/sidepanel.html">
-                    <Button>Home</Button>
+                    <Button autoContrast>Home</Button>
                 </Link>
-            </VStack>
+            </Stack>
         </Box>
     );
 }
