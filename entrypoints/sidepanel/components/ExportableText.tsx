@@ -1,4 +1,4 @@
-import { Button, Group, Stack, Code } from "@mantine/core";
+import { Button, Group, Stack, Code, alpha } from "@mantine/core";
 import { useClipboard } from "@mantine/hooks";
 import { IconCopy, IconDownload, IconCheck } from "@tabler/icons-react";
 import { useMemo } from "react";
@@ -54,8 +54,8 @@ export default function ExportableText({ text, contentType }: Props) {
             <Code block c="white" styles={{
                 root: {
                     background: 'transparent',
-                    borderRadius: 'var(--mantine-radius-md)',
-                    borderWidth: '1px',
+                    border: '1px solid var(--mantine-color-default-border)',
+                    borderRadius: 'var(--mantine-radius-default)',
                     fontSize: 'var(--mantine-font-size-sm)',
                     padding: 'var(--mantine-spacing-sm)',
                     whiteSpace: 'pre-wrap',

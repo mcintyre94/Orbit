@@ -21,7 +21,16 @@ export default function AccountDisplay({ account, isSelected }: Props) {
         >
             <Group gap="xs">
                 <Text span size="lg" >{account.label}</Text>
-                <Tooltip multiline maw="95%" label={account.address}>
+                <Tooltip
+                    multiline
+                    maw="95%"
+                    label={account.address}
+                    styles={{
+                        tooltip: {
+                            wordBreak: 'break-all',
+                        }
+                    }}
+                >
                     <Text span size="md" c="gray.3">({shortAddress(account.address)})</Text>
                 </Tooltip>
                 <CopyButton address={account.address} />

@@ -119,18 +119,7 @@ function TokenDataDisplay({ tokenData }: { tokenData: TokenData }) {
     }, [tokenData.amount, tokenData.decimals]);
 
     return (
-        <Box
-            px="md"
-            mx="-md"
-            py="md"
-            style={{
-                cursor: 'pointer',
-                '&:hover': {
-                    backgroundColor: 'var(--mantine-color-dark-6)'
-                }
-            }}
-            className={classes.listitem}
-        >
+        <Box className={classes.listitem}>
             <Flex align="center" justify="space-between">
                 <Flex align="center" gap="sm">
                     {tokenData.icon ? (

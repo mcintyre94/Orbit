@@ -22,6 +22,7 @@ import { Notifications } from '@mantine/notifications'
 
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
+import './styles/global.css';
 
 const router = createBrowserRouter([
   {

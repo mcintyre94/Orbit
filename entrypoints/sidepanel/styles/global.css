@@ -1,0 +1,17 @@
+/* Remove default link styling */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+a:visited {
+  color: inherit;
+}
+
+body {
+  background-color: #1a202c;
+}
