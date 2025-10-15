@@ -3,26 +3,7 @@ import { Button, Stack, Title, Group, Anchor } from "@mantine/core";
 import TagFilters from "../components/TagFilters";
 import { getFilteredAccountsData } from "../utils/filterAccounts";
 import { FilteredAccountsLoaderData } from "./FilteredAccounts";
-import { IconArrowLeft } from "@tabler/icons-react";
-
-function SubLink({ to, label }: { to: string, label: string }) {
-    return (
-        <NavLink to={to}>
-            {({ isActive }) => (
-                <Anchor
-                    size="lg"
-                    underline="never"
-                    style={{
-                        color: isActive ? 'var(--mantine-color-blue-2)' : 'var(--mantine-color-white)',
-                        textDecoration: isActive ? 'underline' : undefined,
-                    }}
-                >
-                    {label}
-                </Anchor>
-            )}
-        </NavLink>
-    )
-}
+import { InlineLink } from "../components/InlineLink";
 
 export default function ExportAccounts() {
     const loaderData = useRouteLoaderData('accounts-route') as FilteredAccountsLoaderData;
@@ -46,8 +27,8 @@ export default function ExportAccounts() {
             <TagFilters tags={tags} filtersEnabled={filtersEnabled} searchQuery={searchQuery} fetcher={fetcher} />
 
             <Group gap="lg">
-                <SubLink to='addresses' label='Addresses' />
-                <SubLink to='accounts' label='Accounts' />
+                <InlineLink to='addresses' label='Addresses' />
+                <InlineLink to='accounts' label='Accounts' />
             </Group>
 
             <Outlet />

@@ -1,5 +1,5 @@
 import { FetcherWithComponents, Link, useFetcher, useRouteLoaderData } from "react-router-dom";
-import { Box, Button, Group, Stack, Menu, ActionIcon, Flex } from "@mantine/core";
+import { Box, Button, Group, Stack, Menu, ActionIcon } from "@mantine/core";
 import { IconPlus, IconSettings } from "@tabler/icons-react";
 import TagFilters from "../components/TagFilters";
 import AccountDisplay from "../components/AccountDisplay";
@@ -25,7 +25,7 @@ export default function Home() {
                         </ActionIcon>
                     </Menu.Target>
                     <Menu.Dropdown>
-                        <Link to='/accounts/export/addresses'>
+                        <Link to='/accounts/export'>
                             <Menu.Item disabled={accounts.length === 0 && !filtersEnabled}>Export</Menu.Item>
                         </Link>
                         <Link to='/accounts/import'>
