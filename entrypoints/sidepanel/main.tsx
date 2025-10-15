@@ -18,7 +18,7 @@ import ViewAccount, { loader as viewAccountLoader } from './routes/ViewAccount'
 import { loader as filteredAccountsLoader } from './routes/FilteredAccounts'
 import Layout from './layout'
 import Connect, { action as connectAction, loader as connectLoader } from './routes/Connect'
-import { Button, createTheme, MantineProvider } from '@mantine/core'
+import { Button, createTheme, MantineProvider, rem } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 
 import '@mantine/core/styles.css';
@@ -157,6 +157,9 @@ const mantineTheme = createTheme({
       "#4a5167"
     ]
   },
+  spacing: {
+    xxs: rem(4),
+  }
 });
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
