@@ -1,5 +1,7 @@
 import { getSavedAccounts } from "~/accounts/storage";
 import { FilteredAccountsLoaderData } from "../routes/FilteredAccounts";
+import { getSavedFilterState } from "./filterState";
+import { searchAccounts } from "./searchAccounts";
 
 export async function getAccountsAndTags(
   filtersEnabled: boolean,
@@ -32,7 +34,28 @@ export function getFilteredAccountsData(
 }
 
 export async function getUnfilteredAccountsData(): Promise<FilteredAccountsLoaderData> {
-  const filtersEnabled = false;
-  const { accounts, tags } = await getAccountsAndTags(false, new Set());
-  return { accounts, filtersEnabled, searchQuery: "", tags };
+  // Try to restore saved filter state
+  const savedState = await getSavedFilterState();
+
+  const filtersEnabled = savedState?.enableFilters ?? false;
+  const selectedTags = new Set(savedState?.selectedTags ?? []);
+
+  const { accounts, tags } = await getAccountsAndTags(
+    filtersEnabled,
+    selectedTags
+  );
+
+  let filteredAccounts = accounts;
+  const searchQuery = savedState?.search ?? "";
+
+  if (searchQuery) {
+    filteredAccounts = searchAccounts(filteredAccounts, searchQuery);
+  }
+
+  return {
+    accounts: filteredAccounts,
+    filtersEnabled,
+    searchQuery,
+    tags,
+  };
 }

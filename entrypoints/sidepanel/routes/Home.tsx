@@ -1,15 +1,34 @@
 import { FetcherWithComponents, Link, useFetcher, useRouteLoaderData } from "react-router-dom";
 import { Box, Button, Group, Stack, Menu, ActionIcon } from "@mantine/core";
 import { IconPlus, IconSettings } from "@tabler/icons-react";
+import { useEffect } from "react";
 import TagFilters from "../components/TagFilters";
 import AccountDisplay from "../components/AccountDisplay";
 import { getFilteredAccountsData } from "../utils/filterAccounts";
 import { FilteredAccountsLoaderData } from "./FilteredAccounts";
+import { saveFilterState } from "../utils/filterState";
 
 export default function Home() {
     const loaderData = useRouteLoaderData('accounts-route') as FilteredAccountsLoaderData;
     const fetcher = useFetcher() as FetcherWithComponents<FilteredAccountsLoaderData>;
     const { accounts, filtersEnabled, tags, searchQuery } = getFilteredAccountsData(loaderData, fetcher.data)
+
+    // Save filter state whenever it changes
+    useEffect(() => {
+        const currentState = getFilteredAccountsData(loaderData, fetcher.data);
+
+        if (fetcher.state === 'idle' && currentState) {
+            const selectedTags = currentState.tags
+                .filter(t => t.selected)
+                .map(t => t.tagName);
+
+            saveFilterState({
+                enableFilters: currentState.filtersEnabled,
+                search: currentState.searchQuery,
+                selectedTags
+            });
+        }
+    }, [loaderData, fetcher.data, fetcher.state]);
 
     return (
         <Stack gap="lg" align="flex-start">

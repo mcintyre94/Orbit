@@ -54,6 +54,7 @@ const router = createBrowserRouter([
         loader: accountsLoader,
         id: "accounts-route",
         element: <Outlet />,
+        shouldRevalidate: () => true,
         children: [
           {
             path: "home",

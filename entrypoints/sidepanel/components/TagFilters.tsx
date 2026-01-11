@@ -1,6 +1,6 @@
 import { Box, Switch, Stack, Group, TextInput } from "@mantine/core";
 import { IconSearch } from "@tabler/icons-react";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useRef, useCallback, useEffect } from "react";
 import { loader } from "../routes/Accounts";
 import { FetcherWithComponents } from "react-router-dom";
 import TagBadge from "./TagBadge";
@@ -40,6 +40,42 @@ interface Props {
 }
 
 export default function TagFilters({ tags, filtersEnabled, searchQuery, fetcher }: Props) {
+    const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const handleSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        const form = event.currentTarget.form;
+
+        // Clear existing timeout
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+
+        // Set new timeout
+        searchTimeoutRef.current = setTimeout(() => {
+            if (form) {
+                fetcher.submit(form);
+            }
+        }, 300);
+    }, [fetcher]);
+
+    const handleNonSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        // Clear search timeout if pending - we're submitting now
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+            searchTimeoutRef.current = null;
+        }
+        fetcher.submit(event.currentTarget.form);
+    }, [fetcher]);
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            if (searchTimeoutRef.current) {
+                clearTimeout(searchTimeoutRef.current);
+            }
+        };
+    }, []);
+
     if (tags.length === 0) return null;
 
     return (
@@ -61,9 +97,7 @@ export default function TagFilters({ tags, filtersEnabled, searchQuery, fetcher 
                                 label: { whiteSpace: 'pre-wrap', maxWidth: '120px' },
                                 body: { alignItems: 'center' },
                             }}
-                            onChange={(event) => {
-                                fetcher.submit(event.currentTarget.form);
-                            }}
+                            onChange={handleNonSearchChange}
                         />
 
                         <TextInput
@@ -73,9 +107,7 @@ export default function TagFilters({ tags, filtersEnabled, searchQuery, fetcher 
                             defaultValue={searchQuery}
                             role='search'
                             aria-label='Search accounts'
-                            onChange={(event) => {
-                                fetcher.submit(event.currentTarget.form);
-                            }}
+                            onChange={handleSearchChange}
                             leftSection={<IconSearch size={16} />}
                             radius="md"
                             autoComplete='off'
@@ -92,9 +124,7 @@ export default function TagFilters({ tags, filtersEnabled, searchQuery, fetcher 
                                     key={tag.tagName}
                                     name='tag'
                                     value={tag.tagName}
-                                    onChange={(event) => {
-                                        fetcher.submit(event.currentTarget.form);
-                                    }}
+                                    onChange={handleNonSearchChange}
                                     isChecked={tag.selected}
                                     isDisabled={!filtersEnabled}
                                 >{tag.tagName}</TagCheckbox>
