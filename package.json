@@ -32,6 +32,7 @@
     "@types/react": "^18.2.46",
     "@types/react-dom": "^18.2.18",
     "@vitejs/plugin-react": "^5.0.4",
+    "baseline-browser-mapping": "^2.9.14",
     "dotenv": "^16.4.5",
     "postcss": "^8.5.6",
     "postcss-preset-mantine": "^1.18.0",
