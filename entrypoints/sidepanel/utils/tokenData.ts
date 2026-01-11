@@ -1,5 +1,11 @@
 import { Address } from "@solana/addresses"
 
+const SOL_MINT = 'So11111111111111111111111111111111111111112' as Address;
+
+export function isSol(token: TokenData): boolean {
+    return token.mint === SOL_MINT;
+}
+
 export type TokenData = {
     mint: Address;
     amount: bigint;
@@ -52,8 +58,8 @@ export async function getTokensForAddress(address: Address): Promise<TokenData[]
 
     // Sort with SOL first, then by USD value descending
     tokenData.sort((a, b) => {
-        if (a.symbol === 'SOL' && b.symbol !== 'SOL') return -1;
-        if (a.symbol !== 'SOL' && b.symbol === 'SOL') return 1;
+        if (isSol(a) && !isSol(b)) return -1;
+        if (!isSol(a) && isSol(b)) return 1;
         return (b.usdValue || 0) - (a.usdValue || 0);
     });
 
