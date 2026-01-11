@@ -13,7 +13,7 @@ export type TokenData = {
     priceChange24hPercent: number | null;
 }
 
-type OrbitApiTokenResponse = {
+type OrbitApiToken = {
     mint: string;
     amount: string;
     name: string;
@@ -26,12 +26,16 @@ type OrbitApiTokenResponse = {
     priceChange24hPercent: number | null;
 }
 
+type OrbitApiResponse = {
+    tokens: OrbitApiToken[];
+}
+
 export async function getTokensForAddress(address: Address): Promise<TokenData[]> {
     const response = await fetch(`https://orbit-api-sol.vercel.app/api/tokens/${address}`);
     if (!response.ok) {
         throw new Error(`Error fetching token data: ${response.statusText}`);
     }
-    const apiTokens: OrbitApiTokenResponse[] = await response.json();
+    const { tokens: apiTokens }: OrbitApiResponse = await response.json();
 
     const tokenData: TokenData[] = apiTokens.map(token => ({
         mint: token.mint as Address,
