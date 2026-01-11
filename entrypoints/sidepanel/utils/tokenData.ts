@@ -2,7 +2,7 @@ import { Address } from "@solana/addresses"
 
 const SOL_MINT = 'So11111111111111111111111111111111111111112' as Address;
 
-export function isSol(token: TokenData): boolean {
+function isSol(token: TokenData): boolean {
     return token.mint === SOL_MINT;
 }
 
