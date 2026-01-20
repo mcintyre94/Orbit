@@ -11,6 +11,9 @@ importers:
 
   .:
     dependencies:
+      '@lo-fi/webauthn-local-client':
+        specifier: ^0.4000.0
+        version: 0.4000.0
       '@mantine/core':
         specifier: ^8.3.3
         version: 8.3.4(@mantine/hooks@8.3.4(react@18.3.1))(@types/react@18.3.26)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -405,6 +408,14 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
+  '@lo-fi/webauthn-local-client@0.4000.0':
+    resolution: {integrity: sha512-TGEagk+M6vUIPrdMBqTbC++041aAICONsghSQ6gacJUR/2dU9Cq/6rDeRCymQ3ATGFOqOka5XsLOIVp+AZlupw==}
+    peerDependencies:
+      html-webpack-plugin: ~5.6.0
+    peerDependenciesMeta:
+      html-webpack-plugin:
+        optional: true
+
   '@mantine/core@8.3.4':
     resolution: {integrity: sha512-RJ5QUe2FLLJ1uF8xWUpNhDqRFbaOn4S5yTjqLuaurqtZvzee85O/T90dRcR8UNDuE8e/Qqie/jsF/G9RiSxC6g==}
     peerDependencies:
@@ -571,6 +582,12 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@root/asn1@1.0.2':
+    resolution: {integrity: sha512-v9TNX5n06882Z+TSkXrY2jCvoEHlrPB2Nnto5hhi3wRZrsR8XumdgpPDk/XCI33tA8XpxmCCS2kh0ZDwd3AIlg==}
+
+  '@root/encoding@1.0.1':
+    resolution: {integrity: sha512-OaEub02ufoU038gy6bsNHQOjIn8nUjGiLcaRmJ40IUykneJkIW5fxDqKxQx48cszuNflYldsJLPPXCrGfHs8yQ==}
+
   '@solana/addresses@4.0.0':
     resolution: {integrity: sha512-1OS4nU0HFZxHRxgUb6A72Qg0QbIz6Vu2AbB0j/YSxN4EI+S2BftA83Y6uXhTFDQjKuA+MtHjxe6edB3cs1Pqxw==}
     engines: {node: '>=20.18.0'}
@@ -671,6 +688,9 @@ packages:
 
   '@types/react@18.3.26':
     resolution: {integrity: sha512-RFA/bURkcKzx/X9oumPG9Vp3D3JUgus/d0b67KB0t5S/raciymilkOa66olh78MUI92QLbEJevO7rvqU/kjwKA==}
+
+  '@types/root__asn1@1.0.5':
+    resolution: {integrity: sha512-halz3HrALf1N4pUJrtQrH6mdWPczXwshoWjuxmx49riKMJv2MZGKXnauk0RjlnRzM0rlwiAJRlMT9FtSjnF2kw==}
 
   '@types/yauzl@2.10.3':
     resolution: {integrity: sha512-oJoftv0LSuaDZE3Le4DbKX+KS9G36NzOeSap90UIK0yMA/NhKJhqlSGtNDORNRaIbQfzjXDrQa0ytJ6mNRGz/Q==}
@@ -847,6 +867,9 @@ packages:
 
   caniuse-lite@1.0.30001750:
     resolution: {integrity: sha512-cuom0g5sdX6rw00qOoLNSFCJ9/mYIsuSOA+yzpDw8eopiFqcVwQvZHqov0vmEighRxX++cfC0Vg1G+1Iy/mSpQ==}
+
+  cbor-js@0.1.0:
+    resolution: {integrity: sha512-7sQ/TvDZPl7csT1Sif9G0+MA0I0JOVah8+wWlJVQdVEgIbCzlN/ab3x+uvMNsc34TUvO6osQTAmB2ls80JX6tw==}
 
   chalk@4.1.2:
     resolution: {integrity: sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==}
@@ -1440,6 +1463,12 @@ packages:
   latest-version@9.0.0:
     resolution: {integrity: sha512-7W0vV3rqv5tokqkBAFV1LbR7HPOWzXQDpDgEuib/aJ1jsZZx6x3c2mBI+TJhJzOhkGeaLbCKEHXEXLfirtG2JA==}
     engines: {node: '>=18'}
+
+  libsodium-wrappers@0.7.16:
+    resolution: {integrity: sha512-Gtr/WBx4dKjvRL1pvfwZqu7gO6AfrQ0u9vFL+kXihtHf6NfkROR8pjYWn98MFDI3jN19Ii1ZUfPR9afGiPyfHg==}
+
+  libsodium@0.7.16:
+    resolution: {integrity: sha512-3HrzSPuzm6Yt9aTYCDxYEG8x8/6C0+ag655Y7rhhWZM9PT4NpdnbqlzXhGZlDnkgR6MeSTnOt/VIyHLs9aSf+Q==}
 
   lie@3.3.0:
     resolution: {integrity: sha512-UaiMJzeWRlEujzAuw5LokY1L5ecNQYZKfmyZ9L7wDHb/p5etKaxXhohBcrw0EYby+G/NA52vRSN4N39dxHAIwQ==}
@@ -2608,6 +2637,13 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
+  '@lo-fi/webauthn-local-client@0.4000.0':
+    dependencies:
+      '@root/asn1': 1.0.2
+      cbor-js: 0.1.0
+      libsodium: 0.7.16
+      libsodium-wrappers: 0.7.16
+
   '@mantine/core@8.3.4(@mantine/hooks@8.3.4(react@18.3.1))(@types/react@18.3.26)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@floating-ui/react': 0.27.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2733,6 +2769,13 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.52.4':
     optional: true
 
+  '@root/asn1@1.0.2':
+    dependencies:
+      '@root/encoding': 1.0.1
+      '@types/root__asn1': 1.0.5
+
+  '@root/encoding@1.0.1': {}
+
   '@solana/addresses@4.0.0(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.3)':
     dependencies:
       '@solana/assertions': 4.0.0(typescript@5.9.3)
@@ -2841,6 +2884,8 @@ snapshots:
     dependencies:
       '@types/prop-types': 15.7.15
       csstype: 3.1.3
+
+  '@types/root__asn1@1.0.5': {}
 
   '@types/yauzl@2.10.3':
     dependencies:
@@ -3029,6 +3074,8 @@ snapshots:
   camelcase@8.0.0: {}
 
   caniuse-lite@1.0.30001750: {}
+
+  cbor-js@0.1.0: {}
 
   chalk@4.1.2:
     dependencies:
@@ -3545,6 +3592,12 @@ snapshots:
   latest-version@9.0.0:
     dependencies:
       package-json: 10.0.1
+
+  libsodium-wrappers@0.7.16:
+    dependencies:
+      libsodium: 0.7.16
+
+  libsodium@0.7.16: {}
 
   lie@3.3.0:
     dependencies:
