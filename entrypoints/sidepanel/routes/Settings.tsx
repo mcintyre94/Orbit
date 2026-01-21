@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ActionFunctionArgs,
   NavLink,
@@ -13,7 +13,6 @@ import {
   Group,
   Text,
   Switch,
-  Card,
   Anchor,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
@@ -81,27 +80,29 @@ export default function Settings() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
   // Show notifications based on action result
-  if (actionData && "success" in actionData) {
-    if (actionData.action === "enabled") {
+  useEffect(() => {
+    if (actionData && "success" in actionData) {
+      if (actionData.action === "enabled") {
+        notifications.show({
+          title: "Biometric lock enabled",
+          message: "Orbit will now require authentication to access",
+          color: "green",
+        });
+      } else if (actionData.action === "disabled") {
+        notifications.show({
+          title: "Biometric lock disabled",
+          message: "Orbit no longer requires authentication",
+          color: "blue",
+        });
+      }
+    } else if (actionData && "error" in actionData) {
       notifications.show({
-        title: "Biometric lock enabled",
-        message: "Orbit will now require authentication to access",
-        color: "green",
-      });
-    } else if (actionData.action === "disabled") {
-      notifications.show({
-        title: "Biometric lock disabled",
-        message: "Orbit no longer requires authentication",
-        color: "blue",
+        title: "Error",
+        message: actionData.error,
+        color: "red",
       });
     }
-  } else if (actionData && "error" in actionData) {
-    notifications.show({
-      title: "Error",
-      message: actionData.error,
-      color: "red",
-    });
-  }
+  }, [actionData]);
 
   async function handleToggle() {
     if (isEnabled) {
@@ -150,37 +151,35 @@ export default function Settings() {
         <Title order={2}>Settings</Title>
       </Group>
 
-      <Card withBorder p="lg">
-        <Stack gap="md">
-          <Group justify="space-between" align="flex-start">
-            <Group gap="sm">
-              <IconFingerprint size={24} />
-              <Stack gap={4}>
-                <Text fw={500}>Biometric Lock</Text>
-                <Text size="sm" c="dimmed">
-                  {isSupported
-                    ? "Require Touch ID or Windows Hello to access Orbit"
-                    : "Biometric authentication is not available on this device"}
-                </Text>
-              </Stack>
-            </Group>
-            {isSupported && (
-              <Switch
-                checked={isEnabled}
-                onChange={handleToggle}
-                disabled={isAuthenticating}
-                size="md"
-              />
-            )}
+      <Stack gap="md">
+        <Group justify="space-between" align="flex-start">
+          <Group gap="sm">
+            <IconFingerprint size={24} />
+            <Stack gap={4}>
+              <Text fw={500}>Enable Lock</Text>
+              <Text size="sm" c="dimmed">
+                {isSupported
+                  ? "Require TouchID or similar to access Orbit"
+                  : "Passkey authentication is not available on this device"}
+              </Text>
+            </Stack>
           </Group>
-          {isEnabled && (
-            <Text size="xs" c="dimmed">
-              Note: If you lose access to biometrics, you&apos;ll need to
-              re-import your accounts from a backup.
-            </Text>
+          {isSupported && (
+            <Switch
+              checked={isEnabled}
+              onChange={handleToggle}
+              disabled={isAuthenticating}
+              size="md"
+            />
           )}
-        </Stack>
-      </Card>
+        </Group>
+        {isEnabled && (
+          <Text size="xs" c="dimmed">
+            Note: If you lose access to your passkey, you&apos;ll need to
+            re-import your accounts from a backup.
+          </Text>
+        )}
+      </Stack>
     </Stack>
   );
 }
