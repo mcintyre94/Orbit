@@ -9,7 +9,7 @@ import {
   useLoaderData,
   useRouteLoaderData,
 } from "react-router-dom";
-import { Box, Button, Group, Stack, Title } from "@mantine/core";
+import { Box, Button, Group, Stack, Text, Title } from "@mantine/core";
 import AccountDisplay from "../components/AccountDisplay";
 import TagFilters from "../components/TagFilters";
 import { getFilteredAccountsData } from "../utils/filterAccounts";
@@ -273,6 +273,44 @@ export default function Connect() {
         : [...prev, address]
     );
   }, []);
+
+  if (allAccounts.length === 0) {
+    return (
+      <Stack gap="lg" align="flex-start">
+        <Title order={3}>
+          Connect to {forOrigin}
+        </Title>
+
+        <Stack gap="md" py="xl">
+          <Text size="lg" c="dimmed">
+            You don't have any accounts yet.
+          </Text>
+          <Text size="sm" c="dimmed">
+            Add an account first, then you can connect it to this app.
+          </Text>
+        </Stack>
+
+        <Form
+          method="post"
+          id="accounts-form"
+          onReset={() => sendAndClose(tabId, requestId, forOrigin, [])}
+        >
+          <input type="hidden" name="tabIdInput" value={tabId} />
+          <input type="hidden" name="requestIdInput" value={requestId} />
+          <input type="hidden" name="forOriginInput" value={forOrigin} />
+        </Form>
+
+        <Button
+          form="accounts-form"
+          type="reset"
+          variant="outline"
+          size="md"
+        >
+          Cancel
+        </Button>
+      </Stack>
+    );
+  }
 
   return (
     <Stack gap="lg" align="flex-start">
