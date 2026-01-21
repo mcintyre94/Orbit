@@ -76,29 +76,31 @@ export default function TagFilters({ tags, filtersEnabled, searchQuery, fetcher 
         };
     }, []);
 
-    if (tags.length === 0) return null;
+    const hasTags = tags.length > 0;
 
     return (
         <Box>
             <fetcher.Form action="/filtered-accounts">
                 <Stack gap="md" align="flex-start">
                     <Group gap="sm" align="center" wrap="nowrap" style={{ width: '100%' }}>
-                        <Switch
-                            withThumbIndicator={false}
-                            labelPosition="left"
-                            label="Enable tag filtering"
-                            size="md"
-                            name='enableFilters'
-                            id='enableFilters'
-                            value='enabled'
-                            defaultChecked={filtersEnabled}
-                            color="blue.5"
-                            styles={{
-                                label: { whiteSpace: 'pre-wrap', maxWidth: '120px' },
-                                body: { alignItems: 'center' },
-                            }}
-                            onChange={handleNonSearchChange}
-                        />
+                        {hasTags && (
+                            <Switch
+                                withThumbIndicator={false}
+                                labelPosition="left"
+                                label="Enable tag filtering"
+                                size="md"
+                                name='enableFilters'
+                                id='enableFilters'
+                                value='enabled'
+                                defaultChecked={filtersEnabled}
+                                color="blue.5"
+                                styles={{
+                                    label: { whiteSpace: 'pre-wrap', maxWidth: '120px' },
+                                    body: { alignItems: 'center' },
+                                }}
+                                onChange={handleNonSearchChange}
+                            />
+                        )}
 
                         <TextInput
                             type='search'
@@ -117,7 +119,7 @@ export default function TagFilters({ tags, filtersEnabled, searchQuery, fetcher 
                             }}
                         />
                     </Group>
-                    {filtersEnabled ?
+                    {filtersEnabled && hasTags && (
                         <Group gap="xs">
                             {tags.map(tag =>
                                 <TagCheckbox
@@ -130,8 +132,7 @@ export default function TagFilters({ tags, filtersEnabled, searchQuery, fetcher 
                                 >{tag.tagName}</TagCheckbox>
                             )}
                         </Group>
-                        : null
-                    }
+                    )}
                 </Stack>
             </fetcher.Form>
         </Box>
