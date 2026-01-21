@@ -1,6 +1,14 @@
 import type { InjectedEvent } from "../injected/events";
 import { SidePanelEvent } from "../sidepanel/events";
 import { makeConnectionSubmitForwardedEvent } from "./events";
+import {
+  isBiometricLockEnabled,
+  setLockState,
+  getLockState,
+} from "~/biometricLock/storage";
+
+const LOCK_ALARM_NAME = "biometricLockAlarm";
+const INACTIVITY_TIMEOUT_MINUTES = 30;
 
 type SidePanel = {
   setOptions({
@@ -89,6 +97,60 @@ function main() {
     .catch((error) => console.error(error));
 }
 
+/**
+ * Lock the extension on browser startup if biometric lock is enabled.
+ * This ensures users must authenticate when they restart their browser.
+ */
+async function handleBrowserStartup() {
+  const enabled = await isBiometricLockEnabled();
+  if (enabled) {
+    await setLockState({ isLocked: true, lastActivityTimestamp: 0 });
+  }
+}
+
+/**
+ * Check for inactivity and lock if the timeout has been exceeded.
+ */
+async function checkInactivity() {
+  const enabled = await isBiometricLockEnabled();
+  if (!enabled) return;
+
+  const state = await getLockState();
+  if (state.isLocked) return; // Already locked
+
+  const now = Date.now();
+  const inactiveMs = now - state.lastActivityTimestamp;
+  const timeoutMs = INACTIVITY_TIMEOUT_MINUTES * 60 * 1000;
+
+  if (inactiveMs >= timeoutMs) {
+    await setLockState({
+      isLocked: true,
+      lastActivityTimestamp: state.lastActivityTimestamp,
+    });
+  }
+}
+
+/**
+ * Set up the inactivity check alarm.
+ * Checks every 5 minutes for inactivity.
+ */
+function setupInactivityAlarm() {
+  browser.alarms.create(LOCK_ALARM_NAME, { periodInMinutes: 5 });
+}
+
 export default defineBackground(function () {
   main();
+
+  // Lock on browser startup
+  browser.runtime.onStartup.addListener(handleBrowserStartup);
+
+  // Check for inactivity periodically
+  browser.alarms.onAlarm.addListener((alarm) => {
+    if (alarm.name === LOCK_ALARM_NAME) {
+      checkInactivity();
+    }
+  });
+
+  // Set up the inactivity alarm
+  setupInactivityAlarm();
 });
