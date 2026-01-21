@@ -24,6 +24,6 @@ export default defineConfig({
       default_title: "Orbit",
       default_panel: "/sidepanel.html",
     },
-    permissions: ["sidePanel", "storage", "downloads"],
+    permissions: ["sidePanel", "storage", "downloads", "alarms"],
   },
 });
