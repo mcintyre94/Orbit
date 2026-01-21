@@ -11,8 +11,12 @@ export default function TagsInput({ allKnownTags, initialTags }: TagsInputProps)
     const [hiddenValue, setHiddenValue] = useState<string>(JSON.stringify(initialTags));
 
     const handleChange = useCallback((newTags: string[]) => {
-        setTags(newTags);
-        setHiddenValue(JSON.stringify(newTags));
+        // Filter out empty tags and trim whitespace
+        const filteredTags = newTags
+            .map(tag => tag.trim())
+            .filter(tag => tag.length > 0);
+        setTags(filteredTags);
+        setHiddenValue(JSON.stringify(filteredTags));
     }, []);
 
     return (
