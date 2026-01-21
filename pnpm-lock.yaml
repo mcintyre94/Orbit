@@ -41,6 +41,9 @@ importers:
       '@wallet-standard/core':
         specifier: ^1.0.3
         version: 1.1.1
+      libsodium-wrappers:
+        specifier: ^0.8.1
+        version: 0.8.1
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -1467,8 +1470,14 @@ packages:
   libsodium-wrappers@0.7.16:
     resolution: {integrity: sha512-Gtr/WBx4dKjvRL1pvfwZqu7gO6AfrQ0u9vFL+kXihtHf6NfkROR8pjYWn98MFDI3jN19Ii1ZUfPR9afGiPyfHg==}
 
+  libsodium-wrappers@0.8.1:
+    resolution: {integrity: sha512-UOqD9M4HhAhwEo2foIgnUrpqXCj2VKdndZXM3PZ0zGe++9808TzAFSp4o2mOgPM/DNUnUqncR3G0xqiKDoAQXQ==}
+
   libsodium@0.7.16:
     resolution: {integrity: sha512-3HrzSPuzm6Yt9aTYCDxYEG8x8/6C0+ag655Y7rhhWZM9PT4NpdnbqlzXhGZlDnkgR6MeSTnOt/VIyHLs9aSf+Q==}
+
+  libsodium@0.8.1:
+    resolution: {integrity: sha512-V70In9cepY7MMoKyEvnrojqgQN5yQM/8i8kGh4n/IC1g3thA5nonK0d84e0fR86tFOeAQsOdaL5ONuR93ru25A==}
 
   lie@3.3.0:
     resolution: {integrity: sha512-UaiMJzeWRlEujzAuw5LokY1L5ecNQYZKfmyZ9L7wDHb/p5etKaxXhohBcrw0EYby+G/NA52vRSN4N39dxHAIwQ==}
@@ -3597,7 +3606,13 @@ snapshots:
     dependencies:
       libsodium: 0.7.16
 
+  libsodium-wrappers@0.8.1:
+    dependencies:
+      libsodium: 0.8.1
+
   libsodium@0.7.16: {}
+
+  libsodium@0.8.1: {}
 
   lie@3.3.0:
     dependencies:

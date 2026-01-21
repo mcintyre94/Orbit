@@ -4,7 +4,7 @@ declare module "@lo-fi/webauthn-local-client" {
   export interface RegOptions {
     relyingPartyName: string;
     user: {
-      id: string;
+      id: BufferSource; // WebAuthn requires ArrayBuffer or ArrayBufferView
       name: string;
       displayName: string;
     };
@@ -17,8 +17,13 @@ declare module "@lo-fi/webauthn-local-client" {
 
   export interface RegResult {
     response: {
-      credentialId: string;
-      publicKey: string;
+      credentialID: string; // Note: uppercase ID
+      publicKey: {
+        algoCOSE: number;
+        algoOID: string;
+        spki: Uint8Array;
+        raw: Uint8Array;
+      };
     };
   }
 

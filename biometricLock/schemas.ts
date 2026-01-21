@@ -2,8 +2,8 @@ import { z } from "zod";
 
 export const biometricLockSettingsSchema = z.object({
   isEnabled: z.boolean(),
-  credentialId: z.string().nullable(),
-  publicKey: z.string().nullable(),
+  credentialId: z.string(),
+  publicKey: z.string(),
   relyingPartyId: z.string(),
 });
 

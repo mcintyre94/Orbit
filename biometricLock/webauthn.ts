@@ -5,6 +5,11 @@ import {
   regDefaults,
   authDefaults,
 } from "@lo-fi/webauthn-local-client";
+import _sodium from "libsodium-wrappers";
+
+// Initialize libsodium - required by webauthn-local-client
+await _sodium.ready;
+(globalThis as any).sodium = _sodium;
 
 export interface RegistrationResult {
   credentialId: string;
@@ -25,10 +30,14 @@ export async function checkBiometricSupport(): Promise<boolean> {
 export async function registerBiometric(
   userId: string
 ): Promise<RegistrationResult> {
+  // Convert userId string to ArrayBuffer as required by WebAuthn API
+  const encoder = new TextEncoder();
+  const userIdBuffer = encoder.encode(userId);
+
   const regOptions = regDefaults({
     relyingPartyName: "Orbit",
     user: {
-      id: userId,
+      id: userIdBuffer,
       name: userId,
       displayName: "Orbit User",
     },
@@ -44,9 +53,14 @@ export async function registerBiometric(
 
   const regResult = await register(regOptions);
 
+  // Convert publicKey raw bytes to base64 string for storage
+  const publicKeyBase64 = btoa(
+    String.fromCharCode(...regResult.response.publicKey.raw)
+  );
+
   return {
-    credentialId: regResult.response.credentialId,
-    publicKey: regResult.response.publicKey,
+    credentialId: regResult.response.credentialID,
+    publicKey: publicKeyBase64,
   };
 }
 
