@@ -1,5 +1,5 @@
 import { FetcherWithComponents, Link, useFetcher, useRouteLoaderData } from "react-router-dom";
-import { Box, Button, Group, Stack, Menu, ActionIcon } from "@mantine/core";
+import { Box, Button, Group, Stack, Menu, ActionIcon, Text } from "@mantine/core";
 import { IconPlus, IconSettings } from "@tabler/icons-react";
 import { useEffect } from "react";
 import TagFilters from "../components/TagFilters";
@@ -57,13 +57,21 @@ export default function Home() {
             <TagFilters tags={tags} filtersEnabled={filtersEnabled} searchQuery={searchQuery} fetcher={fetcher} />
 
             <Stack align="flex-start" w="100%" gap={0}>
-                {accounts.map(account => (
-                    <Box w="100%" key={account.address}>
-                        <Link to={`/accounts/${account.address}`}>
-                            <AccountDisplay account={account} />
-                        </Link>
-                    </Box>
-                ))}
+                {accounts.length === 0 ? (
+                    <Text c="dimmed" size="sm">
+                        {searchQuery || filtersEnabled
+                            ? 'No accounts match your search or filter criteria'
+                            : 'No accounts yet. Click "Add Account" to get started.'}
+                    </Text>
+                ) : (
+                    accounts.map(account => (
+                        <Box w="100%" key={account.address}>
+                            <Link to={`/accounts/${account.address}`}>
+                                <AccountDisplay account={account} />
+                            </Link>
+                        </Box>
+                    ))
+                )}
             </Stack>
         </Stack>
     )
