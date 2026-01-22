@@ -9,9 +9,11 @@ export const biometricLockSettingsSchema = z.object({
 
 export type BiometricLockSettings = z.infer<typeof biometricLockSettingsSchema>;
 
+// Tracks when the extension was last unlocked (not continuous activity)
+// Used to lock after 30 minutes since unlock
 export const biometricLockStateSchema = z.object({
   isLocked: z.boolean(),
-  lastActivityTimestamp: z.number(),
+  lastUnlockTimestamp: z.number(),
 });
 
 export type BiometricLockState = z.infer<typeof biometricLockStateSchema>;

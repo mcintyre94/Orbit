@@ -24,10 +24,6 @@ import { Notifications } from '@mantine/notifications'
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 import './styles/global.css';
-import { startActivityTracking } from '~/biometricLock/activityTracker';
-
-// Start tracking user activity for biometric lock inactivity timer
-startActivityTracking();
 
 const router = createBrowserRouter([
   {

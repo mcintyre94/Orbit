@@ -104,12 +104,13 @@ function main() {
 async function handleBrowserStartup() {
   const enabled = await isBiometricLockEnabled();
   if (enabled) {
-    await setLockState({ isLocked: true, lastActivityTimestamp: 0 });
+    await setLockState({ isLocked: true, lastUnlockTimestamp: 0 });
   }
 }
 
 /**
- * Check for inactivity and lock if the timeout has been exceeded.
+ * Check if lock timeout has been exceeded since last unlock.
+ * Locks the extension if 30+ minutes have passed since unlock.
  */
 async function checkInactivity() {
   const enabled = await isBiometricLockEnabled();
@@ -119,13 +120,13 @@ async function checkInactivity() {
   if (state.isLocked) return; // Already locked
 
   const now = Date.now();
-  const inactiveMs = now - state.lastActivityTimestamp;
+  const timeSinceUnlock = now - state.lastUnlockTimestamp;
   const timeoutMs = INACTIVITY_TIMEOUT_MINUTES * 60 * 1000;
 
-  if (inactiveMs >= timeoutMs) {
+  if (timeSinceUnlock >= timeoutMs) {
     await setLockState({
       isLocked: true,
-      lastActivityTimestamp: state.lastActivityTimestamp,
+      lastUnlockTimestamp: state.lastUnlockTimestamp,
     });
   }
 }

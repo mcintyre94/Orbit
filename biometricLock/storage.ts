@@ -60,7 +60,7 @@ export async function getLockState(): Promise<BiometricLockState> {
     const jsonOrNull = await storage.getItem<string>(LOCK_STATE_KEY);
     if (!jsonOrNull) {
       // Default to locked if no state exists (e.g., after browser restart)
-      return { isLocked: true, lastActivityTimestamp: 0 };
+      return { isLocked: true, lastUnlockTimestamp: 0 };
     }
 
     const parsed = JSON.parse(jsonOrNull);
@@ -71,10 +71,10 @@ export async function getLockState(): Promise<BiometricLockState> {
     }
 
     // Invalid state, default to locked
-    return { isLocked: true, lastActivityTimestamp: 0 };
+    return { isLocked: true, lastUnlockTimestamp: 0 };
   } catch (error) {
     console.error("Error reading lock state:", error);
-    return { isLocked: true, lastActivityTimestamp: 0 };
+    return { isLocked: true, lastUnlockTimestamp: 0 };
   }
 }
 
@@ -83,20 +83,6 @@ export async function setLockState(state: BiometricLockState): Promise<void> {
     await storage.setItem<string>(LOCK_STATE_KEY, JSON.stringify(state));
   } catch (error) {
     console.error("Error saving lock state:", error);
-  }
-}
-
-export async function updateLastActivity(): Promise<void> {
-  try {
-    const currentState = await getLockState();
-    if (!currentState.isLocked) {
-      await setLockState({
-        ...currentState,
-        lastActivityTimestamp: Date.now(),
-      });
-    }
-  } catch (error) {
-    console.error("Error updating last activity:", error);
   }
 }
 

@@ -6,7 +6,6 @@ import {
   getLockState,
   isBiometricLockEnabled,
   setLockState,
-  updateLastActivity,
 } from "~/biometricLock/storage";
 import { authenticateBiometric } from "~/biometricLock/webauthn";
 
@@ -28,13 +27,6 @@ export default function LockGuard({ children }: LockGuardProps) {
     checkLockState();
   }, []);
 
-  // Update activity timestamp on navigation (when unlocked)
-  useEffect(() => {
-    if (isLocked === false) {
-      updateLastActivity();
-    }
-  }, [location.pathname, isLocked]);
-
   async function checkLockState() {
     const enabled = await isBiometricLockEnabled();
     if (!enabled) {
@@ -54,14 +46,14 @@ export default function LockGuard({ children }: LockGuardProps) {
       const settings = await getBiometricLockSettings();
       if (!settings?.credentialId) {
         // No credential, something is wrong - unlock anyway
-        await setLockState({ isLocked: false, lastActivityTimestamp: Date.now() });
+        await setLockState({ isLocked: false, lastUnlockTimestamp: Date.now() });
         setIsLocked(false);
         return;
       }
 
       const success = await authenticateBiometric(settings.credentialId);
       if (success) {
-        await setLockState({ isLocked: false, lastActivityTimestamp: Date.now() });
+        await setLockState({ isLocked: false, lastUnlockTimestamp: Date.now() });
         setIsLocked(false);
       } else {
         setError("Authentication failed. Please try again.");

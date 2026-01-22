@@ -49,7 +49,7 @@ export async function action({ request }: ActionFunctionArgs) {
         relyingPartyId: window.location.hostname,
       });
       // Start unlocked after enabling
-      await setLockState({ isLocked: false, lastActivityTimestamp: Date.now() });
+      await setLockState({ isLocked: false, lastUnlockTimestamp: Date.now() });
       return { success: true, action: "enabled" };
     } catch (error) {
       console.error("Failed to enable biometric lock:", error);
