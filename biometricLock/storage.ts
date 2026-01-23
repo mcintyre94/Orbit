@@ -36,23 +36,15 @@ export async function getBiometricLockSettings(): Promise<BiometricLockSettings 
 export async function saveBiometricLockSettings(
   settings: BiometricLockSettings
 ): Promise<void> {
-  try {
-    await storage.setItem<string>(
-      BIOMETRIC_SETTINGS_KEY,
-      JSON.stringify(settings)
-    );
-  } catch (error) {
-    console.error("Error saving biometric lock settings:", error);
-  }
+  await storage.setItem<string>(
+    BIOMETRIC_SETTINGS_KEY,
+    JSON.stringify(settings)
+  );
 }
 
 export async function clearBiometricLockSettings(): Promise<void> {
-  try {
-    await storage.removeItem(BIOMETRIC_SETTINGS_KEY);
-    await storage.removeItem(LOCK_STATE_KEY);
-  } catch (error) {
-    console.error("Error clearing biometric lock settings:", error);
-  }
+  await storage.removeItem(BIOMETRIC_SETTINGS_KEY);
+  await storage.removeItem(LOCK_STATE_KEY);
 }
 
 export async function getLockState(): Promise<BiometricLockState> {
@@ -79,11 +71,7 @@ export async function getLockState(): Promise<BiometricLockState> {
 }
 
 export async function setLockState(state: BiometricLockState): Promise<void> {
-  try {
-    await storage.setItem<string>(LOCK_STATE_KEY, JSON.stringify(state));
-  } catch (error) {
-    console.error("Error saving lock state:", error);
-  }
+  await storage.setItem<string>(LOCK_STATE_KEY, JSON.stringify(state));
 }
 
 export async function isBiometricLockEnabled(): Promise<boolean> {

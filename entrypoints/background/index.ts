@@ -104,7 +104,12 @@ function main() {
 async function handleBrowserStartup() {
   const enabled = await isBiometricLockEnabled();
   if (enabled) {
-    await setLockState({ isLocked: true, lastUnlockTimestamp: 0 });
+    try {
+      await setLockState({ isLocked: true, lastUnlockTimestamp: 0 });
+    } catch (error) {
+      console.error("Failed to lock on browser startup:", error);
+      // Continue - extension can still function, user will need to unlock on first access
+    }
   }
 }
 
@@ -124,10 +129,15 @@ async function checkInactivity() {
   const timeoutMs = INACTIVITY_TIMEOUT_MINUTES * 60 * 1000;
 
   if (timeSinceUnlock >= timeoutMs) {
-    await setLockState({
-      isLocked: true,
-      lastUnlockTimestamp: state.lastUnlockTimestamp,
-    });
+    try {
+      await setLockState({
+        isLocked: true,
+        lastUnlockTimestamp: state.lastUnlockTimestamp,
+      });
+    } catch (error) {
+      console.error("Failed to lock after inactivity timeout:", error);
+      // Continue - will retry on next check (every 5 minutes)
+    }
   }
 }
 
