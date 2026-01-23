@@ -17,6 +17,7 @@ import ViewAccount, { loader as viewAccountLoader } from './routes/ViewAccount'
 import { loader as filteredAccountsLoader } from './routes/FilteredAccounts'
 import Layout from './layout'
 import Connect, { action as connectAction, loader as connectLoader } from './routes/Connect'
+import Settings, { action as settingsAction, loader as settingsLoader } from './routes/Settings'
 import { createTheme, MantineProvider, rem } from '@mantine/core'
 import { Notifications } from '@mantine/notifications'
 
@@ -59,6 +60,12 @@ const router = createBrowserRouter([
           {
             path: "home",
             element: <Home />,
+          },
+          {
+            path: "settings",
+            loader: settingsLoader,
+            action: settingsAction,
+            element: <Settings />,
           },
           {
             path: "new",

@@ -8,6 +8,9 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- WebAuthn dependencies - must load before main app -->
+    <script src="/vendor/asn1.all.min.js"></script>
+    <script src="/vendor/cbor.js"></script>
     <script type="module" src="./main.tsx"></script>
   </body>
 </html>

@@ -44,6 +44,10 @@ export default function Home() {
                         </ActionIcon>
                     </Menu.Target>
                     <Menu.Dropdown>
+                        <Link to='/accounts/settings'>
+                            <Menu.Item>Settings</Menu.Item>
+                        </Link>
+                        <Menu.Divider />
                         <Link to='/accounts/export'>
                             <Menu.Item disabled={accounts.length === 0 && !filtersEnabled}>Export</Menu.Item>
                         </Link>
