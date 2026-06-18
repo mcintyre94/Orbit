@@ -29,6 +29,10 @@ import { SOLANA_MAINNET_CHAIN } from "@solana/wallet-standard-chains";
 import {
   SolanaSignTransaction,
   SolanaSignTransactionFeature,
+  // TEMPORARY: solana:signOffchainMessage support (mocked, not actually signed)
+  SolanaSignOffchainMessage,
+  SolanaSignOffchainMessageFeature,
+  SolanaSignOffchainMessageMethod,
 } from "@solana/wallet-standard-features";
 import {
   makeDisconnectEvent,
@@ -72,7 +76,8 @@ export class OrbitWallet implements Wallet {
       publicKey: this.#base58Encoder.encode(account.address) as Uint8Array,
       label: account.label,
       chains: this.chains,
-      features: [StandardConnect, StandardEvents],
+      // TEMPORARY: advertise solana:signOffchainMessage on every account (mocked)
+      features: [StandardConnect, StandardEvents, SolanaSignOffchainMessage],
     }));
   }
 
@@ -101,6 +106,8 @@ export class OrbitWallet implements Wallet {
     StandardDisconnectFeature &
     StandardEventsFeature &
     SolanaSignTransactionFeature &
+    // TEMPORARY: solana:signOffchainMessage support (mocked, not actually signed)
+    SolanaSignOffchainMessageFeature &
     AccountsTagsFeature {
     return {
       [StandardConnect]: {
@@ -124,6 +131,13 @@ export class OrbitWallet implements Wallet {
             new Error("Wallet does not support signing transactions")
           ),
         supportedTransactionVersions: [0],
+      },
+      // TEMPORARY: solana:signOffchainMessage support. Orbit cannot sign, so this
+      // returns a mocked signature rather than performing real Ed25519 signing.
+      [SolanaSignOffchainMessage]: {
+        version: "1.0.0",
+        supportedMessageVersions: [1],
+        signOffchainMessage: this.#signOffchainMessage,
       },
       [AccountsTags]: {
         version: "1.0.0",
@@ -172,6 +186,18 @@ export class OrbitWallet implements Wallet {
     const disconnectEvent = makeDisconnectEvent(requestId);
     window.postMessage(disconnectEvent);
     return promise;
+  };
+
+  // TEMPORARY: mocked solana:signOffchainMessage. Orbit is read-only and cannot
+  // sign, so this returns the UTF-8 message bytes verbatim and a fixed 64-byte
+  // zero-filled signature instead of a real Ed25519 signature.
+  #signOffchainMessage: SolanaSignOffchainMessageMethod = async (...inputs) => {
+    const encoder = new TextEncoder();
+    return inputs.map((input) => ({
+      signedOffchainMessage: encoder.encode(input.message),
+      signature: new Uint8Array(64),
+      signatureType: "ed25519" as const,
+    }));
   };
 
   #getTagsForAccounts: AccountsTagsMethod = async ({ addresses }) => {
